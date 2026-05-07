@@ -16834,7 +16834,7 @@ declare namespace MimeKit {
     registerMimeType(mimeType: string, type: any): void;
   }
 
-  interface HeaderList extends Header[] {
+  interface HeaderList extends Array<Header> {
     item: string;
     count: number;
     isReadOnly: boolean;
@@ -16889,7 +16889,7 @@ declare namespace MimeKit {
 
   type XMessagePriority = 'Highest' | 'High' | 'Normal' | 'Low' | 'Lowest';
 
-  interface InternetAddressList extends InternetAddress[] {
+  interface InternetAddressList extends Array<InternetAddress> {
     mailboxes: MailboxAddress[];
     item: InternetAddress;
     count: number;
@@ -16922,7 +16922,7 @@ declare namespace MimeKit {
     parse(text: string): InternetAddressList;
   }
 
-  interface MessageIdList extends string[] {
+  interface MessageIdList extends Array<string> {
     item: string;
     count: number;
     isReadOnly: boolean;
@@ -17011,7 +17011,7 @@ declare namespace MimeKit {
   interface MailboxAddress {
   }
 
-  interface DomainList extends string[] {
+  interface DomainList extends Array<string> {
     item: string;
     count: number;
     isReadOnly: boolean;
@@ -17185,7 +17185,7 @@ declare namespace MimeKit {
   interface ContentType {
   }
 
-  interface ParameterList extends Parameter[] {
+  interface ParameterList extends Array<Parameter> {
     item: string;
     count: number;
     isReadOnly: boolean;
@@ -17321,7 +17321,7 @@ declare namespace MimeKit.Cryptography {
 
   type EncryptionAlgorithm = 'Aes128' | 'Aes192' | 'Aes256' | 'Camellia128' | 'Camellia192' | 'Camellia256' | 'Cast5' | 'Des' | 'TripleDes' | 'Idea' | 'Blowfish' | 'Twofish' | 'RC240' | 'RC264' | 'RC2128' | 'Seed';
 
-  interface DigitalSignatureCollection extends IDigitalSignature[] {
+  interface DigitalSignatureCollection extends Array<IDigitalSignature> {
     count: number;
     item?: IDigitalSignature;
     contains(value: IDigitalSignature): boolean;
@@ -17351,7 +17351,7 @@ declare namespace MimeKit.Cryptography {
 
 }
 declare namespace Kooboo.IndexedDB.BTree {
-  interface ItemCollection extends number[] {
+  interface ItemCollection extends Array<number> {
   }
 
   interface KeyBytesCollection {

@@ -55,6 +55,11 @@ Kooboo 服务端模板脚本：
 - 在 API 边界使用 type guard 或 schema validation。
 - DOM element narrowing 应保持局部且明显。
 
+生成式声明文件：
+
+- 仓库根部的 `kooboo.d.ts` 会参与 TypeScript 解析；如果修正声明语法，只做最小语法兼容调整，不要重写生成内容的结构。
+- 当 interface 需要继承数组类型时，使用 `extends Array<T>`，不要使用 `extends T[]` 或 `extends string[]`。后者在 interface extends 子句中不是合法语法，会在业务源码检查前阻断 `tsc`。
+
 ---
 
 ## 禁用模式
@@ -63,3 +68,4 @@ Kooboo 服务端模板脚本：
 - 不要对 API response 或用户输入 payload 使用 `any`。
 - 不要对可能不存在的 DOM 元素依赖未检查的 type assertion。
 - 未记录为什么简单检查不足前，不要添加验证依赖。
+- 不要为了通过当前检查而批量重排或格式化 `kooboo.d.ts`；它是生成式声明面，非任务相关的大面积改动会淹没真正的前端变更。
