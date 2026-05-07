@@ -1,0 +1,58 @@
+<svg viewBox="0 0 32 32" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="32" height="32">
+                                                        <mask id="ut3i008cbox8x5eu56w3ylupnecuy4sa"
+                                                            style="mask-type:alpha" width="24" height="22" x="4" y="5"
+                                                            maskUnits="userSpaceOnUse">
+                                                            <path
+                                                                fill="url(#Property_1=Wire,_Color=Gradient,_Background=Light__paint0_linear)"
+                                                                d="M8 13a4 4 0 100-8 4 4 0 000 8z"></path>
+                                                            <path
+                                                                fill="url(#Property_1=Wire,_Color=Gradient,_Background=Light__paint1_linear)"
+                                                                d="M24 27a4 4 0 100-8 4 4 0 000 8z"></path>
+                                                            <path
+                                                                fill="url(#Property_1=Wire,_Color=Gradient,_Background=Light__paint2_linear)"
+                                                                d="M26 11v8.54a3.99 3.99 0 00-2-.54c-.73 0-1.41.2-2 .54V11c0-1.1-.9-2-2-2s-2 .9-2 2v10c0 3.31-2.69 6-6 6s-6-2.69-6-6v-8.54c.59.34 1.27.54 2 .54s1.41-.2 2-.54V21c0 1.1.9 2 2 2s2-.9 2-2V11c0-3.31 2.69-6 6-6s6 2.69 6 6z">
+                                                            </path>
+                                                        </mask>
+                                                        <g mask="url(#ut3i008cbox8x5eu56w3ylupnecuy4sa)">
+                                                            <path
+                                                                fill="url(#Property_1=Wire,_Color=Gradient,_Background=Light__paint3_linear)"
+                                                                d="M32 0H0v32h32V0z"></path>
+                                                        </g>
+                                                        <defs>
+                                                            <linearGradient
+                                                                id="Property_1=Wire,_Color=Gradient,_Background=Light__paint0_linear"
+                                                                x1="4.886" x2="11.6" y1="5.886" y2="12.6"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset=".5"></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Wire,_Color=Gradient,_Background=Light__paint1_linear"
+                                                                x1="20.886" x2="27.6" y1="19.886" y2="26.6"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset=".5"></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Wire,_Color=Gradient,_Background=Light__paint2_linear"
+                                                                x1="10.037" x2="22.787" y1="10.037" y2="22.787"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Wire,_Color=Gradient,_Background=Light__paint3_linear"
+                                                                x1="32" x2="0" y1="0" y2="32"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-color="#6EE7B7">
+                                                                </stop>
+                                                                <stop offset="1"
+                                                                    stop-color="#047857">
+                                                                </stop>
+                                                            </linearGradient>
+                                                        </defs>
+                                                    </svg>

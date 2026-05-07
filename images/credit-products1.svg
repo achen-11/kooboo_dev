@@ -1,0 +1,46 @@
+<svg viewBox="0 0 32 32" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="32" height="32">
+                                                        <mask id="xbyalb251rkk3e5stwt2p7n8w35uhcgj"
+                                                            style="mask-type:alpha" maskUnits="userSpaceOnUse" x="3"
+                                                            y="3" width="26" height="26">
+                                                            <path
+                                                                d="M29 19c0 5.52-4.48 10-10 10-4.33 0-8.02-2.75-9.4-6.6-.39-1.06-.6-2.21-.6-3.4 0-.9.12-1.76.34-2.59.92-3.44 3.63-6.15 7.07-7.07a5.005 5.005 0 011.46 4.79 5.02 5.02 0 00-3.74 3.74 5.005 5.005 0 001.46 4.79 5.002 5.002 0 007.07-7.07c.22-.83.34-1.69.34-2.59 0-1.19-.21-2.34-.6-3.4A9.981 9.981 0 0129 19z"
+                                                                fill="url(#32_origination-partnerships__paint0_linear)">
+                                                            </path>
+                                                            <path
+                                                                d="M23 13c0 .9-.12 1.76-.34 2.59-.92 3.44-3.63 6.15-7.07 7.07a5.005 5.005 0 01-1.46-4.79 5.02 5.02 0 003.74-3.74 5.005 5.005 0 00-1.46-4.79 5.002 5.002 0 00-7.07 7.07C9.12 17.24 9 18.1 9 19c0 1.19.21 2.34.6 3.4A9.981 9.981 0 013 13C3 7.48 7.48 3 13 3c4.33 0 8.02 2.75 9.4 6.6.39 1.06.6 2.21.6 3.4z"
+                                                                fill="url(#32_origination-partnerships__paint1_linear)">
+                                                            </path>
+                                                        </mask>
+                                                        <g mask="url(#xbyalb251rkk3e5stwt2p7n8w35uhcgj)">
+                                                            <path
+                                                                fill="url(#32_origination-partnerships__paint2_linear)"
+                                                                d="M32 0H0v32h32V0z"></path>
+                                                        </g>
+                                                        <defs>
+                                                            <linearGradient
+                                                                id="32_origination-partnerships__paint0_linear"
+                                                                x1="31.718" y1="6.282" x2="13.225" y2="24.775"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="32_origination-partnerships__paint1_linear"
+                                                                x1="23.544" y1="2.456" x2="-10.528" y2="36.528"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="32_origination-partnerships__paint2_linear" x1="32"
+                                                                x2="0" y1="0" y2="32" gradientUnits="userSpaceOnUse">
+                                                                <stop stop-color="#F87171">
+                                                                </stop>
+                                                                <stop offset="1"
+                                                                    stop-color="#DC2626">
+                                                                </stop>
+                                                            </linearGradient>
+                                                        </defs>
+                                                    </svg>

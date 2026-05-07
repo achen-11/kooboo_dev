@@ -1,0 +1,119 @@
+<svg viewBox="0 0 32 32" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="32" height="32">
+                                                        <mask id="4h6qikunu094rjohz9liyv5ucrweo2iz"
+                                                            style="mask-type:alpha" width="26" height="21" x="3" y="6"
+                                                            maskUnits="userSpaceOnUse">
+                                                            <path
+                                                                fill="url(#Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint0_linear)"
+                                                                d="M15.51 9.17c0 .56-1.35 1.01-3 1.01s-3-.45-3-1.01 1.35-1.02 3-1.02 3 .46 3 1.02z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint1_linear)"
+                                                                d="M22 8.53v4.5c-2.84.16-5 .98-5 1.97v4.52c-1.06-.33-2.46-.52-4-.52-.85 0-1.67.06-2.4.17v-6.84L22 8.53z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint2_linear)"
+                                                                d="M19 21v4c0 1.1-2.69 2-6 2s-6-.9-6-2v-4c0 1.1 2.69 2 6 2s6-.9 6-2z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint3_linear)"
+                                                                d="M14.4 6L3 9.8l7.6 2.53L22 8.53 14.4 6zm-1.89 4.18c-1.65 0-3-.45-3-1.01s1.35-1.02 3-1.02 3 .46 3 1.02-1.35 1.01-3 1.01z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint4_linear)"
+                                                                d="M10.6 12.33v6.84C8.48 19.48 7 20.18 7 21v.06l-4-1.33V9.8l7.6 2.53z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint5_linear)"
+                                                                d="M13 23c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint6_linear)"
+                                                                d="M23 17c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint7_linear)"
+                                                                d="M29 15v7c0 1.1-2.69 2-6 2-1.54 0-2.94-.19-4-.52V21c0-.59-.77-1.12-2-1.48V15c0 1.1 2.69 2 6 2s6-.9 6-2z">
+                                                            </path>
+                                                        </mask>
+                                                        <g mask="url(#4h6qikunu094rjohz9liyv5ucrweo2iz)">
+                                                            <path
+                                                                fill="url(#Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint8_linear)"
+                                                                d="M32 0H0v32h32V0z"></path>
+                                                        </g>
+                                                        <defs>
+                                                            <linearGradient
+                                                                id="Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint0_linear"
+                                                                x1="9.379" x2="20.077" y1="7.718" y2="12.672"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint1_linear"
+                                                                x1="41.198" x2="14.174" y1="14.025" y2="14.025"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint2_linear"
+                                                                x1="7" x2="19" y1="24" y2="24"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset=".33"></stop>
+                                                                <stop offset=".66" stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint3_linear"
+                                                                x1="2.678" x2="19.59" y1="5.33" y2="11.934"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint4_linear"
+                                                                x1="-2.193" x2="10.76" y1="18.73" y2="12.787"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint5_linear"
+                                                                x1="22.265" x2="1.822" y1="21" y2="21"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset=".5" stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint6_linear"
+                                                                x1="32.265" x2="11.822" y1="15" y2="15"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset=".5" stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint7_linear"
+                                                                x1="17" x2="29" y1="19.5" y2="19.5"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset=".33"></stop>
+                                                                <stop offset=".66" stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Debt_Financing,_Color=Gradient,_Background=Light__paint8_linear"
+                                                                x1="32" x2="0" y1="0" y2="32"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-color="#F87171">
+                                                                </stop>
+                                                                <stop offset="1"
+                                                                    stop-color="#DC2626">
+                                                                </stop>
+                                                            </linearGradient>
+                                                        </defs>
+                                                    </svg>

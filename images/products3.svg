@@ -1,0 +1,69 @@
+<svg viewBox="0 0 32 32" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="32" height="32">
+                                                        <mask id="95c3hxwoztpt7h6128e953sczu6tiav9"
+                                                            style="mask-type:alpha" width="26" height="26" x="3" y="3"
+                                                            maskUnits="userSpaceOnUse">
+                                                            <path
+                                                                fill="url(#Property_1=Instant_Transfer,_Color=Gradient,_Background=Light__paint0_linear)"
+                                                                d="M11 18.5V29l18-9V9.5l-18 9zm9 3.58c-1.56.78-2.83.15-2.83-1.42 0-1.56 1.27-3.46 2.83-4.24 1.56-.78 2.83-.15 2.83 1.42 0 1.56-1.27 3.46-2.83 4.24z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Instant_Transfer,_Color=Gradient,_Background=Light__paint1_linear)"
+                                                                d="M14.83 11.34c0 1.56-1.27 3.46-2.83 4.24-1.56.78-2.83.15-2.83-1.42 0-1.56 1.27-3.46 2.83-4.24 1.56-.78 2.83-.15 2.83 1.42z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Instant_Transfer,_Color=Gradient,_Background=Light__paint2_linear)"
+                                                                d="M22.83 17.84c0 1.56-1.27 3.46-2.83 4.24-1.56.78-2.83.15-2.83-1.42 0-1.56 1.27-3.46 2.83-4.24 1.56-.78 2.83-.15 2.83 1.42z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Instant_Transfer,_Color=Gradient,_Background=Light__paint3_linear)"
+                                                                d="M3 12v10.5l18-9V3L3 12zm9 3.58c-1.56.78-2.83.15-2.83-1.42 0-1.56 1.27-3.46 2.83-4.24 1.56-.78 2.83-.15 2.83 1.42 0 1.56-1.27 3.46-2.83 4.24z">
+                                                            </path>
+                                                        </mask>
+                                                        <g mask="url(#95c3hxwoztpt7h6128e953sczu6tiav9)">
+                                                            <path
+                                                                fill="url(#Property_1=Instant_Transfer,_Color=Gradient,_Background=Light__paint4_linear)"
+                                                                d="M32 0H0v32h32V0z"></path>
+                                                        </g>
+                                                        <defs>
+                                                            <linearGradient
+                                                                id="Property_1=Instant_Transfer,_Color=Gradient,_Background=Light__paint0_linear"
+                                                                x1="27.933" x2="16.003" y1="27.94" y2="14.871"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Instant_Transfer,_Color=Gradient,_Background=Light__paint1_linear"
+                                                                x1="13.468" x2="5.012" y1="14.12" y2="6.228"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Instant_Transfer,_Color=Gradient,_Background=Light__paint2_linear"
+                                                                x1="23.375" x2="14.792" y1="21.962" y2="15.066"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Instant_Transfer,_Color=Gradient,_Background=Light__paint3_linear"
+                                                                x1="3.263" x2="18.162" y1="6.421" y2="17.213"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Instant_Transfer,_Color=Gradient,_Background=Light__paint4_linear"
+                                                                x1="32" x2="0" y1="0" y2="32"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-color="#6EE7B7">
+                                                                </stop>
+                                                                <stop offset="1"
+                                                                    stop-color="#047857">
+                                                                </stop>
+                                                            </linearGradient>
+                                                        </defs>
+                                                    </svg>

@@ -1,0 +1,30 @@
+<svg width="20" height="20"  viewBox="0 0 20 20" fill="none"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            >
+                                                            <path
+                                                                d="M15 4v8H7.5A2.5 2.5 0 0 0 5 14.5v-8A2.5 2.5 0 0 1 7.5 4H15Z"
+                                                                fill="url(#20_guides__a)"></path>
+                                                            <path
+                                                                d="M15 12v5H7.5c-.69 0-1.32-.28-1.77-.73A2.5 2.5 0 0 1 7.5 12H15Z"
+                                                                fill="url(#20_guides__b)"></path>
+                                                            <defs>
+                                                                <linearGradient id="20_guides__a" x1="4.97" y1="9.25"
+                                                                    x2="14.715" y2="9.25"
+                                                                    gradientUnits="userSpaceOnUse">
+                                                                    <stop stop-color="#1E40AF"
+                                                                        stop-opacity=".3"></stop>
+                                                                    <stop offset=".19"
+                                                                        stop-color="#1E40AF"></stop>
+                                                                    <stop offset="1" stop-color="#1E40AF"
+                                                                        stop-opacity=".7"></stop>
+                                                                </linearGradient>
+                                                                <linearGradient id="20_guides__b" x1="12.86" y1="10.401"
+                                                                    x2="5.974" y2="22.482"
+                                                                    gradientUnits="userSpaceOnUse">
+                                                                    <stop stop-color="#1E40AF"
+                                                                        stop-opacity="0"></stop>
+                                                                    <stop offset="1"
+                                                                        stop-color="#1E40AF"></stop>
+                                                                </linearGradient>
+                                                            </defs>
+                                                        </svg>														

@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+                                                        <mask id="meye8e66h5373gjb1sbheuyoun3k3dr0"
+                                                            style="mask-type:alpha" maskUnits="userSpaceOnUse" x="3"
+                                                            y="4" width="26" height="24">
+                                                            <path d="M13 17v11l16-8V9l-16 8z"
+                                                                fill="url(#ach__paint0_linear_1773:55454)"></path>
+                                                            <path d="M29 9v4l-16 8v-4l16-8zM13 24v4l16-8v-4l-16 8z"
+                                                                fill="url(#ach__paint1_linear_1773:55454)"></path>
+                                                            <path
+                                                                d="M16 12.499c2.205 0 3.992-.895 3.992-1.999S18.205 8.501 16 8.501s-3.992.895-3.992 1.999 1.787 1.999 3.992 1.999z"
+                                                                fill="url(#ach__paint2_linear_1773:55454)"></path>
+                                                            <path d="M13 17v11L3 23V12l10 5z"
+                                                                fill="url(#ach__paint3_linear_1773:55454)"></path>
+                                                            <path d="M13 17v4L3 16v-4l10 5zM3 19v4l10 5v-4L3 19z"
+                                                                fill="url(#ach__paint4_linear_1773:55454)"></path>
+                                                            <path
+                                                                d="M19 4L3 12l10 5 16-8-10-5zm-.17 7.91c-1.56.79-4.1.79-5.66 0-1.56-.78-1.56-2.04 0-2.82 1.56-.79 4.1-.79 5.66 0 1.56.78 1.56 2.04 0 2.82z"
+                                                                fill="url(#ach__paint5_linear_1773:55454)"></path>
+                                                        </mask>
+                                                        <g mask="url(#meye8e66h5373gjb1sbheuyoun3k3dr0)">
+                                                            <path d="M32 0H0v32h32V0z"
+                                                                fill="url(#ach__paint6_linear_1773:55454)"></path>
+                                                        </g>
+                                                        <defs>
+                                                            <linearGradient id="ach__paint0_linear_1773:55454"
+                                                                x1="31.448" y1="18.631" x2="2.575" y2="18.269"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient id="ach__paint1_linear_1773:55454"
+                                                                x1="44.822" y1="18.5" x2="5.681" y2="18.5"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient id="ach__paint2_linear_1773:55454"
+                                                                x1="11.75" y1="9.246" x2="33.857" y2="15.769"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient id="ach__paint3_linear_1773:55454"
+                                                                x1="-7.378" y1="29.494" x2="12.529" y2="17.204"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient id="ach__paint4_linear_1773:55454" x1=".013"
+                                                                y1="23.401" x2="13.591" y2="17.619"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient id="ach__paint5_linear_1773:55454"
+                                                                x1="8.012" y1="4.365" x2="23.636" y2="16.365"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient id="ach__paint6_linear_1773:55454" x1="32"
+                                                                y1="0" x2="0" y2="32" gradientUnits="userSpaceOnUse">
+                                                                <stop stop-color="#6EE7B7">
+                                                                </stop>
+                                                                <stop offset="1"
+                                                                    stop-color="#047857">
+                                                                </stop>
+                                                            </linearGradient>
+                                                        </defs>
+                                                    </svg>

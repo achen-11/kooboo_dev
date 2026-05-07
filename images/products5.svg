@@ -1,0 +1,136 @@
+<svg viewBox="0 0 32 32" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="32" height="32">
+                                                        <mask id="203vy5xbxiywwvo66cdjvd9oby3bodwx"
+                                                            style="mask-type:alpha" width="30" height="26" x="1" y="3"
+                                                            maskUnits="userSpaceOnUse">
+                                                            <path
+                                                                fill="url(#Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint0_linear)"
+                                                                d="M28.09 21l-10 4-15-6 3-1.2V19c0 .55.9 1 2 1s2-.45 2-1v-2.8l1-.4V21c0 .55.9 1 2 1s2-.45 2-1v-4.95l1 .4V23c0 .55.9 1 2 1s2-.45 2-1v-5.2l1 .4V21c0 .55.9 1 2 1s2-.45 2-1v-1.2l3 1.2z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint1_linear)"
+                                                                d="M30.09 24l-12 4.8V25l10-4 2 3z"></path>
+                                                            <path
+                                                                fill="url(#Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint2_linear)"
+                                                                d="M27.09 11.49v2l-9.2 3.68v-2l9.2-3.68z"></path>
+                                                            <path
+                                                                fill="url(#Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint3_linear)"
+                                                                d="M27.09 11.49l-9.2 3.68-6.9-8.49L20.19 3l6.9 8.49z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint4_linear)"
+                                                                d="M20.09 16.29V23c0 .55-.9 1-2 1s-2-.45-2-1v-6.55l1.8.72.2-.08 2-.8z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint5_linear)"
+                                                                d="M25.09 14.29V21c0 .55-.9 1-2 1s-2-.45-2-1v-5.11l2-.8 2-.8z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint6_linear)"
+                                                                d="M10.09 14.05V19c0 .55-.9 1-2 1s-2-.45-2-1v-6.55l4 1.6z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint7_linear)"
+                                                                d="M18.09 25v3.8l-17-6.8 2-3 15 6z"></path>
+                                                            <path
+                                                                fill="url(#Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint8_linear)"
+                                                                d="M15.09 16.05V21c0 .55-.9 1-2 1s-2-.45-2-1v-6.55l1.69.68.31.12 2 .8z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint9_linear)"
+                                                                d="M17.89 15.17v2l-13.8-5.52v-2l6.9-2.97 6.9 8.49z">
+                                                            </path>
+                                                        </mask>
+                                                        <g mask="url(#203vy5xbxiywwvo66cdjvd9oby3bodwx)">
+                                                            <path
+                                                                fill="url(#Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint10_linear)"
+                                                                d="M32 0H0v32h32V0z"></path>
+                                                        </g>
+                                                        <defs>
+                                                            <linearGradient
+                                                                id="Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint0_linear"
+                                                                x1="15.58" x2="15.652" y1="22.678" y2="3.786"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint1_linear"
+                                                                x1="32.233" x2="22.22" y1="12.517" y2="27.252"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint2_linear"
+                                                                x1="34.789" x2="20.306" y1="11.496" y2="14.833"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint3_linear"
+                                                                x1="30.369" x2="15.131" y1="7.306" y2="9.699"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint4_linear"
+                                                                x1="16.09" x2="20.09" y1="20.145" y2="20.145"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity=".4"></stop>
+                                                                <stop offset=".25" stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint5_linear"
+                                                                x1="21.09" x2="25.09" y1="18.145" y2="18.145"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity=".4"></stop>
+                                                                <stop offset=".25" stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint6_linear"
+                                                                x1="6.09" x2="10.09" y1="16.225" y2="16.225"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity=".4"></stop>
+                                                                <stop offset=".25" stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint7_linear"
+                                                                x1="-1.569" x2="19.346" y1="27.206" y2="21.519"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint8_linear"
+                                                                x1="11.09" x2="15.09" y1="18.225" y2="18.225"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-opacity=".4"></stop>
+                                                                <stop offset=".25" stop-opacity="0"></stop>
+                                                                <stop offset="1"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint9_linear"
+                                                                x1="-4.336" x2="16.579" y1="17.03" y2="11.343"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Deposits_and_Bank_Accounts,_Color=Gradient,_Background=Light__paint10_linear"
+                                                                x1="32" x2="0" y1="0" y2="32"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-color="#6EE7B7">
+                                                                </stop>
+                                                                <stop offset="1"
+                                                                    stop-color="#047857">
+                                                                </stop>
+                                                            </linearGradient>
+                                                        </defs>
+                                                    </svg>

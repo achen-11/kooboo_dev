@@ -1,0 +1,67 @@
+<svg width="20" height="20"
+                                                            viewBox="0 0 20 20" fill="none"
+                                                            xmlns="http://www.w3.org/2000/svg">
+                                                            <path
+                                                                d="m15.53 10.47-1.176 1.176a.5.5 0 0 1-.707 0L8.354 6.354a.5.5 0 0 1 0-.707L9.53 4.47a3.49 3.49 0 0 1 4.42-.42c.19.12.36.26.52.42l1.06 1.06c.16.16.3.33.42.52a3.49 3.49 0 0 1-.42 4.42Z"
+                                                                fill="url(#20_api__a)"></path>
+                                                            <path
+                                                                d="m18 4-2.05 2.05a2.99 2.99 0 0 0-.42-.52l-1.06-1.06c-.16-.16-.33-.3-.52-.42L16 2l2 2Z"
+                                                                fill="url(#20_api__b)"></path>
+                                                            <path
+                                                                d="M11.646 13.646a.5.5 0 0 1 0 .707L10.47 15.53a3.49 3.49 0 0 1-4.42.42 2.99 2.99 0 0 1-.52-.42l-1.06-1.06c-.16-.16-.3-.33-.42-.52a3.49 3.49 0 0 1 .42-4.42l1.176-1.176a.5.5 0 0 1 .707 0l5.293 5.292Z"
+                                                                fill="url(#20_api__c)"></path>
+                                                            <path
+                                                                d="M6.05 15.95 4 18l-2-2 2.05-2.05c.12.19.26.36.42.52l1.06 1.06c.16.16.33.3.52.42Z"
+                                                                fill="url(#20_api__d)"></path>
+                                                            <path
+                                                                d="M10.646 10.354 9.5 11.5l1 1 1.146-1.146a.5.5 0 0 0 0-.707l-.293-.293a.499.499 0 0 0-.707 0Z"
+                                                                fill="url(#20_api__e)"></path>
+                                                            <path
+                                                                d="M8.646 8.354 7.5 9.5l1 1 1.146-1.146a.5.5 0 0 0 0-.707l-.292-.293a.5.5 0 0 0-.708 0Z"
+                                                                fill="url(#20_api__f)"></path>
+                                                            <defs>
+                                                                <linearGradient id="20_api__a" x1="19.802" y1="13.802"
+                                                                    x2="9.25" y2="3.25" gradientUnits="userSpaceOnUse">
+                                                                    <stop stop-color="#3B82F6"></stop>
+                                                                    <stop offset="1" stop-color="#1E40AF"
+                                                                        stop-opacity="0"></stop>
+                                                                </linearGradient>
+                                                                <linearGradient id="20_api__b" x1="17.884" y1="5.934"
+                                                                    x2="13.965" y2="2.015"
+                                                                    gradientUnits="userSpaceOnUse">
+                                                                    <stop stop-color="#3B82F6"></stop>
+                                                                    <stop offset="1" stop-color="#1E40AF"
+                                                                        stop-opacity="0"></stop>
+                                                                </linearGradient>
+                                                                <linearGradient id="20_api__c" x1="10.54" y1="16.54"
+                                                                    x2="-1.951" y2="4.049"
+                                                                    gradientUnits="userSpaceOnUse">
+                                                                    <stop stop-color="#3B82F6"></stop>
+                                                                    <stop offset="1" stop-color="#1E40AF"
+                                                                        stop-opacity="0"></stop>
+                                                                </linearGradient>
+                                                                <linearGradient id="20_api__d" x1="5.451" y1="17.401"
+                                                                    x2="-2.955" y2="8.995"
+                                                                    gradientUnits="userSpaceOnUse">
+                                                                    <stop stop-color="#3B82F6"></stop>
+                                                                    <stop offset="1" stop-color="#1E40AF"
+                                                                        stop-opacity="0"></stop>
+                                                                </linearGradient>
+                                                                <linearGradient id="20_api__e" x1="12.032" y1="12.532"
+                                                                    x2="9.258" y2="9.758"
+                                                                    gradientUnits="userSpaceOnUse">
+                                                                    <stop stop-color="#3B82F6"
+                                                                        stop-opacity="0"></stop>
+                                                                    <stop offset="1"
+                                                                        stop-color="#1E40AF"></stop>
+                                                                </linearGradient>
+                                                                <linearGradient id="20_api__f" x1="10.032" y1="10.532"
+                                                                    x2="7.258" y2="7.758"
+                                                                    gradientUnits="userSpaceOnUse">
+                                                                    <stop stop-color="#3B82F6"
+                                                                        stop-opacity="0"></stop>
+                                                                    <stop offset="1"
+                                                                        stop-color="#1E40AF"></stop>
+                                                                </linearGradient>
+                                                            </defs>
+                                                        </svg>

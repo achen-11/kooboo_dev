@@ -1,0 +1,71 @@
+<svg viewBox="0 0 32 32" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="32" height="32">
+                                                        <mask id="st4rztwzx76rtbz0bihkyprrmtvx9mye"
+                                                            style="mask-type:alpha" width="26" height="26" x="3" y="3"
+                                                            maskUnits="userSpaceOnUse">
+                                                            <path
+                                                                fill="url(#Property_1=Forward_Flow,_Color=Gradient,_Background=Light__paint0_linear)"
+                                                                d="M20.543 4.457c-1.42-1.42-3.263-1.881-4.115-1.029-.852.852-.392 2.695 1.029 4.115 1.421 1.421 3.263 1.881 4.115 1.029.852-.852.392-2.695-1.029-4.115z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Forward_Flow,_Color=Gradient,_Background=Light__paint1_linear)"
+                                                                d="M14.543 24.457c-1.42-1.42-3.263-1.881-4.115-1.029-.852.852-.392 2.695 1.029 4.115 1.421 1.421 3.263 1.881 4.115 1.029.852-.852.392-2.695-1.029-4.115z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Forward_Flow,_Color=Gradient,_Background=Light__paint2_linear)"
+                                                                d="M17.457 7.543c-1.42-1.42-1.881-3.263-1.029-4.115l-13 13c-.852.852-.392 2.695 1.029 4.115 1.421 1.421 3.263 1.881 4.115 1.029l13-13c-.852.852-2.695.392-4.115-1.029z">
+                                                            </path>
+                                                            <path
+                                                                fill="url(#Property_1=Forward_Flow,_Color=Gradient,_Background=Light__paint3_linear)"
+                                                                d="M27.543 11.457c-1.421-1.42-3.263-1.881-4.115-1.029l-13 13c.852-.852 2.695-.392 4.115 1.029 1.42 1.42 1.881 3.263 1.029 4.115l13-13c.852-.852.392-2.695-1.029-4.115z">
+                                                            </path>
+                                                        </mask>
+                                                        <g mask="url(#st4rztwzx76rtbz0bihkyprrmtvx9mye)">
+                                                            <path
+                                                                fill="url(#Property_1=Forward_Flow,_Color=Gradient,_Background=Light__paint4_linear)"
+                                                                d="M32 0H0v32h32V0z"></path>
+                                                        </g>
+                                                        <defs>
+                                                            <linearGradient
+                                                                id="Property_1=Forward_Flow,_Color=Gradient,_Background=Light__paint0_linear"
+                                                                x1="12.107" x2="23.1" y1="6.379" y2="5.775"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Forward_Flow,_Color=Gradient,_Background=Light__paint1_linear"
+                                                                x1="11.352" x2="22.708" y1="26.386" y2="23.728"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Forward_Flow,_Color=Gradient,_Background=Light__paint2_linear"
+                                                                x1="14.3" x2="9.073" y1="15.844" y2="10.617"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset=".702" stop-opacity=".1"></stop>
+                                                                <stop offset="1" stop-opacity=".3"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Forward_Flow,_Color=Gradient,_Background=Light__paint3_linear"
+                                                                x1="22.844" x2="17.63" y1="21.3" y2="16.087"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset=".702" stop-opacity=".1"></stop>
+                                                                <stop offset="1" stop-opacity=".3"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=Forward_Flow,_Color=Gradient,_Background=Light__paint4_linear"
+                                                                x1="32" x2="0" y1="0" y2="32"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-color="#F87171">
+                                                                </stop>
+                                                                <stop offset="1"
+                                                                    stop-color="#DC2626">
+                                                                </stop>
+                                                            </linearGradient>
+                                                        </defs>
+                                                    </svg>

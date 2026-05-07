@@ -1,0 +1,68 @@
+<svg viewBox="0 0 32 32" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="32" height="32">
+                                                        <mask id="hz0ovw35dxko9s2ilkh9crqgfrhqdgp9"
+                                                            style="mask-type:alpha" maskUnits="userSpaceOnUse" x="4"
+                                                            y="5" width="24" height="22">
+                                                            <path
+                                                                d="M25 18v4H4v-6c0-1.1.9-2 2-2h1v2c0 1.1.9 2 2 2h16zM4 25c0 1.1.9 2 2 2h17c1.1 0 2-.9 2-2H4z"
+                                                                fill="url(#Property_1=BIN_Sponsorship,_Color=Gradient,_Background=Light__paint0_linear)">
+                                                            </path>
+                                                            <path
+                                                                d="M13 11v1c0 .55-.45 1-1 1h-2c-.55 0-1-.45-1-1v-1c0-.55.45-1 1-1h2c.55 0 1 .45 1 1z"
+                                                                fill="url(#Property_1=BIN_Sponsorship,_Color=Gradient,_Background=Light__paint1_linear)">
+                                                            </path>
+                                                            <path
+                                                                d="M26 5H9c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h17c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-13 7c0 .55-.45 1-1 1h-2c-.55 0-1-.45-1-1v-1c0-.55.45-1 1-1h2c.55 0 1 .45 1 1v1z"
+                                                                fill="url(#Property_1=BIN_Sponsorship,_Color=Gradient,_Background=Light__paint2_linear)">
+                                                            </path>
+                                                            <path d="M25 22H4v3h21v-3z"
+                                                                fill="url(#Property_1=BIN_Sponsorship,_Color=Gradient,_Background=Light__paint3_linear)">
+                                                            </path>
+                                                        </mask>
+                                                        <g mask="url(#hz0ovw35dxko9s2ilkh9crqgfrhqdgp9)">
+                                                            <path d="M32 0H0v32h32V0z"
+                                                                fill="url(#Property_1=BIN_Sponsorship,_Color=Gradient,_Background=Light__paint4_linear)">
+                                                            </path>
+                                                        </g>
+                                                        <defs>
+                                                            <linearGradient
+                                                                id="Property_1=BIN_Sponsorship,_Color=Gradient,_Background=Light__paint0_linear"
+                                                                x1="12.213" y1="24.79" x2="23.984" y2="2.712"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=BIN_Sponsorship,_Color=Gradient,_Background=Light__paint1_linear"
+                                                                x1="10.234" y1="12.038" x2="17.684" y2="6.803"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=BIN_Sponsorship,_Color=Gradient,_Background=Light__paint2_linear"
+                                                                x1="31.89" y1=".441" x2="8.935" y2="18.082"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=BIN_Sponsorship,_Color=Gradient,_Background=Light__paint3_linear"
+                                                                x1="1.392" y1="28.249" x2="26.472" y2="19.163"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop></stop>
+                                                                <stop offset="1" stop-opacity="0"></stop>
+                                                            </linearGradient>
+                                                            <linearGradient
+                                                                id="Property_1=BIN_Sponsorship,_Color=Gradient,_Background=Light__paint4_linear"
+                                                                x1="32" y1="0" x2="0" y2="32"
+                                                                gradientUnits="userSpaceOnUse">
+                                                                <stop stop-color="#6EE7B7">
+                                                                </stop>
+                                                                <stop offset="1"
+                                                                    stop-color="#047857">
+                                                                </stop>
+                                                            </linearGradient>
+                                                        </defs>
+                                                    </svg>
