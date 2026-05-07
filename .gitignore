@@ -138,10 +138,12 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-.DS_Store
 .agents
 .codex
 .trellis/*
 !.trellis/spec/
 !.trellis/spec/**
 AGENTS.md
+
+.DS_Store
+.trellis/spec/.DS_Store
