@@ -1,0 +1,46 @@
+<style>
+	.component-summary {
+		position: relative;
+		overflow-x: hidden;
+	}
+
+	.component-summary::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		width: 150vw;
+		mask-image: radial-gradient(farthest-side at 60% 35%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+		-webkit-mask-image: radial-gradient(farthest-side at 60% 35%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+		background-image: linear-gradient(90deg, rgb(126, 167, 233), rgb(148, 239, 183));
+		background-repeat: repeat;
+	}
+
+	.component-summary::after {
+		content: "";
+		position: absolute;
+		width: 150vw;
+		inset: 0;
+		background-repeat: repeat;
+		background-image: url(/images/guilloche.svg);
+		background-size: 20px;
+		mix-blend-mode: overlay;
+	}
+</style>
+
+<section class="component-summary">
+	<div class="relative z-[1] mx-auto max-w-screen-xl py-10 px-6 lg:py-16 lg:px-24">
+		<div class="md:pl-[8.6%] md:max-w-[66%]">
+			<p class="text-xl mb-8" k-label="company.title">中国创新、兼容欧美</p>
+			<h1 class="text-[1.5rem] md:text-2xl xl:text-[2rem] xl:!leading-9" k-label="company.slogan">
+				用创新的软件开发方式与人才培养机制，为企业降低数倍的开发成本。让每家企业都可以定制开发自己的软件系统</h1>
+		</div>
+		<div class="flex flex-col sm:flex-row gap-4">
+			<div class="sm:basis-2/3 pt-16">
+				<img class="h-[420px] w-full object-cover rounded-lg" src="/20221126211721.jpg" alt="公司人员">
+			</div>
+			<div class="sm:basis-1/3">
+				<img class="h-[420px] w-full object-cover rounded-lg" src="/mmexport1585848757747.jpg" alt="公司人员">
+			</div>
+		</div>
+	</div>
+</section>

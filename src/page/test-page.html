@@ -1,0 +1,43 @@
+<!-- @k-url /test-page --> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pure HTML Tabs</title>
+</head>
+<body>
+  <div class="tabs">
+    <input type="radio" class="home-tabs" value="1">
+    <input type="radio" class="home-tabs" value="2">
+    <input type="radio" class="home-tabs" value="3">
+  </div>
+  <div class="tabs">
+    <input type="radio" class="home-tabs" value="1">
+    <input type="radio" class="home-tabs" value="2">
+    <input type="radio" class="home-tabs" value="3">
+  </div>  
+  <div class="tabs">
+    <input type="radio" class="home-tabs" value="1">
+    <input type="radio" class="home-tabs" value="2">
+    <input type="radio" class="home-tabs" value="3">
+  </div>
+</body>
+
+<script>
+  const allRadios = document.querySelectorAll('.tabs input[type="radio"]');
+
+  allRadios.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      if (radio.checked) {
+        const value = radio.value;
+        allRadios.forEach(r => {
+          if (r.value === value) {
+            r.checked = true;
+          }
+        });
+      }
+    });
+  });
+</script>
+</html>

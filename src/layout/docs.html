@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" class="font-sans text-gray-700 scroll-smooth lg:scroll-auto">
+
+<head>
+	<title>Kooboo Web Ecosystem</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
+	<link rel="shortcut icon" href="/favicon.ico">
+</head>
+
+<body>
+	<main k-placeholder="Main" class="bg-white"></main>
+		<script env="server" type="module">
+		k.utils.clientJS.setVariable('__customer_service__', k.userOptions.customer_service)
+		
+		const i18nStore = k.utils.clientJS.i18n()
+		const locale = i18nStore.locale
+		k.utils.clientJS.setVariable('lang', {locale})
+	</script>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+		
+			const script = document.createElement('script')
+			script.onload = () => {
+				const chatWidget = createChatWidget({
+					site_id: __customer_service__.id,
+					language: window.lang?.locale || 'zh'
+				})
+				window.toggleChat = chatWidget.toggleChat
+			}
+			script.src = __customer_service__.url
+			script.defer = true;  // 关键优化：添加 defer 属性
+			document.head.appendChild(script)
+		})
+	</script>
+</body>
+
+</html>

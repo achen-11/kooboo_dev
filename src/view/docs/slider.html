@@ -1,0 +1,47 @@
+<script env="server">
+	var categoryName = k.request.category
+	var articleName = k.request.article;
+	var categories = k.content.category.all();
+	
+	var currentCategory = categories[0];
+	if (categoryName) {
+		currentCategory = categories.find(o => o.UserKey == categoryName);
+	}
+	
+	var currentCategoryId = currentCategory.id;
+	var articleList = currentCategory.article;
+	
+	var currentArticle = articleList[0]
+	if (articleName) {
+		currentArticle = k.content.article.get(articleName);
+	}
+	
+	if (currentArticle) {
+		k.response.meta.title = currentArticle.title;
+		k.response.meta.setMeta("description", currentArticle.title);
+		k.response.meta.setMeta("keywords", currentArticle.title);
+	}
+	
+</script>
+
+<div id="sliderMask" class="hidden lg:!hidden fixed z-[8] inset-0 h-full"></div>
+<aside id="sliderEl" class="transition-transform ease-in-out -translate-x-full lg:!translate-x-0 left-0 pt-16 lg:pt-[4.5rem] overflow-y-auto antialiased fixed z-[9] top-0 h-full w-64 border-r border-gray-200 bg-white">
+	<nav class="p-2">
+		<section k-for="category in categories" k-repeat-self="" k-attribute="class category.id == currentCategoryId ? 'category-active' : ''" class="group rounded transition-colors duration-200 hover:bg-blue-50/50">
+			<div class="flex items-start p-3 cursor-pointer">
+				<div class="flex flex-1 gap-3">
+					<img class="w-5 h-5" k-attribute="src category.icon">
+					<p class="text-sm" k-content="category.name"></p>
+				</div>
+				<img class="group-[.category-active]:rotate-90 transition-transform w-4 h-4 relative top-0.5" src="/images/arrow.svg">
+			</div>
+			<ul class="group-[.category-active]:block hidden px-4 text-xs text-gray-500">
+				<li k-for="article in category.article" k-repeat-self="" k-attribute="class article.id == currentArticle.id ? 'item-active' : ''" class="group transition-colors last:pb-2 hover:text-gray-700">
+					<a class="flex py-2 px-3 relative group-[.item-active]:before:bg-blue-700 before:content-empty before:content-empty before:absolute before:top-0 before:bottom-0 before:right-full before:w-px before:bg-gray-200" href="/docs/{category.UserKey}/{article.UserKey}">
+						<p k-content="article.title"></p>
+					</a>
+				</li>
+			</ul>
+		</section>
+	</nav>
+</aside>

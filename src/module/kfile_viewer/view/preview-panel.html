@@ -1,0 +1,46 @@
+<template id="kfile-viewer-preview-panel">
+  <section class="flex-shrink-0 border-l border-slate-200 bg-slate-50 flex flex-col overflow-hidden" :style="{ width: previewWidth + 'px' }" aria-label="文件预览">
+    <div v-if="!selectedFile && !editFileName" class="flex-1 flex flex-col items-center justify-center text-slate-400 text-sm p-6 text-center">
+      <svg class="w-12 h-12 text-slate-300 mb-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+      </svg>
+      <p>选择文件可预览或编辑</p>
+    </div>
+    <template v-else="">
+      <div class="flex-shrink-0 px-3 py-1.5 border-b border-slate-200 flex items-center justify-between gap-2 bg-white">
+        <span class="text-sm font-medium text-slate-700 truncate min-w-0" :title="editFileName || (selectedFile && (selectedFile.Name || selectedFile.FullName))">{{ editFileName || (selectedFile && (selectedFile.Name || selectedFile.FullName)) }}</span>
+        <div class="flex items-center gap-1 flex-shrink-0">
+          <template v-if="editFileName">
+            <button type="button" @click="saveEdit" class="px-2 py-1 text-xs rounded bg-emerald-600 text-white hover:bg-emerald-700 transition-colors cursor-pointer">保存</button>
+            <button type="button" @click="cancelEdit" class="px-2 py-1 text-xs rounded bg-slate-200 hover:bg-slate-300 transition-colors cursor-pointer">取消</button>
+          </template>
+          <template v-else-if="selectedFile">
+            <a v-if="fileUrl" :href="fileUrl" target="_blank" rel="noopener" class="px-2 py-1 text-xs rounded bg-slate-200 hover:bg-slate-300 transition-colors cursor-pointer">打开</a>
+            <button type="button" @click="copyLink" class="px-2 py-1 text-xs rounded bg-slate-200 hover:bg-slate-300 transition-colors cursor-pointer">复制链接</button>
+            <button type="button" @click="startEdit(selectedFile)" class="px-2 py-1 text-xs rounded bg-indigo-600 text-white hover:bg-indigo-700 transition-colors cursor-pointer">编辑</button>
+            <button type="button" @click="confirmDelete(selectedFile.FullName || selectedFile.Name, false)" class="px-2 py-1 text-xs rounded bg-red-100 text-red-700 hover:bg-red-200 transition-colors cursor-pointer">删除</button>
+          </template>
+        </div>
+      </div>
+      <div class="flex-1 overflow-auto p-3 min-h-0">
+        <div v-if="editFileName" class="flex flex-col h-full">
+          <textarea v-model="editContent" class="flex-1 w-full min-h-[200px] p-3 rounded border border-slate-200 font-mono text-sm resize-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="文本内容"></textarea>
+        </div>
+        <div v-else-if="previewError" class="text-red-600 text-sm py-4">{{ previewError }}</div>
+        <div v-else-if="isImage(selectedFile)" class="flex justify-center items-center h-full">
+          <img :src="fileUrl" alt="" class="max-w-full max-h-full object-contain">
+        </div>
+        <div v-else-if="isMarkdown(selectedFile) && previewHtml" class="preview-markdown prose prose-slate max-w-none text-sm" v-html="previewHtml"></div>
+        <pre v-else="" class="text-sm text-slate-700 whitespace-pre-wrap break-words font-mono">{{ previewContent || '（无文本内容或无法预览）' }}</pre>
+      </div>
+    </template>
+  </section>
+</template>
+<script>
+  defineComponent('kfile-viewer-preview-panel', {
+    template: '#kfile-viewer-preview-panel',
+    setup() {
+      return inject('store')
+    }
+  })
+</script>

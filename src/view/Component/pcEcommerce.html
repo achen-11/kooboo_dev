@@ -1,0 +1,70 @@
+<style scoped="">
+	.pc-content .support {
+		padding: 10px;
+		background: linear-gradient(90deg,
+				rgba(250, 255, 230, 0.6) 0%,
+				rgba(210, 240, 255, 0.6) 100%);
+		border-radius: 10px;
+	}
+
+	.pc-content .support {
+		position: relative;
+		padding-left: 34px;
+		line-height: 1.5;
+	}
+
+	.pc-content .support::before {
+		content: '';
+		position: absolute;
+		left: 10px;
+		width: 16px;
+		height: 16px;
+		background: url('/icon/tip.svg') no-repeat center / contain;
+		margin-top: 3px;
+	}
+
+	.pc-content .unsupport::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		width: 16px;
+		height: 16px;
+		background: url('/icon/no.svg') no-repeat center / contain;
+		margin-top: 2px;
+	}
+
+	.pc-content .unsupport {
+		position: relative;
+		padding-left: 24px;
+		line-height: 1.5;
+	}
+</style>
+
+<div env="server" class="relative z-[3] max-w-screen-xl mx-auto lg:px-24 px-6 pc-content">
+	<div class="max-w-7xl mx-auto space-y-6 mb-[32px]">
+		<div class="flex flex-col gap-y-6 gap-x-12 " v-for="(section, sIdx) in ecommerceContent" :key="sIdx">
+			<div class="gap-6 p-y-4 font-medium  border-b">
+				<div class="flex items-center gap-3 col-span-4 md:col-span-1">
+					<img :src="section.url" alt="定位">
+					<span class="text-[20px] text-[#374151] ">{{ section.title }}</span>
+				</div>
+			</div>
+
+
+			<div v-for="(feature, fIdx) in section.ecommerceFeature" :key="fIdx" class="text-[#4F5868] text-[14px]">
+				<div class="flex flex-col space-y-6">
+					<div v-for="(row, rIdx) in feature.rows" :key="rIdx" class="grid grid-cols-4 gap-x-12">
+						<div class="font-medium text-[16px] text-[#374151]">
+							<span v-if="row.isFirst">{{ feature.title }}</span>
+							<span v-else=""></span>
+						</div>
+						<div class="p-[10px]" :class="row.shopify.type" v-html="row.shopify.content"></div>
+						<div class="p-[10px]" :class="row.kooboo.type" v-html="row.kooboo.content"></div>
+						<div class="p-[10px]" :class="row.shoplazza.type" v-html="row.shoplazza.content"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>

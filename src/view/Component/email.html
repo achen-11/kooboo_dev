@@ -1,0 +1,102 @@
+<script env="server">
+	var emailIntros = k.content.email.all().sort((a, b) => a.sort - b.sort).slice(0, 9)
+</script>
+
+<link k-device="desktop" rel="stylesheet" type="text/css" href="/swiper9.min.css">
+<style k-device="desktop">
+	/* action swiper style */
+	.swiper-button-prev,
+	.swiper-button-next {
+		color: #0ea5e9;
+		transition: opacity 0.1s ease-in;
+	}
+
+	.action-swiper-wrapper .swiper-button-prev,
+	.action-swiper-wrapper .swiper-button-next {
+		opacity: 0;
+	}
+
+	.action-swiper-wrapper:hover .swiper-button-prev,
+	.action-swiper-wrapper:hover .swiper-button-next {
+		opacity: 1;
+	}
+
+	/* background style of action swiper wrapper */
+	.action-swiper-wrapper {
+		position: relative;
+		overflow: hidden;
+	}
+
+	.action-swiper-wrapper::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		transform: translateY(60%) scale(2);
+		background-image: linear-gradient(90deg, rgb(238, 110, 134), rgb(239, 170, 101));
+		opacity: 0.5;
+		border-radius: 50%;
+		-webkit-mask-image: radial-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0) 50%);
+		mask-image: radial-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0) 50%);
+	}
+
+	.action-swiper-wrapper::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background-image: url(/images/guilloche.svg);
+		background-repeat: repeat;
+		background-position: top right;
+		background-size: 20px;
+		opacity: 0.075;
+		-webkit-mask-image: linear-gradient(160deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+		mask-image: linear-gradient(160deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+	}
+</style>
+
+<section class="mx-auto py-10 max-w-screen-xl px-6 lg:py-16 lg:px-24">
+	<p k-label="EmailBenefit" class="mb-8 before:content-empty before:w-2 before:h-4 before:mr-2 before:bg-gradient-to-b before:from-pink-500 before:to-orange-500 before:inline-block before:relative before:top-0.5 before:rounded-[1px]">
+		可定制， 可扩展</p>
+	<h2 class="text-2xl lg:text-4xl mb-8" k-label="EmailTitle">高级集团邮箱</h2>
+
+	<div class="flex flex-row text-gray-500">
+        <div class=" space-y-10 lg:basis-4/12 lg:space-y-8">
+		<div k-for="item in emailIntros" repeat-self="true">
+			<img class="w-full shadow-md border border-gray-200 rounded-md p-2 mb-8 lg:hidden" k-attribute="src item.thumb; alt item.name">
+			<h3 class="text-xl lg:text-2xl text-gray-700 mb-2" k-content="item.name"></h3>
+			<p k-content="item.description"></p>
+		</div>
+	</div>
+	<!-- desktop swiper -->
+	<div class="action-swiper-wrapper hidden lg:block basis-8/12 ml-4 bg-gray-50 rounded-md">
+		<div class="h-full flex items-center justify-center">
+			<div class="swiper action-swiper w-full">
+				<div class="swiper-wrapper">
+					<div class="swiper-slide" k-for="item in emailIntros" repeat-self="true">
+						<img class="w-10/12 mx-auto shadow-md bg-white/95 p-4 bg-clip-padding rounded" k-attribute="src item.thumb; alt item.name">
+					</div>
+				</div>
+				<div class="swiper-button-prev"></div>
+				<div class="swiper-button-next"></div>
+			</div>
+		</div>
+	</div>
+	</div>
+</section>
+
+<script k-device="desktop" type="text/javascript" src="/swiper9.min.js"></script>
+<script k-device="desktop">
+	new Swiper(".action-swiper", {
+		slidesPerView: 1,
+		spaceBetween: 30,
+		loop: true,
+		lazy: true,
+		autoplay: {
+			delay: 2500,
+			disableOnInteraction: false,
+		},
+		navigation: {
+			nextEl: ".swiper-button-next",
+			prevEl: ".swiper-button-prev",
+		},
+	});
+</script>

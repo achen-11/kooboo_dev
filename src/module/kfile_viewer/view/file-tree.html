@@ -1,0 +1,66 @@
+<template id="kfile-viewer-file-tree">
+  <aside class="flex-shrink-0 bg-white border-r border-slate-200 overflow-hidden flex flex-col transition-all duration-200" :class="treeCollapsed ? 'w-0' : 'w-56'" role="navigation" aria-label="文件夹树">
+    <div class="flex items-center justify-between px-2 py-1.5 border-b border-slate-100">
+      <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">文件夹</span>
+      <button type="button" @click="toggleTree" class="p-1 rounded hover:bg-slate-100 cursor-pointer transition-colors" :title="treeCollapsed ? '展开' : '收起'" aria-label="切换文件夹面板">
+        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+        </svg>
+      </button>
+    </div>
+    <div v-if="treeCollapsed" class="hidden"></div>
+    <template v-else="">
+      <div v-if="treeLoading" class="px-2 py-2 space-y-2" aria-live="polite" aria-busy="true">
+        <div class="h-8 rounded bg-slate-100 animate-pulse"></div>
+        <div class="h-8 rounded bg-slate-100 animate-pulse w-4/5"></div>
+        <div class="h-8 rounded bg-slate-100 animate-pulse w-3/5"></div>
+        <div class="h-8 rounded bg-slate-100 animate-pulse w-5/6"></div>
+        <p class="text-slate-400 text-sm pt-1">加载中…</p>
+      </div>
+      <div v-else-if="listError" class="px-2 py-4 text-red-600 text-sm" role="alert">{{ listError }}</div>
+      <ul v-else="" class="flex-1 overflow-auto py-2 space-y-0.5" role="tree" aria-label="文件夹列表">
+        <li role="none">
+          <button type="button" @click="navigateTo('')" @keydown.down.prevent="focusNext($event)" @keydown.up.prevent="focusPrev($event)" :class="currentFolder === '' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-50'" class="w-full text-left px-3 py-1.5 rounded-md text-sm flex items-center gap-2 cursor-pointer transition-colors" :aria-current="currentFolder === '' ? 'true' : null" role="treeitem" :tabindex="treeFocusedIndex === 0 ? 0 : -1" :data-tree-index="0" @focus="setTreeFocus(0)">
+            <svg class="w-4 h-4 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+            <span class="truncate">根目录</span>
+          </button>
+        </li>
+        <li v-for="(f, idx) in topFolders" :key="f.FullName || f.Name" role="none">
+          <button type="button" @click="navigateTo(f.FullName)" @keydown.down.prevent="focusNext($event)" @keydown.up.prevent="focusPrev($event)" @keydown.enter.prevent="navigateTo(f.FullName)" :class="currentFolder === f.FullName ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-50'" class="w-full text-left px-3 py-1.5 rounded-md text-sm flex items-center gap-2 cursor-pointer transition-colors" :aria-current="currentFolder === f.FullName ? 'true' : null" role="treeitem" :tabindex="treeFocusedIndex === idx + 1 ? 0 : -1" :data-tree-index="idx + 1" @focus="setTreeFocus(idx + 1)">
+            <svg class="w-4 h-4 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+            <span class="truncate">{{ f.Name }}</span>
+          </button>
+        </li>
+      </ul>
+    </template>
+  </aside>
+</template>
+<script>
+  defineComponent('kfile-viewer-file-tree', {
+    template: '#kfile-viewer-file-tree',
+    setup() {
+      var Vue = window.Vue, store = inject('store');
+      var treeFocusedIndex = Vue && Vue.ref ? Vue.ref(0) : { value: 0 };
+      function setTreeFocus(i) { treeFocusedIndex.value = i; }
+      function focusNext(ev) {
+        var btn = ev.target.closest('[data-tree-index]');
+        if (!btn) return;
+        var next = btn.parentElement.nextElementSibling;
+        if (next) {
+          var n = next.querySelector('[data-tree-index]');
+          if (n) { setTreeFocus(parseInt(n.getAttribute('data-tree-index'), 10)); n.focus(); }
+        }
+      }
+      function focusPrev(ev) {
+        var btn = ev.target.closest('[data-tree-index]');
+        if (!btn) return;
+        var prev = btn.parentElement.previousElementSibling;
+        if (prev) {
+          var p = prev.querySelector('[data-tree-index]');
+          if (p) { setTreeFocus(parseInt(p.getAttribute('data-tree-index'), 10)); p.focus(); }
+        }
+      }
+      return Object.assign({}, store, { treeFocusedIndex: treeFocusedIndex, setTreeFocus: setTreeFocus, focusNext: focusNext, focusPrev: focusPrev });
+    }
+  })
+</script>

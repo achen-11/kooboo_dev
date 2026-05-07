@@ -1,0 +1,15 @@
+<script env="server">
+	var products = k.content.products.all().sort((a, b) => a.sort - b.sort)
+	
+</script>
+<section class="mx-auto py-10 max-w-screen-xl px-6 lg:py-16 lg:px-24">
+	<p k-label="ShowCaseHeadling" class="mb-8 before:content-empty before:w-2 before:h-4 before:mr-2 before:bg-gradient-to-b before:from-pink-500 before:to-cyan-500 before:inline-block before:relative before:top-0.5 before:rounded-[1px]">
+		案例展示</p>
+	<h2 class="text-2xl lg:text-4xl mb-8" k-label="ShowCaseTitle">近期项目或模板</h2>
+	<ul class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3">
+		<li class="shadow-md border border-gray-200" k-for="item in products" repeat-self="true">
+			<img class="w-full" k-device="desktop" loading="lazy" k-attribute="src item.thumb" alt="kooboo show case">
+			<img class="w-full" k-device="mobile" loading="lazy" k-attribute="src {item.thumb}?width=500" alt="kooboo show case">
+		</li>
+	</ul>
+</section>

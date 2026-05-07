@@ -1,0 +1,97 @@
+<script env="server">
+	var advantages = k.content.advantage.all().sort((a, b) => a.sort - b.sort).slice(0, 3)
+	
+	if (k.info.page) {
+	    var name = k.info.page.name.toLowerCase();
+	    var pageAdvantage = k.content.PageAdvantage.all().find(o => o.PageName == name);
+	}
+</script>
+
+<link k-device="desktop" rel="stylesheet" type="text/css" href="/swiper9.min.css">
+<style>
+	.component-advantage {
+		position: relative;
+	}
+
+	.component-advantage::before {
+		content: '';
+		inset: 0;
+		position: absolute;
+		opacity: .3;
+		background-image: radial-gradient(1000px 1500px at right top, rgb(126, 167, 233), rgba(136, 222, 235, 1));
+	}
+
+	.component-advantage::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background-image: url(/images/guilloche.svg);
+		background-repeat: repeat;
+		background-position: top right;
+		background-size: 20px;
+		mix-blend-mode: overlay;
+		background-clip: padding-box;
+		-webkit-mask-image: linear-gradient(160deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+		mask-image: linear-gradient(160deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+	}
+
+	.advantage-swiper .swiper-pagination-bullet {
+		width: 12px;
+		height: 12px;
+	}
+</style>
+
+<section class="component-advantage mx-auto my-10 max-w-screen-xl py-10 px-6 lg:py-16 lg:px-24 lg:my-16 before:xl:rounded-lg after:xl:rounded-lg">
+	<div class="relative z-[1]">
+		<p k-content="pageAdvantage.HeadLine" class="mb-8 before:content-empty before:w-2 before:h-4 before:mr-2 before:bg-gradient-to-b before:from-blue-500 before:to-cyan-500 before:inline-block before:relative before:top-0.5 before:rounded-[1px]">
+			1分钟拥有自己的独立站</p>
+		<h2 class="text-4xl lg:text-6xl mb-8" k-content="pageAdvantage.Title">多种可选方式</h2>
+		<div class="flex flex-row">
+			<div class="space-y-8 lg:basis-5/12">
+				<div class="text-gray-500" k-for="item in pageAdvantage.Items" repeat-self="true">
+					<h3 class="text-2xl text-gray-700 mb-2" k-content="item.Title"></h3>
+					<p k-content="item.Summary"></p>
+					<img class="w-full mt-4 lg:hidden" k-attribute="src item.Image; alt item.name">
+				</div>
+			</div>
+
+			<!-- desktop swiper -->
+			<div class="hidden lg:block basis-7/12 pl-4">
+				<div class="swiper advantage-swiper w-full">
+					<div class="swiper-wrapper">
+						<div class="swiper-slide" k-for="item in pageAdvantage.Items" repeat-self="true">
+							<img class="w-10/12 mx-auto shadow-md bg-white/95 px-4 py-6 bg-clip-padding rounded" k-attribute="src item.Image; alt item.Title">
+						</div>
+					</div>
+					<div class="swiper-pagination"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script k-device="desktop" type="text/javascript" src="/swiper9.min.js"></script>
+<script k-device="desktop">
+	new Swiper(".advantage-swiper", {
+	    effect: "coverflow",
+	    grabCursor: true,
+	    lazy: true,
+	    centeredSlides: true,
+	    slidesPerView: "auto",
+	    autoplay: {
+	        delay: 2500,
+	        disableOnInteraction: false,
+	    },
+	    coverflowEffect: {
+	        rotate: 60,
+	        stretch: 400,
+	        depth: 450,
+	        modifier: 1,
+	        slideShadows: false,
+	    },
+	    pagination: {
+	        el: ".swiper-pagination",
+	        clickable: true,
+	    },
+	});
+</script>

@@ -1,0 +1,44 @@
+<script env="server">
+	var pricelist = k.content.Price.all();
+	
+</script>
+
+<script src="/pricing.js"></script>
+
+<section class="mx-auto max-w-screen-xl py-10 px-6 lg:py-16 lg:px-24">
+	<h1 class="text-4xl mb-8 lg:text-5xl" k-label="PriceTitle">参考价格</h1>
+ 
+	<ul id="pricingList" k-for="item in pricelist" class="flex flex-wrap text-sm md:text-base md:gap-7 mb-8 md:gap-11 text-gray-500 border-b border-gray-200">
+		<li class="mr-4 md:mr-0">
+			<a k-if="repeat/first" class="tab-active transition-colors transition-shadow py-3 inline-block whitespace-nowrap hover:text-gray-700 hover:shadow-[0_1px_0_0_rgb(124,127,136)]" href="#bandWidth" k-content="item.name" k-attribute="href #{item.UserKey}">流量</a>
+
+			<a k-else="" class="transition-colors transition-shadow py-3 inline-block whitespace-nowrap hover:text-gray-700 hover:shadow-[0_1px_0_0_rgb(124,127,136)]" href="#bandWidth" k-content="item.name" k-attribute="href #{item.UserKey}">流量</a>
+
+		</li>
+	</ul>
+
+	<div class="flex flex-col gap-8" k-for="item in pricelist">
+
+		<div k-attribute="id item.UserKey" class="p-8 rounded-md bg-gray-50">
+			<div class="flex mb-8 flex-wrap gap-4 md:flex-nowrap justify-between items-end">
+				<div class="flex flex-col items-start gap-4 md:flex-row md:basis-2/3">
+					<img class="w-8" k-attribute="src item.Icon">
+					<div class="text-gray-500">
+						<h2 class="text-gray-700 text-2xl mb-2" k-content="item.name">Title</h2>
+						<p k-content="item.HeadLine"> HeadLine </p>
+					</div>
+				</div>
+			</div>
+			<ul class="md:pl-12" k-for="priceitem in item.PriceItem">
+
+				<li class="grid grid-cols-[1fr_max-content] gap-x-5 gap-y-1 py-3 border-t border-gray-200">
+					<h3 k-content="priceitem.Title"> title </h3>
+					<span class="text-gray-700 text-right" k-content="priceitem.Price"> price</span>
+					<p class="text-xs font-light" k-content="priceitem.SubTitle">subtitle </p>
+					<span class="text-xs font-light text-right" k-content="priceitem.PriceUnit"> price unit </span>
+				</li>
+			</ul>
+		</div>
+
+	</div>
+</section>

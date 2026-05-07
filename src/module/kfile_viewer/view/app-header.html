@@ -1,0 +1,35 @@
+<template id="kfile-viewer-app-header">
+  <header class="flex-shrink-0 bg-white border-b border-slate-200">
+    <div class="px-4 py-3 flex items-center gap-3 flex-wrap">
+      <h1 class="text-lg font-semibold text-slate-800 shrink-0">KFile 文件管理</h1>
+      <div class="flex items-center gap-2 text-slate-400" aria-hidden="true">|</div>
+      <button type="button" @click="toggleTree" class="p-1.5 rounded-md bg-slate-100 hover:bg-slate-200 transition-colors text-sm cursor-pointer shrink-0" :title="treeCollapsed ? '展开文件夹' : '收起文件夹'" aria-label="切换文件夹面板">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+      <button type="button" @click="refresh" class="p-1.5 rounded-md bg-slate-100 hover:bg-slate-200 transition-colors text-sm cursor-pointer shrink-0" title="刷新列表" aria-label="刷新">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+      </button>
+      <div class="flex items-center gap-2 text-slate-400" aria-hidden="true">|</div>
+      <nav class="flex items-center gap-2 flex-wrap">
+        <button type="button" @click="openNewFolderModal" class="px-3 py-1.5 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition-colors text-sm cursor-pointer shrink-0">新建文件夹</button>
+        <button type="button" @click="openNewFileModal" class="px-3 py-1.5 rounded-md bg-slate-600 text-white hover:bg-slate-700 transition-colors text-sm cursor-pointer shrink-0">新建文件</button>
+        <label class="px-3 py-1.5 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 transition-colors text-sm cursor-pointer shrink-0 cursor-pointer">
+          上传文件
+          <input type="file" class="hidden" multiple="" @change="onFileSelect">
+        </label>
+      </nav>
+    </div>
+  </header>
+</template>
+<script>
+  defineComponent('kfile-viewer-app-header', {
+    template: '#kfile-viewer-app-header',
+    setup() {
+      return inject('store')
+    }
+  })
+</script>

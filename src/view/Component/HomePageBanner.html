@@ -1,0 +1,213 @@
+<script env="server">
+	var apps = k.content.Applications.all()
+	
+	var homeContent = k.content.homeContent
+	
+	var homeTabs = k.content.homeContent.homeTabs
+</script>
+
+<style>
+	.app-item {
+		background: white;
+		box-shadow: 0px 4px 16px 0px rgba(191, 220, 249, 0.37);
+	}
+
+	.app-item:hover {
+		background: linear-gradient(180deg,
+				rgba(230, 248, 255, 1) 0%,
+				rgba(237, 255, 252, 1) 22%,
+				rgba(255, 255, 255, 1) 100%),
+			linear-gradient(37.79deg,
+				rgba(23, 235, 213, 0.1) 0%,
+				rgba(33, 41, 255, 0.1) 100%);
+		box-shadow: 0px 4px 16px 0px rgba(191, 220, 249, 0.56);
+	}
+
+	.color-btn {
+		background: linear-gradient(90deg,
+				#44c6f7 0%,
+				#222fff 100%);
+	}
+
+	.color-btn:hover {
+		background: linear-gradient(90deg,
+				#3ebcc8 0%,
+				#1747F2 100%);
+	}
+
+	input:checked~.color-tabs {
+		border-image: linear-gradient(90deg,
+				rgba(33, 41, 255, 1) 0%,
+				rgba(23, 235, 213, 1) 100%);
+		border-image-slice: 1;
+	}
+
+	input:checked~.color-tabs .tabs-text {
+		background: linear-gradient(270deg,
+				rgba(23, 235, 213, 1) 0%,
+				rgba(33, 41, 255, 1) 100%);
+		background-clip: text;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.home-tab-0.home-image {
+		background: linear-gradient(108.29deg,
+				rgba(145, 229, 255, 0.71) 0%,
+				rgba(218, 255, 195, 0.71) 100%);
+		box-shadow: 0px -0.07px 3.37px 0px rgba(128, 197, 238, 0.06),
+			0px -0.17px 8.51px 0px rgba(128, 197, 238, 0.09),
+			0px -0.35px 17.37px 0px rgba(128, 197, 238, 0.11),
+			0px -0.73px 35.77px 0px rgba(128, 197, 238, 0.14),
+			0px -2px 98px 0px rgba(128, 197, 238, 0.2);
+	}
+
+	.home-tab-1.home-image {
+		background: linear-gradient(108.29deg,
+				rgba(255, 235, 195, 0.71) 0%,
+				rgba(255, 156, 198, 0.71) 100%);
+		box-shadow: 0px 0.96px 2.75px 0px rgba(246, 188, 124, 0.04),
+			0px 2.43px 6.95px 0px rgba(246, 188, 124, 0.06),
+			0px 4.96px 14.18px 0px rgba(246, 188, 124, 0.08),
+			0px 10.22px 29.2px 0px rgba(246, 188, 124, 0.1),
+			0px 28px 80px 0px rgba(246, 188, 124, 0.14);
+	}
+
+	.home-tab-2.home-image {
+		background: linear-gradient(108.29deg,
+				rgba(145, 229, 255, 0.71) 0%,
+				rgba(218, 255, 195, 0.71) 100%);
+		box-shadow: 0px -0.07px 3.37px 0px rgba(128, 197, 238, 0.06),
+			0px -0.17px 8.51px 0px rgba(128, 197, 238, 0.09),
+			0px -0.35px 17.37px 0px rgba(128, 197, 238, 0.11),
+			0px -0.73px 35.77px 0px rgba(128, 197, 238, 0.14),
+			0px -2px 98px 0px rgba(128, 197, 238, 0.2);
+	}
+
+	.home-tab-3.home-image {
+		background: linear-gradient(108.29deg,
+				rgba(255, 235, 195, 0.71) 0%,
+				rgba(255, 156, 198, 0.71) 100%);
+		box-shadow: 0px 0.96px 2.75px 0px rgba(246, 188, 124, 0.04),
+			0px 2.43px 6.95px 0px rgba(246, 188, 124, 0.06),
+			0px 4.96px 14.18px 0px rgba(246, 188, 124, 0.08),
+			0px 10.22px 29.2px 0px rgba(246, 188, 124, 0.1),
+			0px 28px 80px 0px rgba(246, 188, 124, 0.14);
+	}
+</style>
+
+<div env="server" class="relative pb-8 md:pb-30">
+	<div class="absolute inset-y-0 -inset-x-20 z-0 pointer-events-none">
+		<div class="bg-[#b4fce7] rounded-full w-[12.23%] h-[31.93%] absolute left-[75.06%] top-0 blur-150px"></div>
+		<div class="bg-[#bee8ff] rounded-full w-[12.23%] h-[31.93%] absolute left-[53.71%] top-[54.29%] blur-150px">
+		</div>
+		<div class="bg-[#b4defc] rounded-full w-[17.51%] h-[45.71%] absolute left-[82.48%] top-[24.03%] blur-150px">
+		</div>
+		<div class="bg-[#d0fcff] rounded-full w-[13.72%] h-[35.80%] absolute left-[4.70%] top-[44.54%] blur-150px">
+		</div>
+		<div class="bg-[#b4effc] rounded-full w-[9.34%] h-[24.37%] absolute left-0 top-[20.17%] blur-150px"></div>
+		<div class="bg-[#fff6d8] rounded-full w-[17.51%] h-[45.71%] absolute left-[66.31%] top-[54.29%] blur-150px">
+		</div>
+		<div class="bg-[#fff6d8] rounded-full w-[15.83%] h-[41.34%] absolute left-0 top-[3.19%] blur-150px"></div>
+		<div class="bg-[#fff6d8] rounded-full w-[13.00%] h-[33.95%] absolute left-[59.81%] top-[0.59%] blur-150px">
+		</div>
+	</div>
+
+	<div class="max-w-screen-xl mx-auto py-10 px-6 lg:py-16 lg:px-24 flex flex-col gap-10 md:flex-row tabs-ctn">
+		<div class="w-full md:w-100 z-2">
+			<p k-content="homeContent.Heading" class="mb-8 before:content-empty before:w-2 before:h-4 before:mr-2 before:bg-gradient-to-b before:from-blue-500 before:to-cyan-500 before:inline-block before:relative before:top-0.5 before:rounded-[1px]">
+			</p>
+			<h1 class="mb-10 text-5xl lg:text-56px font-500 text-nowrap" k-content="homeContent.Title"></h1>
+			<div class="bg-white rounded-2xl p-6" style="
+				box-shadow: 0px 0.41px 2.3px 0px rgba(156, 207, 255, 0.04),
+				0px 1.04px 5.82px 0px rgba(156, 207, 255, 0.05),
+				0px 2.13px 11.87px 0px rgba(156, 207, 255, 0.07),
+				0px 4.38px 24.46px 0px rgba(156, 207, 255, 0.08),
+				0px 12px 67px 0px rgba(156, 207, 255, 0.12);
+			">
+				<div class="mb-6 flex">
+					<label k-for="(item, index) in homeTabs" repeat-self="" class="cursor-pointer">
+						<input type="radio" name="tabs" :value="index" class="home-tabs peer hidden" :checked="index===0">
+						<div class="border-b-2 border-[#e1e9f3] px-2.5 pb-3 color-tabs flex items-center gap-2">
+							<div class="text-[#374151] text-base tabs-text" k-content="item.tabTitle"></div>
+
+							<span v-if="index === 0" class="bg-red-500 text-white color-btn text-xs px-2 py-1 rounded-full">
+								NEW
+							</span>
+						</div>
+					</label>
+
+				</div>
+				<div k-for="(item, index) in homeTabs" repeat-self="">
+					<input type="radio" name="tabs1" :value="index" class="home-tabs peer hidden" :checked="index===0">
+					<div class="space-y-5 hidden peer-checked:block">
+						<div class="flex flex-row gap-4 items-center justify-start">
+							<img :src="item.icon" class="w-8 h-8" alt="">
+							<div class="text-[#374151] text-xl font-medium" k-content="item.title"></div>
+						</div>
+						<div class="flex flex-col gap-3 h-19">
+							<div k-for="point in item.sellingPoints" repeat-self="" class="text-[#6b7280] text-sm">
+								<span>· </span>
+								<span k-content="point"></span>
+							</div>
+						</div>
+						<div class="flex justify-end items-center gap-2" k-for="btn in item.buttons">
+							<a :href="btn.value" class="flex min-w-35 color-btn cursor-pointer rounded-full py-3.5 pr-2 pl-5 gap-4 items-center justify-between shrink-0 w-fit h-14">
+								<div class="text-white text-xl font-medium" k-content="btn.key"></div>
+								<div class="shrink-0 w-[38px] h-[38px] bg-[#ffffff] rounded-full flex items-center justify-center">
+									<img class="w-6 h-6" src="/icon/arrow.svg" alt="arrow">
+								</div>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="h-fit flex-1 mt-auto z-1">
+			<div k-for="(item, index) in homeTabs" repeat-self="">
+				<input type="radio" name="tabs2" :value="index" class="home-tabs peer hidden" :checked="index===0">
+				<div :class="`home-tab-${index}`" class="hidden peer-checked:block flex-1 rounded-[20px] border-[rgba(255,255,255,0.74)] border p-3 home-image">
+					<!-- <img class="h-full rounded-[16px] object-top-left object-cover" k-attribute="src item.HeadImage" alt=""> -->
+					<img class="h-full w-full rounded-[16px] object-top-left object-cover" :src="item.image+'?width=600'" alt="">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="mx-6 mb-16 text-[#374151] text-center text-[32px] font-medium" k-label="Efficient collaboration, technology makes work easier">
+	高效协同，科技让工作更简单
+</div>
+<!-- <div class="mx-auto mb-20 w-fit grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8 lg:gap-12"
+	k-for="item in apps"> -->
+<div class="mx-auto mb-20 w-fit grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8" k-for="item in apps">
+	<a k-if="item.linkto" target="_blank" href="#" k-attribute="href item.linkto" class="app-item group w-40 cursor-pointer rounded-lg flex flex-col gap-4 items-center justify-start rounded-lg px-2 py-7">
+		<img k-attribute="src item.icon" alt="" class="w-16 h-16">
+		<div class="flex flex-col gap-2 items-center justify-start">
+			<div class="text-[#374151] group-hover:text-[#2296f3] text-center text-base font-medium" k-content="item.title"></div>
+			<div class="text-[#6b7280] text-center text-xs" k-content="item.description"></div>
+		</div>
+	</a>
+	<div k-else="" class="app-item group w-40 rounded-lg flex flex-col gap-4 items-center justify-start rounded-lg px-2 py-7">
+		<img k-attribute="src item.icon" alt="" class="w-16 h-16">
+		<div class="flex flex-col gap-2 items-center justify-start">
+			<div class="text-[#374151] group-hover:text-[#2296f3] text-center text-base font-medium" k-content="item.title"></div>
+			<div class="text-[#6b7280] text-center text-xs" k-content="item.description"></div>
+		</div>
+	</div>
+</div>
+<script>
+	const allRadios = document.querySelectorAll('input[type="radio"].home-tabs');
+	
+	allRadios.forEach(radio => {
+		radio.addEventListener('change', (e) => {
+			if (radio.checked) {
+				const value = radio.value
+				allRadios.forEach(r => {
+					if (r.value === value) {
+						r.checked = true
+					}
+				})
+			}
+		})
+	})
+</script>

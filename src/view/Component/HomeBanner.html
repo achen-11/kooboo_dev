@@ -1,0 +1,77 @@
+<script env="server">
+	if (k.info.page) {
+		var name = k.info.page.name.toLowerCase();
+		var item = k.content.HomeBanner.all().find(o => o.PageName == name);
+	
+		if (item) {
+			k.response.meta.title = "Kooboo " + item.Title;
+			k.response.meta.setMeta("keywords", item.Title);
+			k.response.meta.setMeta("description", item.SubTitle);
+		}
+	
+		var DocLink = item.DocLink;
+		if (!DocLink) {
+			DocLink = "/docs";
+		}
+	
+		DocLink = k.site.multilingual.getLangUrl(DocLink, k.site.info.culture);
+	}
+</script>
+
+<style>
+	.component-banner {
+		position: relative;
+		overflow-x: hidden;
+	}
+
+	.component-banner::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		width: 150vw;
+		mask-image: radial-gradient(farthest-side at 50% 50%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+		-webkit-mask-image: radial-gradient(farthest-side at 50% 50%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+		background-image: linear-gradient(90deg, rgb(126, 167, 233), rgb(148, 239, 183));
+		background-repeat: repeat;
+	}
+
+	.component-banner::after {
+		content: "";
+		position: absolute;
+		width: 150vw;
+		inset: 0;
+		background-repeat: repeat;
+		background-image: url(/images/guilloche.svg);
+		background-size: 20px;
+		mix-blend-mode: overlay;
+	}
+</style>
+
+<section class="component-banner">
+	<div class="relative z-[1] max-w-screen-xl mx-auto py-10 px-6 lg:py-16 lg:px-24">
+		<div class="max-w-screen-xl">
+			<p k-content="item.Heading" class="mb-8 before:content-empty before:w-2 before:h-4 before:mr-2 before:bg-gradient-to-b before:from-blue-500 before:to-cyan-500 before:inline-block before:relative before:top-0.5 before:rounded-[1px]">
+				专业开发 立等可取</p>
+			<h1 class="text-5xl lg:text-7xl" k-content="item.Title">独立站 黑科技</h1>
+			<p class="text-2xl font-light mt-2 text-gray-500" k-content="item.SubTitle">一分钟建站，点哪里改哪里，全球部署，CDN 加速</p>
+		</div>
+		<div class="mt-10 flex flex-wrap items-center">
+			<a env="server" class="group flex justify-center shadow-[0_0_0_1px_rgba(0,0,0,0.1)] w-full sm:w-fit bg-[#111a4a] items-center text-white rounded-lg py-3.5 px-6 hover:transition-all hover:shadow-sm" :href="`/_start/login?lang=${k.request.culture}`">
+				<span class="mr-1 leading-none" k-label="StartNow">立即开始</span>
+				<svg viewBox="0 0 16 16" fill="none" class="-mr-1 inline-block h-4 stroke-current" xmlns="http://www.w3.org/2000/svg">
+					<path d="M8 13L13 8L8 3" stroke="white" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="round" class="group-hover:transition-transform -translate-x-1 group-hover:translate-x-0">
+					</path>
+					<path d="M12 8L2 8" stroke="white" stroke-width="1.5" class="group-hover:transition-transform origin-left scale-0 group-hover:scale-100"></path>
+				</svg>
+			</a>
+			<a class="flex justify-center bg-white w-full mt-4 sm:w-fit sm:ml-3 sm:mt-0 items-center shadow-[0_0_0_1px_rgba(0,0,0,0.1)] rounded-lg py-3.5 px-6 hover:transition-all hover:shadow-[0_0_2px_1px_rgba(0,0,0,0.2)]" href="/docs" k-attribute="href DocLink">
+				<span class="mr-1 leading-none" k-label="Docs">说明文档</span>
+			</a>
+		</div>
+		<div class="relative mt-12">
+			<div class="w-full overflow-hidden rounded shadow-[0_0_5px_2px_rgba(0,0,0,0.1)]">
+				<img class="w-full h-auto" alt="kooboo Ecosystem" k-attribute="src item.HeadImage; alt item.Title">
+			</div>
+		</div>
+	</div>
+</section>

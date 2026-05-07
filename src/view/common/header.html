@@ -1,0 +1,94 @@
+<script env="server">
+	var langs = k.site.multilingual.currentURLs();
+	var culture = k.site.multilingual.currentCulture;
+	var switchlang = "zh"
+	var switchlink = langs.filter(o => !o.isActive)[0].URL;
+	if (culture == "zh") {
+		switchlang = "en";
+	}
+	
+</script>
+
+<header class="transition-transform shadow duration-300 sticky z-10 left-0 top-0 right-0 bg-white">
+	<nav class="flex py-4 px-6 items-center mx-auto max-w-screen-xl text-gray-700 lg:px-24">
+		<!-- mobile menu -->
+		<div class="lg:hidden relative mr-4 select-none">
+			<input type="checkbox" aria-hidden="true" tabindex="-1" class="peer w-8 h-8 absolute z-[2] left-0 cursor-pointer opacity-0">
+			<span class="transition-transform origin-top-left block w-8 h-1 my-[5px] relative z-[1] bg-gray-500 rounded peer-checked:rotate-45 peer-checked:-translate-y-[2px] peer-checked:translate-x-[6px]"></span>
+			<span class="transition-opacity origin-top-left block w-8 h-1 my-[5px] relative z-[1] bg-gray-500 rounded peer-checked:opacity-0"></span>
+			<span class="transition-transform origin-bottom-left block w-8 h-1 my-[5px] relative z-[1] bg-gray-500 rounded peer-checked:-rotate-45 peer-checked:translate-y-[2px] peer-checked:translate-x-[6px]"></span>
+			<div class="transition-transform shadow ease-in-out antialiased absolute left-0 top-0 -mt-4 -ml-6 w-screen -translate-x-full peer-checked:translate-x-0">
+				<ul class="py-4 px-6 mt-16 bg-white border-t border-grey-100">
+					<li><a class="inline-block w-full pl-14 py-3 mb-1" k-label="menu.home" href="/home">主页</a></li>
+					<li><a class="inline-block w-full pl-14 py-3 mb-1" k-label="menu.innovation" href="/Innovation">创新</a></li>
+					<li><a class="inline-block w-full pl-14 py-3 mb-1" k-label="menu.ecommerce" href="/Ecommerce">电商</a>
+					</li>
+					<li><a class="inline-block w-full pl-14 py-3 mb-1" k-label="menu.mail" href="/Mail">专业邮局</a></li>
+					<li><a class="inline-block w-full pl-14 py-3 mb-1" k-label="menu.application" href="/Application">企业应用</a></li>
+					<!-- <li><a class="inline-block w-full pl-14 py-3 mb-1" k-label="menu.development"
+							href="/Development">开发服务</a></li> -->
+					<li><a class="inline-block w-full pl-14 py-3 mb-1" k-label="menu.docs" href="/docs">文档</a></li>
+					<!-- <li><a class="inline-block w-full pl-14 py-3 mb-1" k-label="menu.pricing" href="/pricing">价格</a>
+					</li> -->
+				</ul>
+			</div>
+		</div>
+
+		<!-- mobile language switch -->
+		<a class="lg:hidden inline-block px-4 py-1 border-l-2 border-grey-700 relative z-[2]" k-content="switchlang" k-attribute="href switchlink" href="/home">EN</a>
+
+		<!-- logo -->
+		<a href="/home" class="ml-auto lg:ml-0 relative z-[2] shrink-0" title="home">
+			<img class="h-5 w-[98px]" src="/Kooboo.png" alt="kooboo Logo">
+		</a>
+
+		<!-- desktop menu -->
+		<ul class="hidden items-center justify-between ml-auto mr-auto lg:flex lg:space-x-1">
+			<li><a class="px-3.5 py-2.5 rounded-md transition-colors hover:bg-gray-100 hover:text-gray-900" href="/home" k-label="menu.home">主页</a></li>
+			<li><a class="px-3.5 py-2.5 rounded-md transition-colors hover:bg-gray-100 hover:text-gray-900" href="/Innovation" k-label="menu.innovation">创新</a></li>
+			<li><a class="px-3.5 py-2.5 rounded-md transition-colors hover:bg-gray-100 hover:text-gray-900" href="/Ecommerce" k-label="menu.ecommerce">电商</a></li>
+			<li><a class="px-3.5 py-2.5 rounded-md transition-colors hover:bg-gray-100 hover:text-gray-900" href="/Mail" k-label="menu.mail">专业邮局</a></li>
+			<li><a class="px-3.5 py-2.5 rounded-md transition-colors hover:bg-gray-100 hover:text-gray-900" href="/Application" k-label="menu.application">企业应用</a></li>
+			<!-- <li><a class="px-3.5 py-2.5 rounded-md transition-colors hover:bg-gray-100 hover:text-gray-900"
+					href="/Development" k-label="menu.development">开发服务</a></li> -->
+			<li><a class="px-3.5 py-2.5 rounded-md transition-colors hover:bg-gray-100 hover:text-gray-900" href="/docs" k-label="menu.docs">文档</a></li>
+			<!-- <li><a class="px-3.5 py-2.5 rounded-md transition-colors hover:bg-gray-100 hover:text-gray-900"
+					href="/pricing" k-label="menu.pricing">价格</a></li> -->
+
+		</ul>
+
+		<!-- desktop language & login -->
+		<div class="group relative hidden hover:transition-all py-1 px-3 rounded-lg lg:flex items-center cursor-pointer shadow-[0_0_0_1px_rgba(0,0,0,0.1)] hover:shadow-[0_0_2px_1px_rgba(0,0,0,0.2)] after:content-empty after:absolute after:top-full after:left-0 after:right-0 after:bg-transparent after:h-2">
+			<img class="h-8 w-8 mr-1" k-attribute="src /images/{culture}.png" src="/images/Chinese.png" alt="switch language">
+			<svg class="group-hover:transition-transform group-hover:rotate-180 ease-in-out duration-200" t="1687837835352" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6636" width="16" height="16">
+				<path d="M862.276177 319.319629 511.892041 669.701718 161.449577 319.319629 862.276177 319.319629z" p-id="6637"></path>
+			</svg>
+			<ul k-for="item in langs" class="absolute group-hover:transition-transform scale-0 group-hover:scale-100 mt-2 top-full right-0 shadow-sm border border-gray-100 rounded p-1.5 w-19 bg-white text-sm text-gray-500">
+
+				<li class="group/item rounded hover:bg-gray-100">
+					<a class="transition-transform flex items-center justify-center rounded-sm" k-attribute="href item.URL" title="Switch language"><img class="h-8 w-8 group-hover/item:scale-80" k-attribute="src /images/{item.Key}.png" alt="switch language"></a>
+				</li>
+			</ul>
+		</div>
+		<!-- <a class="group hidden items-center lg:flex shadow-[0_0_0_1px_rgba(0,0,0,0.1)] rounded-lg py-3 px-4 ml-3 hover:transition-all hover:shadow-[0_0_2px_1px_rgba(0,0,0,0.2)]"
+					href="/_Admin/login">
+					<span class="mr-1 leading-none" k-label="SignIn">登录</span>
+					<svg viewBox="0 0 16 16" fill="none" class="-mr-1 inline-block h-4 stroke-current"
+						xmlns="http://www.w3.org/2000/svg">
+						<path d="M8 13L13 8L8 3" stroke="black" stroke-width="1.5" stroke-linecap="square"
+							stroke-linejoin="round" class="group-hover:transition-transform -translate-x-1 group-hover:translate-x-0">
+						</path>
+						<path d="M12 8L2 8" stroke="black" stroke-width="1.5"
+							class="group-hover:transition-transform origin-left scale-0 group-hover:scale-100"></path>
+					</svg>
+				</a> -->
+		<a env="server" class="group shrink-0 hidden lg:flex justify-center shadow-[0_0_0_1px_rgba(0,0,0,0.1)] w-fit sm:w-fit bg-[#111a4a] items-center text-white rounded-lg ml-3 py-3 px-4 transition-all hover:shadow-sm" :href="`/_start/login?lang=${k.request.culture}`">
+			<span class="mr-1 leading-none" k-label="StartNow">立即开始</span>
+			<svg viewBox="0 0 16 16" fill="none" class="-mr-1 inline-block h-4 stroke-current" xmlns="http://www.w3.org/2000/svg">
+				<path d="M8 13L13 8L8 3" stroke="white" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="round" class="transition-transform -translate-x-1 group-hover:translate-x-0">
+				</path>
+				<path d="M12 8L2 8" stroke="white" stroke-width="1.5" class="transition-transform origin-left scale-0 group-hover:scale-100"></path>
+			</svg>
+		</a>
+	</nav>
+</header>

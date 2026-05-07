@@ -1,0 +1,98 @@
+<template id="kfile-viewer-file-list">
+  <div class="flex-1 flex flex-col min-w-0">
+    <!-- 统一高度的工具栏 -->
+    <div class="flex-shrink-0 bg-white border-b border-slate-200 px-3 py-1.5 flex items-center justify-between gap-2 text-sm">
+      <div class="flex items-center gap-1 min-w-0 flex-1 overflow-hidden">
+        <span class="text-slate-500 shrink-0">路径：</span>
+        <button type="button" @click="navigateTo('')" class="text-indigo-600 hover:underline cursor-pointer shrink-0">根目录</button>
+        <template v-for="(item, i) in breadcrumbPartsDisplay" :key="i">
+          <template v-if="item.name === '...'">
+            <span class="text-slate-400 shrink-0">...</span>
+          </template>
+          <template v-else="">
+            <span class="text-slate-400 shrink-0">/</span>
+            <button type="button" @click="navigateTo(item.path)" class="text-indigo-600 hover:underline cursor-pointer truncate shrink-0" :title="item.name">{{ item.name }}</button>
+          </template>
+        </template>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button type="button" @click="listViewMode = 'list'" :class="listViewMode === 'list' ? 'bg-white border-indigo-500 text-indigo-600' : 'border-slate-200 text-slate-500 hover:bg-white'" class="p-1.5 rounded border transition-colors cursor-pointer" title="列表" aria-label="列表视图">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+        </button>
+        <button type="button" @click="listViewMode = 'grid'" :class="listViewMode === 'grid' ? 'bg-white border-indigo-500 text-indigo-600' : 'border-slate-200 text-slate-500 hover:bg-white'" class="p-1.5 rounded border transition-colors cursor-pointer" title="网格" aria-label="网格视图">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+        </button>
+        <span class="text-slate-400 text-xs">排序：</span>
+        <button type="button" @click="setSortBy('name')" :class="sortBy === 'name' ? 'bg-indigo-50 border-indigo-300 text-indigo-700' : 'border-slate-200 hover:bg-white'" class="px-2 py-1 text-xs rounded border transition-colors cursor-pointer">名称</button>
+        <button type="button" @click="setSortBy('size')" :class="sortBy === 'size' ? 'bg-indigo-50 border-indigo-300 text-indigo-700' : 'border-slate-200 hover:bg-white'" class="px-2 py-1 text-xs rounded border transition-colors cursor-pointer">大小</button>
+        <button type="button" @click="setSortBy('time')" :class="sortBy === 'time' ? 'bg-indigo-50 border-indigo-300 text-indigo-700' : 'border-slate-200 hover:bg-white'" class="px-2 py-1 text-xs rounded border transition-colors cursor-pointer">时间</button>
+      </div>
+    </div>
+    <div class="flex-1 overflow-auto bg-white p-4 min-h-0">
+      <div v-if="listLoading" class="text-slate-400 text-sm py-8 text-center">加载中…</div>
+      <div v-else-if="listError" class="text-red-600 text-sm py-4">{{ listError }}</div>
+      <div v-else-if="!subFoldersInList.length && !filesInList.length" class="text-slate-400 text-sm py-8 text-center">
+        <p>暂无文件</p>
+        <p class="text-xs mt-1">可点击顶栏「新建文件夹」「新建文件」或「上传文件」</p>
+      </div>
+      <div v-else-if="listViewMode === 'list'" class="border border-slate-200 rounded-lg overflow-hidden">
+        <table class="w-full text-sm text-left">
+          <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
+            <tr><th class="px-3 py-2 font-medium">名称</th><th class="px-3 py-2 font-medium w-24">大小</th><th class="px-3 py-2 font-medium w-12"></th></tr>
+          </thead>
+          <tbody>
+            <tr v-for="f in sortedSubFoldersInList" :key="'folder-' + f.FullName" @click="navigateTo(f.FullName)" @dblclick.stop="openRenameModal(f.FullName, true)" class="border-t border-slate-100 hover:bg-indigo-50/50 cursor-pointer group">
+              <td class="px-3 py-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                <span class="truncate">{{ f.Name }}</span>
+              </td>
+              <td class="px-3 py-2 text-slate-400">—</td>
+              <td class="px-3 py-2"><button type="button" @click.stop="confirmDelete(f.FullName, true)" class="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-red-100 text-slate-400 hover:text-red-600 cursor-pointer" title="删除" aria-label="删除"> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></td>
+            </tr>
+            <tr v-for="file in sortedFilesInList" :key="'file-' + (file.FullName || file.Name)" @click="selectFile(file)" @dblclick.stop="openRenameModal(file.FullName || file.Name, false)" :class="selectedFile && (selectedFile.FullName || selectedFile.Name) === (file.FullName || file.Name) ? 'bg-indigo-50' : ''" class="border-t border-slate-100 hover:bg-slate-50 cursor-pointer group">
+              <td class="px-3 py-2 flex items-center gap-2">
+                <svg class="w-5 h-5 flex-shrink-0" :class="getFileIconClass(file)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <span class="truncate">{{ file.Name }}</span>
+              </td>
+              <td class="px-3 py-2 text-slate-400">{{ file.StringSize || '' }}</td>
+              <td class="px-3 py-2"><button type="button" @click.stop="confirmDelete(file.FullName || file.Name, false)" class="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-red-100 text-slate-400 hover:text-red-600 cursor-pointer" title="删除" aria-label="删除"> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-else="" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2">
+        <template v-for="f in sortedSubFoldersInList" :key="'folder-' + f.FullName">
+          <div class="relative p-3 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50 flex flex-col items-center gap-1 cursor-pointer transition-colors text-left w-full group">
+            <button type="button" @click="navigateTo(f.FullName)" @dblclick.stop="openRenameModal(f.FullName, true)" class="flex flex-col items-center gap-1 w-full cursor-pointer text-left">
+              <svg class="w-8 h-8 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+              <span class="text-sm font-medium text-slate-700 truncate w-full text-center">{{ f.Name }}</span>
+            </button>
+            <button type="button" @click.stop="confirmDelete(f.FullName, true)" class="absolute top-1 right-1 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-red-100 text-slate-400 hover:text-red-600 transition-opacity cursor-pointer" title="删除文件夹" aria-label="删除文件夹">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+          </div>
+        </template>
+        <template v-for="file in sortedFilesInList" :key="'file-' + (file.FullName || file.Name)">
+          <div :class="selectedFile && (selectedFile.FullName || selectedFile.Name) === (file.FullName || file.Name) ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 hover:border-slate-300'" class="relative p-3 rounded-lg border flex flex-col items-center gap-1 cursor-pointer transition-colors text-left w-full group">
+            <button type="button" @click="selectFile(file)" @dblclick.stop="openRenameModal(file.FullName || file.Name, false)" class="flex flex-col items-center gap-1 w-full cursor-pointer text-left">
+              <svg class="w-8 h-8 flex-shrink-0" :class="getFileIconClass(file)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              <span class="text-sm font-medium text-slate-700 truncate w-full text-center">{{ file.Name }}</span>
+              <span class="text-xs text-slate-400">{{ file.StringSize || '' }}</span>
+            </button>
+            <button type="button" @click.stop="confirmDelete(file.FullName || file.Name, false)" class="absolute top-1 right-1 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-red-100 text-slate-400 hover:text-red-600 transition-opacity cursor-pointer" title="删除文件" aria-label="删除文件">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+  defineComponent('kfile-viewer-file-list', {
+    template: '#kfile-viewer-file-list',
+    setup() {
+      return inject('store')
+    }
+  })
+</script>

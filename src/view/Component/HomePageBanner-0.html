@@ -1,0 +1,225 @@
+<script env="server">
+	var item = k.content.HomeBanner.all().find(o => o.PageName == "home");
+	
+	if (item) {
+		k.response.meta.title = "Kooboo " + item.Title;
+		k.response.meta.setMeta("keywords", item.SubTitle);
+		k.response.meta.setMeta("description", item.SubTitle);
+	}
+	
+	var apps = k.content.Applications.all()
+	
+</script>
+
+<style>
+	.app-item {
+		background: white;
+		box-shadow: 0px 4px 16px 0px rgba(191, 220, 249, 0.37);
+	}
+
+	.app-item:hover {
+		background: linear-gradient(180deg,
+				rgba(230, 248, 255, 1) 0%,
+				rgba(237, 255, 252, 1) 22%,
+				rgba(255, 255, 255, 1) 100%),
+			linear-gradient(37.79deg,
+				rgba(23, 235, 213, 0.1) 0%,
+				rgba(33, 41, 255, 0.1) 100%);
+		box-shadow: 0px 4px 16px 0px rgba(191, 220, 249, 0.56);
+	}
+
+	.color-btn {
+		background: linear-gradient(90deg,
+				#44c6f7 0%,
+				#222fff 100%);
+	}
+
+	.color-btn:hover {
+		background: linear-gradient(90deg,
+				#3ebcc8 0%,
+				#1747F2 100%);
+	}
+
+	input:checked~.color-tabs {
+		border-image: linear-gradient(90deg,
+				rgba(33, 41, 255, 1) 0%,
+				rgba(23, 235, 213, 1) 100%);
+		border-image-slice: 1;
+	}
+
+	input:checked~.color-tabs .tabs-text {
+		background: linear-gradient(270deg,
+				rgba(23, 235, 213, 1) 0%,
+				rgba(33, 41, 255, 1) 100%);
+		background-clip: text;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.tabs-ctn.home-tab-1 .home-image {
+		background: linear-gradient(108.29deg,
+				rgba(145, 229, 255, 0.71) 0%,
+				rgba(218, 255, 195, 0.71) 100%);
+		box-shadow: 0px -0.07px 3.37px 0px rgba(128, 197, 238, 0.06),
+			0px -0.17px 8.51px 0px rgba(128, 197, 238, 0.09),
+			0px -0.35px 17.37px 0px rgba(128, 197, 238, 0.11),
+			0px -0.73px 35.77px 0px rgba(128, 197, 238, 0.14),
+			0px -2px 98px 0px rgba(128, 197, 238, 0.2);
+	}
+
+	.tabs-ctn.home-tab-2 .home-image {
+		background: linear-gradient(108.29deg,
+				rgba(255, 235, 195, 0.71) 0%,
+				rgba(255, 156, 198, 0.71) 100%);
+		box-shadow: 0px 0.96px 2.75px 0px rgba(246, 188, 124, 0.04),
+			0px 2.43px 6.95px 0px rgba(246, 188, 124, 0.06),
+			0px 4.96px 14.18px 0px rgba(246, 188, 124, 0.08),
+			0px 10.22px 29.2px 0px rgba(246, 188, 124, 0.1),
+			0px 28px 80px 0px rgba(246, 188, 124, 0.14);
+	}
+</style>
+
+<section env="server" class="relative pb-8 md:pb-30">
+	<div class="absolute inset-y-0 -inset-x-20 z-0 pointer-events-none">
+		<div class="bg-[#b4fce7] rounded-full w-[12.23%] h-[31.93%] absolute left-[75.06%] top-0" style="filter: blur(133.8px)"></div>
+		<div class="bg-[#bee8ff] rounded-full w-[12.23%] h-[31.93%] absolute left-[53.71%] top-[54.29%]" style="filter: blur(133.8px)"></div>
+		<div class="bg-[#b4defc] rounded-full w-[17.51%] h-[45.71%] absolute left-[82.48%] top-[24.03%]" style="filter: blur(149.65px)"></div>
+		<div class="bg-[#d0fcff] rounded-full w-[13.72%] h-[35.80%] absolute left-[4.70%] top-[44.54%]" style="filter: blur(149.65px)"></div>
+		<div class="bg-[#b4effc] rounded-full w-[9.34%] h-[24.37%] absolute left-0 top-[20.17%]" style="filter: blur(149.65px)"></div>
+		<div class="bg-[#fff6d8] rounded-full w-[17.51%] h-[45.71%] absolute left-[66.31%] top-[54.29%]" style="filter: blur(149.65px)"></div>
+		<div class="bg-[#fff6d8] rounded-full w-[15.83%] h-[41.34%] absolute left-0 top-[3.19%]" style="filter: blur(149.65px)"></div>
+		<div class="bg-[#fff6d8] rounded-full w-[13.00%] h-[33.95%] absolute left-[59.81%] top-[0.59%]" style="filter: blur(149.65px)"></div>
+	</div>
+
+	<div class="max-w-screen-xl mx-auto py-10 px-6 lg:py-16 lg:px-24 flex flex-col gap-10 md:flex-row tabs-ctn">
+		<div class="w-full md:w-100 z-2">
+			<p k-content="item.Heading" class="mb-8 before:content-empty before:w-2 before:h-4 before:mr-2 before:bg-gradient-to-b before:from-blue-500 before:to-cyan-500 before:inline-block before:relative before:top-0.5 before:rounded-[1px]">
+			</p>
+			<h1 class="mb-10 text-5xl lg:text-56px font-500 text-nowrap" k-content="item.Title"></h1>
+			<div class="bg-white rounded-2xl p-6 space-y-6" style="
+				box-shadow: 0px 0.41px 2.3px 0px rgba(156, 207, 255, 0.04),
+				0px 1.04px 5.82px 0px rgba(156, 207, 255, 0.05),
+				0px 2.13px 11.87px 0px rgba(156, 207, 255, 0.07),
+				0px 4.38px 24.46px 0px rgba(156, 207, 255, 0.08),
+				0px 12px 67px 0px rgba(156, 207, 255, 0.12);
+			">
+				<div class="flex">
+					<label class="cursor-pointer">
+						<input type="radio" id="home-tab-1" name="tabs" value="1" class="hidden" checked="">
+						<div class="border-b-2 border-[#e1e9f3] px-2.5 pb-3 color-tabs">
+							<div class="text-[#374151] text-base tabs-text" k-label="fastbuild">
+								快速建立您的网站
+							</div>
+						</div>
+					</label>
+					<label class="cursor-pointer">
+						<input type="radio" id="home-tab-2" name="tabs" value="2" class="hidden">
+						<div class="border-b-2 border-[#e1e9f3] px-2.5 pb-3 color-tabs">
+							<div class="text-[#374151] text-base tabs-text" k-label="useapps">
+								使用海量应用
+							</div>
+						</div>
+					</label>
+				</div>
+				<div class="space-y-5 home-tab-1 hidden [&.active]:block">
+					<div class="flex flex-row gap-4 items-center justify-start">
+						<img src="/icon/imac.svg" class="w-8 h-8" alt="">
+						<div class="text-[#374151] text-xl font-medium" k-label="Powerful website development tools">
+							强大的建站开发工具
+						</div>
+					</div>
+					<div class="flex flex-col gap-3 h-19">
+						<div class="text-[#6b7280] text-sm">
+							<span>· </span>
+							<span k-label="Build HeadLine One">3W+海量模板，随意挑选</span>
+						</div>
+						<div class="text-[#6b7280] text-sm">
+							<span>· </span>
+							<span k-label="Build HeadLine Two">
+								简单的拖拽编辑器，上手迅速，随点随改
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="space-y-5 hidden home-tab-2 [&.active]:block">
+					<div class="flex flex-row gap-4 items-center justify-start">
+						<img src="/icon/toolbox.svg" class="w-8 h-8" alt="">
+						<div class="text-[#374151] text-xl font-medium" k-label="Hundreds of applications">
+							上百种开源应用
+						</div>
+					</div>
+					<div class="flex flex-col gap-3 h-19">
+						<div class="text-[#6b7280] text-sm">
+							<span>· </span>
+							<span k-label="Easy to install various open source tools with one click">一键轻松安装各类开源工具</span>
+						</div>
+						<div class="text-[#6b7280] text-sm">
+							<span>· </span>
+							<span k-label="Use AI to quickly build applications and put them on the market with one click">
+								用 AI 快速构建应用，一键上架市场销售
+							</span>
+						</div>
+					</div>
+				</div>
+				<a :href="`/_start/login?lang=${k.request.culture}`" class="home-tab-1 hidden [&.active]:flex min-w-35 color-btn ml-auto cursor-pointer rounded-full py-3.5 pr-2 pl-5 gap-4 items-center justify-between shrink-0 w-fit h-14">
+					<div class="text-white text-xl font-semibold" k-label="Build now">
+						立即建站
+					</div>
+					<div class="shrink-0 w-[38px] h-[38px] bg-[#ffffff] rounded-full flex items-center justify-center">
+						<img src="/icon/arrow.svg" alt="">
+					</div>
+				</a>
+				<a :href="`/_start/login?lang=${k.request.culture}`" class="home-tab-2 hidden [&.active]:flex min-w-35 color-btn ml-auto cursor-pointer rounded-full py-3.5 pr-2 pl-5 gap-4 items-center justify-between shrink-0 w-fit h-14">
+					<div class="text-white text-xl font-semibold" k-label="Use now">
+						立即使用
+					</div>
+					<div class="shrink-0 w-[38px] h-[38px] bg-[#ffffff] rounded-full flex items-center justify-center">
+						<img src="/icon/arrow.svg" alt="">
+					</div>
+				</a>
+			</div>
+		</div>
+		<div class="z-1 mt-auto flex-1 rounded-[20px] border-[rgba(255,255,255,0.74)] border h-[380px] p-3 home-image">
+			<img class="h-full rounded-[16px] object-top-left object-cover" k-attribute="src item.HeadImage" alt="">
+		</div>
+	</div>
+</section>
+<div class="mb-16 text-[#374151] text-center text-[32px] font-medium" k-label="Efficient collaboration, technology makes work easier">
+	高效协同，科技让工作更简单
+</div>
+<div class="mx-auto mb-20 w-fit grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8" k-for="item in apps">
+	<div target="_blank" href="#" k-attribute="href item.linkto" class="app-item group w-40 cursor-pointer rounded-lg flex flex-col gap-4 items-center justify-start rounded-lg px-2 py-7">
+		<img k-attribute="src item.icon" alt="" class="w-16 h-16">
+		<div class="flex flex-col gap-2 items-center justify-start">
+			<div class="text-[#374151] group-hover:text-[#2296f3] text-center text-base font-medium" k-content="item.title"></div>
+			<div class="text-[#6b7280] text-center text-xs" k-content="item.description"></div>
+		</div>
+	</div>
+</div>
+<script>
+	const tabs = document.querySelectorAll('input[name="tabs"]')
+	const tabContents = document.querySelectorAll('.home-tab-1, .home-tab-2')
+	const tabCtn = document.querySelector('.tabs-ctn')
+	tabs.forEach((tab) => {
+		tab.addEventListener('change', () => {
+			tabCtn.classList.remove('home-tab-1')
+			tabCtn.classList.remove('home-tab-2')
+			tabCtn.classList.add(`home-tab-${tab.value}`)
+			tabContents.forEach((content) => {
+				content.classList.remove('active')
+			})
+			const activeTab = document.querySelectorAll(`.home-tab-${tab.value}`)
+			activeTab.forEach((content) => {
+				content.classList.add('active')
+			})
+		})
+	})
+	const defaultTab = document.querySelector('input[name="tabs"]:checked')
+	if (defaultTab) {
+		const defaultContent = document.querySelectorAll(`.home-tab-${defaultTab.value}`)
+		defaultContent.forEach((content) => {
+			content.classList.add('active')
+			tabCtn.classList.add(`home-tab-${defaultTab.value}`)
+		})
+	}
+</script>

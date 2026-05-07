@@ -1,0 +1,11 @@
+{
+  "name": "kooboo_dev",
+  "version": "1.0.0",
+  "type": "module",
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "dev": "kb sync"
+  }
+}

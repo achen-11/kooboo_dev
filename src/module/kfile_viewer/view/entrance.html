@@ -1,0 +1,90 @@
+<template id="main-component">
+    <div class="flex flex-col h-screen">
+      <kfile-viewer-app-header></kfile-viewer-app-header>
+      <div class="flex flex-1 min-h-0 relative">
+        <kfile-viewer-file-tree></kfile-viewer-file-tree>
+        <!-- 收起时显示的展开按钮 -->
+        <button v-if="treeCollapsed" @click="toggleTree" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-1.5 bg-white border border-r-0 border-slate-200 rounded-l-md shadow-md hover:bg-slate-50 cursor-pointer transition-colors" title="展开文件夹" aria-label="展开文件夹">
+          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+          </svg>
+        </button>
+        <main class="flex-1 flex flex-col min-w-0">
+          <div class="flex-1 flex min-h-0" ref="containerRef">
+            <kfile-viewer-file-list class="flex-1 min-w-0"></kfile-viewer-file-list>
+            <!-- 拖拽分隔条 -->
+            <div class="w-1 cursor-col-resize bg-transparent hover:bg-indigo-300 transition-colors flex-shrink-0" @mousedown="handleResizeStart" @dblclick="togglePreviewWidth" title="拖拽调整宽度，双击切换"></div>
+            <kfile-viewer-preview-panel></kfile-viewer-preview-panel>
+          </div>
+        </main>
+      </div>
+      <kfile-viewer-modals></kfile-viewer-modals>
+    </div>
+  </template>
+  <script>
+    definePage({
+      template: '#main-component',
+      setup() {
+        var store = window.KFileViewerCreateStore && window.KFileViewerCreateStore();
+        if (store) provide('store', store);
+  
+        var Vue = window.Vue;
+        var containerRef = Vue && Vue.ref ? Vue.ref(null) : { value: null };
+        var treeCollapsed = store && store.treeCollapsed;
+  
+        // 快捷键：Cmd/Ctrl + B 切换左侧菜单
+        function handleKeydown(e) {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+            e.preventDefault();
+            if (store) store.toggleTree();
+          }
+        }
+  
+        if (typeof document !== 'undefined') {
+          document.addEventListener('keydown', handleKeydown);
+        }
+  
+        function handleResizeStart(e) {
+          if (!store) return;
+          store.startResize();
+          var startX = e.clientX;
+          var startWidth = store.previewWidth.value;
+  
+          function onMouseMove(e) {
+            var dx = startX - e.clientX;
+            store.setPreviewWidth(startWidth + dx);
+          }
+  
+          function onMouseUp() {
+            if (store) store.endResize();
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+          }
+  
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        }
+  
+        function togglePreviewWidth() {
+          if (!store) return;
+          if (store.previewWidth.value > 500) {
+            store.setPreviewWidth(460);
+          } else {
+            store.setPreviewWidth(Math.min(window.innerWidth * 0.5, 460));
+          }
+        }
+  
+        function toggleTree() {
+          if (store) store.toggleTree();
+        }
+  
+        return {
+          containerRef: containerRef,
+          treeCollapsed: treeCollapsed,
+          handleResizeStart: handleResizeStart,
+          togglePreviewWidth: togglePreviewWidth,
+          toggleTree: toggleTree
+        };
+      }
+    })
+  </script>

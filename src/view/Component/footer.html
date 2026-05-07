@@ -1,0 +1,38 @@
+<style>
+.component-footer {
+	position: relative;
+	overflow: hidden;
+
+}
+
+	.component-footer::before {
+		content: "";
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 140vw;
+		height: 800px;
+		-webkit-mask-image: radial-gradient(farthest-side at 50% 50%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+		mask-image: radial-gradient(farthest-side at 50% 50%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+		background-image: linear-gradient(90deg, rgb(126, 167, 233), rgb(148, 239, 183));
+	}
+
+	.component-footer::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background-image: url(/images/guilloche.svg);
+		background-repeat: repeat;
+		background-position: top right;
+		background-size: 20px;
+		mix-blend-mode: overlay;
+	}
+
+</style>
+
+<div class="component-footer">
+	<div class="relative z-[1] pt-20">
+		<view id="component/start"></view>
+		<view id="common/footer"></view>
+	</div>
+</div>

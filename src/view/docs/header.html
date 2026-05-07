@@ -1,0 +1,62 @@
+<script env="server">
+	var langs = k.site.multilingual.currentURLs();
+	var culture = k.site.multilingual.currentCulture;
+
+	var switchlink = langs.filter(o=>!o.isActive)[0].URL; 
+
+	var switchlang = "zh"
+
+	if (culture == "zh") {
+		switchlang = "en";
+	}
+	
+</script>
+
+
+<header class="shadow sticky z-10 left-0 top-0 right-0 bg-white">
+	<div class="flex py-4 px-6 items-center text-gray-700">
+		<!-- mobile menu -->
+		<div class="lg:hidden relative mr-4 select-none">
+			<input id="sliderCheckbox" type="checkbox" class="peer w-8 h-8 absolute z-[2] left-0 cursor-pointer opacity-0">
+			<span class="transition-transform origin-top-left block w-8 h-1 my-[5px] relative z-[1] bg-gray-500 rounded peer-checked:rotate-45 peer-checked:-translate-y-[2px] peer-checked:translate-x-[6px]"></span>
+			<span class="transition-opacity origin-top-left block w-8 h-1 my-[5px] relative z-[1] bg-gray-500 rounded peer-checked:opacity-0"></span>
+			<span class="transition-transform origin-bottom-left block w-8 h-1 my-[5px] relative z-[1] bg-gray-500 rounded peer-checked:-rotate-45 peer-checked:translate-y-[2px] peer-checked:translate-x-[6px]"></span>
+		</div>
+
+		<!-- mobile language switch -->
+		<a class="lg:hidden inline-block px-4 py-1 border-l-2 border-grey-700 relative z-[2]" k-content="switchlang" k-attribute="href switchlink" href="/home">EN</a>
+
+		<!-- logo -->
+		<a href="/home" class="ml-auto lg:ml-0 relative z-[2]">
+			<img class="h-5 w-auto" src="/Kooboo.png" alt="Kooboo Logo">
+		</a>
+
+
+
+		<a href="/docs" class="inline-block ml-4 pl-4 border-l border-gray-300" k-label="Docs">文档</a>
+
+		<!-- desktop login -->
+		<div class="group ml-auto  relative hidden transition-all py-1 px-3 rounded-lg lg:flex items-center cursor-pointer shadow-[0_0_0_1px_rgba(0,0,0,0.1)] hover:shadow-[0_0_2px_1px_rgba(0,0,0,0.2)] after:content-empty after:absolute after:top-full after:left-0 after:right-0 after:bg-transparent after:h-2">
+			<img class="h-8 w-auto mr-1" k-attribute="src /images/{culture}.png" src="/images/Chinese.png" alt="Chinese">
+			<svg class="transition-transform group-hover:rotate-180 ease-in-out duration-200" t="1687837835352" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6636" width="16" height="16">
+				<path d="M862.276177 319.319629 511.892041 669.701718 161.449577 319.319629 862.276177 319.319629z" p-id="6637"></path>
+			</svg>
+			<ul k-for="item in langs" class="absolute transition-transform scale-0 group-hover:scale-100 mt-2 top-full right-0 shadow-sm border border-gray-100 rounded p-1.5 w-19 bg-white text-sm text-gray-500">
+
+				<li class="group/item rounded hover:bg-gray-100">
+					<a class="transition-transform flex items-center justify-center rounded-sm" k-attribute="href item.URL"><img class="h-8 group-hover/item:scale-80" k-attribute="src /images/{item.Key}.png"></a>
+				</li>
+			</ul>
+		</div>
+
+
+		<a env="server" class="group hidden items-center lg:flex shadow-[0_0_0_1px_rgba(0,0,0,0.1)] rounded-lg py-3 px-4 ml-3 transition-all hover:shadow-[0_0_2px_1px_rgba(0,0,0,0.2)]" :href="`/_start/login?lang=${k.request.culture}`">
+			<span class="mr-1 leading-none" k-label="Login">登录</span>
+			<svg viewBox="0 0 16 16" fill="none" class="-mr-1 inline-block h-4 stroke-current" xmlns="http://www.w3.org/2000/svg">
+				<path d="M8 13L13 8L8 3" stroke="black" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="round" class="transition-transform -translate-x-1 group-hover:translate-x-0">
+				</path>
+				<path d="M12 8L2 8" stroke="black" stroke-width="1.5" class="transition-transform origin-left scale-0 group-hover:scale-100"></path>
+			</svg>
+		</a>
+	</div>
+</header>

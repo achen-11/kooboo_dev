@@ -1,0 +1,303 @@
+<script env="server">
+	k.response.meta.title = "简历列表";
+</script>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+<script src="https://unpkg.com/element-plus/dist/index.full.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<style>
+	.scrollbar-hide {
+		scrollbar-width: none;
+		/* Firefox */
+		-ms-overflow-style: none;
+		/* IE 10+ */
+	}
+
+	.scrollbar-hide::-webkit-scrollbar {
+		display: none;
+		/* Chrome, Safari, Opera */
+	}
+
+	html {
+		scrollbar-width: none;
+		/* Firefox */
+		-ms-overflow-style: none;
+		/* IE 10+ */
+	}
+</style>
+
+<div id="app">
+	<div id="main-content" class="p-2 md:p-4 bg-gray-50 min-h-screen scrollbar-hide">
+		<div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-y-3 md:gap-4">
+			<!-- 左侧：简历列表 -->
+			<div class="bg-white shadow rounded-lg p-3 md:p-4 space-y-2 md:space-y-3 col-span-1 md:h-[calc(100vh-32px)] flex flex-col">
+				<div class="text-sm md:text-base">
+					<!-- 简历列表 -->
+					<div class="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+
+						<el-select v-model="jobType" placeholder="请选择岗位类型" class="w-full" @change="handleSelect">
+							<el-option v-for="(item, index) in jobQuestions" :key="index" :label="item.name" :value="item.key">
+						</el-option></el-select>
+
+						<el-button class="px-2 py-1 md:px-3 text-sm md:text-base" type="primary" @click="reset">重置</el-button>
+					</div>
+				</div>
+
+				<div class="flex justify-center items-center text-gray-600 cursor-default text-xs md:text-sm overflow-x-auto">
+					<div class="border-r-2 border-gray-200 pr-3 hidden"></div>
+					<i class="hidden mr-2 md:mr-3 mb-1 md:mb-2 cursor-pointer whitespace-nowrap text-[#0087C2] font-medium border-r border-gray-200 pr-2 md:pr-3"></i>
+					<div :class="['mr-2 md:mr-3 mb-1 md:mb-2 cursor-pointer whitespace-nowrap',currentIndex === index ? 'text-[#0087C2] font-medium' : '',index !== type.length - 1 ? 'border-r border-gray-200 pr-2 md:pr-3' : '' ]" v-for="(item, index) in type" @click="handleNum(index)">{{item}}
+					</div>
+				</div>
+
+				<div class="h-[300px] md:h-auto md:flex-1 md:overflow-hidden">
+					<el-scrollbar>
+						<div class="space-y-2">
+							<div class="border-[#0087C2]"></div>
+							<div v-for="(item, index) in (filterResumes ? filterResumes : resumes)" @click="handleClick(item,index)" :class="['relative flex cursor-pointer border rounded p-2 hover:bg-gray-50 resume-item transition-colors duration-150',currentResume == index ? 'border-[#0087C2]' : '']">
+
+								<!-- 移动端按钮放在右侧顶部，桌面端保持原位置 -->
+								<div class="absolute top-1 right-1 flex gap-1">
+									<img class="w-5 h-5 bg-white rounded-full p-0.5 shadow-sm" :src="item.isCollect === 0 ? '/icon/collect.svg' : '/icon/no_collect.svg'" @click.stop="handleCollect(item)">
+
+									<img class="w-5 h-5 bg-white rounded-full p-0.5 shadow-sm" src="/icon/deleteResume.svg" @click.stop="handleDelete(item)">
+								</div>
+
+								<!-- 左侧：占 50%，可换行 -->
+								<div class="w-1/2 md:w-1/3 pr-2 text-xs md:text-sm break-words whitespace-normal overflow-hidden font-medium">
+									{{ item.data.username }}
+								</div>
+
+								<!-- 右侧：占 50% -->
+								<div class="w-1/2 md:w-2/3 pl-2 ml-0 md:ml-2">
+									<p class="text-xs mb-0 md:mb-1 text-gray-600 truncate">{{ jobQuestions?.find(i =>
+										i.id ==
+										item.jobQuestionId).name }}</p>
+									<div class="text-[10px] md:text-xs text-gray-400 mt-0 md:mt-1">{{
+										formatTimestamp(item.created) }}</div>
+								</div>
+							</div>
+						</div>
+					</el-scrollbar>
+				</div>
+
+				<div class="w-full text-right">
+					<el-button class="text-xl mt-[5px]" @click="handleClear" link="" size="small" type="danger">清理临时文件</el-button>
+				</div>
+
+			</div>
+
+			<!-- 右侧：简历详细信息 -->
+			<div v-if="currentQuestion" class="bg-white shadow rounded-lg p-3 md:p-4 col-span-2 max-h-[calc(100vh-20px)] ">
+				<el-scrollbar ref="scrollContainer">
+					<div id="job-content md:h-[calc(100vh-20px)]">
+						<div class="content-item">
+							<div class="space-y-3 md:space-y-4">
+								<div>
+									<form id="baseForm" novalidate="" class="flex flex-wrap gap-x-2 md:gap-x-4 gap-y-2 md:flex-row flex-col">
+										<div class="flex-1 mb-2 md:mb-3 md:mb-0" v-for="(inputBase, index) in baseQuestions">
+											<label :for="inputBase.name" class="block mb-0 md:mb-1 text-xs text-gray-600">
+												<span v-if="inputBase.is_required" class="text-[#FF6F5C]">*</span>
+												<span class="text-gray-700">{{inputBase.text}}</span>
+											</label>
+											<input type="text" :id="inputBase.name" :name="inputBase.name" readonly="" :value="currentAnswer.data[inputBase.name]" class="border border-gray-200 rounded w-full h-7 md:h-8 py-0 md:py-1 px-2 focus:outline-none focus:ring-1 focus:ring-blue-200 text-xs md:text-sm">
+										</div>
+									</form>
+								</div>
+								<div class="h-px w-full bg-gray-100"></div>
+								<div>
+									<form id="myForm" novalidate="" class="space-y-4 md:space-y-6">
+										<div v-for="(qItem, index) in currentQuestion">
+											<label for="username" class="block mb-0 md:mb-1 text-xs md:text-sm text-gray-700">
+												<span v-if="qItem.is_required" class="text-[#FF6F5C]">*</span>
+												<span class="text-sm md:text-base text-gray-800 font-medium">{{index+1}}、{{qItem.text}}</span>
+											</label>
+											<div class="space-y-1 md:space-y-2" v-if="qItem.type=='radio'">
+												<div class="flex items-center gap-1 md:gap-2" v-for="iSelect in JSON.parse(qItem.options)">
+													<input type="radio" readonly="" :name="qItem.name" class="accent-[#0087C2] w-3 h-3 md:w-4 md:h-4" :value="iSelect.key" :checked="iSelect.key == currentAnswer.data[qItem.name]" :id="`${iSelect.key}_${iSelect.value}`">
+													<label class="text-xs md:text-sm text-gray-700" :for="`${iSelect.key}_${iSelect.value}`">
+														{{iSelect.value}}
+													</label>
+												</div>
+											</div>
+
+											<div class="space-y-1 md:space-y-2" v-if="qItem.type=='checkbox'">
+												<div class="flex items-center gap-1 md:gap-2" v-for="iSelect in JSON.parse(qItem.options)">
+													<input type="checkbox" :value="iSelect.key" :required="qItem.is_required" :name="qItem.name" :checked="currentAnswer.data[qItem.name] == iSelect.key || currentAnswer.data[qItem.name]?.includes(iSelect.key)" class="accent-[#0087C2] w-3 h-3 md:w-4 md:h-4" :id="`${iSelect.key}_${iSelect.value}`">
+													<label class="text-xs md:text-sm text-gray-700" :for="`${iSelect.key}_${iSelect.value}`">
+														{{iSelect.value}}
+													</label>
+												</div>
+											</div>
+
+											<div class="space-y-1 md:space-y-2" v-if="qItem.type=='input'">
+												<input :required="qItem.is_required" type="text" :name="qItem.name" :value="currentAnswer.data[qItem.name]" class="border border-gray-200 rounded w-full h-7 md:h-8 py-0 md:py-1 px-2 focus:outline-none focus:ring-1 focus:ring-blue-200 text-xs md:text-sm">
+											</div>
+
+											<div class="space-y-1 md:space-y-2" v-if="qItem.type=='textarea'">
+												<textarea :required="qItem.is_required" class="border border-gray-200 rounded w-full h-20 md:h-24 py-0 md:py-1 px-2 focus:outline-none focus:ring-1 focus:ring-blue-200 text-xs md:text-sm" :name="qItem.name" rows="4" cols="50"></textarea>
+											</div>
+
+											<div class="space-y-1 md:space-y-2" v-if="qItem.type=='file'">
+												<div id="fileList" class="space-y-1 md:space-y-2">
+													<div v-for="(file, idx) in currentAnswer.fileAnswers[qItem.name]" :key="idx" class="flex items-center">
+														<a :href="file.relativeUrl" target="_blank" class="text-blue-500 hover:underline text-xs md:text-sm">
+															{{ file.name }} ({{ file.stringSize }})
+														</a>
+													</div>
+												</div>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</el-scrollbar>
+			</div>
+			<div v-if="!currentQuestion" class="bg-white rounded-lg p-4 md:p-6 col-span-2 text-gray-400 text-xs md:text-sm flex items-center justify-center">
+				请选择一个简历查看详细信息
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="module">
+	const { createApp, ref, onMounted, nextTick } = Vue
+	
+	const app = createApp({
+		setup() {
+			const resumes = ref()
+			const filterResumes = ref()
+			const baseQuestions = ref()
+			const jobQuestions = ref()
+			const currentQuestion = ref()
+			const currentAnswer = ref()
+			const jobType = ref()
+			const currentResume = ref()
+			const scrollContainer = ref(null)
+	
+	
+			const type = ["全部", "收藏"]
+			const currentIndex = ref(0)
+	
+			const handleNum = (key) => {
+				if (key === 0) {
+					filterResumes.value = resumes.value
+				} else {
+					filterResumes.value = resumes.value.filter(i => i.isCollect === 1)
+				}
+				currentIndex.value = key
+			}
+	
+			const handleDelete = async (data) => {
+				ElementPlus.ElMessageBox.confirm(
+					'是否删除该用户的简历?',
+					{
+						confirmButtonText: '确定',
+						cancelButtonText: '取消',
+						type: 'warning',
+					}
+				)
+					.then(async () => {
+						const res = await axios.delete(`/api/join-us/admin/remove?id=${data._id}`)
+						await getResums()
+					})
+					.catch(() => {
+						return
+					})
+			}
+	
+			const handleCollect = async (data) => {
+				const res = await axios.put(`/api/join-us/admin/collect?id=${data._id}&isCollect=${data.isCollect === 0 ? 1 : 0}`)
+				await getResums()
+			}
+	
+			const getResums = async () => {
+				const res = await axios.get('/api/join-us/admin/list')
+				console.log(res);
+				resumes.value = res.data
+			}
+	
+			const getQuestions = async () => {
+				const res = await axios.get('/api/join-us/admin/questions')
+				baseQuestions.value = res.data.baseQuestions
+				jobQuestions.value = res.data.jobQuestions
+			}
+	
+			const handleClick = (data, index) => {
+				const current = jobQuestions.value.filter(i => i.id == data.jobQuestionId)
+				currentQuestion.value = current[0].questions
+				const answer = resumes.value.filter(i => i.jobQuestionId == data.jobQuestionId)
+				currentAnswer.value = data
+				currentResume.value = index
+				if (scrollContainer.value) {
+					scrollContainer.value.wrapRef.scrollTop = 0
+				}
+			}
+	
+			const handleSelect = (key) => {
+				const jobQuestionId = jobQuestions.value.filter(i => i.key == key)[0].id
+				console.log(resumes.value.filter(i => i.jobQuestionId == jobQuestionId));
+				filterResumes.value = resumes.value.filter(i => i.jobQuestionId == jobQuestionId)
+	
+			}
+	
+			const reset = () => {
+				jobType.value = null,
+					filterResumes.value = null
+			}
+	
+			const handleClear = () => {
+				axios.get('/api/join-us/admin/clearTempFile')
+				ElementPlus.ElMessage.success('临时文件清理成功')
+			}
+	
+			const formatTimestamp = (timestamp) => {
+				const date = new Date(Number(timestamp)); // 确保是数字
+				const year = date.getFullYear();
+				const month = (date.getMonth() + 1).toString().padStart(2, '0');
+				const day = date.getDate().toString().padStart(2, '0');
+				const hour = date.getHours().toString().padStart(2, '0');
+				const minute = date.getMinutes().toString().padStart(2, '0');
+				const second = date.getSeconds().toString().padStart(2, '0');
+				return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+			}
+	
+			onMounted(() => {
+				getQuestions()
+				getResums()
+			})
+	
+			return {
+				getResums,
+				getQuestions,
+				resumes,
+				baseQuestions,
+				jobQuestions,
+				currentQuestion,
+				currentAnswer,
+				formatTimestamp,
+				handleClick,
+				handleSelect,
+				jobType,
+				filterResumes,
+				reset,
+				handleCollect,
+				handleDelete,
+				handleNum,
+				currentIndex,
+				type,
+				handleClear,
+				currentResume,
+				scrollContainer
+			}
+		}
+	})
+	
+	app.use(ElementPlus)
+	app.mount('#app')
+</script>

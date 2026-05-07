@@ -1,0 +1,515 @@
+<script env="server">
+	var item = k.content.HomeBanner.all().find(o => o.PageName == "hire");
+	
+	if (item) {
+		k.response.meta.title = "Kooboo " + item.Title;
+		k.response.meta.setMeta("keywords", item.SubTitle);
+		k.response.meta.setMeta("description", item.SubTitle);
+	}
+	
+	var jobQuestions = k.content.JobQuestion.all().sort((a, b) => a.key - b.key)
+	var baseQuestions = k.content.JobBaseQuestion.all()
+
+	let key = k.request.queryString.key
+	if (!jobQuestions.find(i => i.key === key)) {
+		key = jobQuestions?.[0]?.key
+	}
+	
+	k.utils.clientJS.setVariable('currentKey', key)
+	
+	k.utils.clientJS.setVariable('jobQuestions', Array.from(jobQuestions).reduce((a, c) => ({ ...a, [c.id]: c.questions }), {}))
+	
+	k.utils.clientJS.setVariable('baseQuestions', baseQuestions)
+	
+	k.utils.clientJS.setVariable('K_i18n_', k.utils.clientJS.i18n())
+</script>
+<script env="client" src="/k-i18n.js"></script>
+<script env="client">
+	if (K_i18n_ && KI18n) {
+		const { t } = KI18n.createI18n(K_i18n_)
+		window.t = t
+	}
+	
+</script>
+
+<style>
+	.component-banner {
+		position: relative;
+		overflow-x: hidden;
+	}
+
+	.component-banner::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		width: 150vw;
+		mask-image: radial-gradient(farthest-side at 50% 50%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+		-webkit-mask-image: radial-gradient(farthest-side at 50% 50%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+		background-image: linear-gradient(90deg, rgb(126, 167, 233), rgb(148, 239, 183));
+		background-repeat: repeat;
+	}
+
+	.component-banner::after {
+		content: "";
+		position: absolute;
+		width: 150vw;
+		inset: 0;
+		background-repeat: repeat;
+		background-image: url(/images/guilloche.svg);
+		background-size: 20px;
+		mix-blend-mode: overlay;
+	}
+
+	.spanText span {
+		display: block;
+		/* 或 inline-block */
+		white-space: pre-wrap;
+		/* 保留空格和换行符，同时允许自动换行 */
+		word-break: break-word;
+		/* 单词过长自动断行 */
+	}
+</style>
+
+<section class="component-banner">
+	<div class="absolute inset-y-0 -inset-x-20 z-0 pointer-events-none">
+		<div class="bg-[#b4fce7] rounded-full w-[12.23%] h-[31.93%] absolute left-[75.06%] top-0" style="filter: blur(133.8px)"></div>
+		<div class="bg-[#bee8ff] rounded-full w-[12.23%] h-[31.93%] absolute left-[53.71%] top-[54.29%]" style="filter: blur(133.8px)"></div>
+		<div class="bg-[#b4defc] rounded-full w-[17.51%] h-[45.71%] absolute left-[82.48%] top-[24.03%]" style="filter: blur(149.65px)"></div>
+		<div class="bg-[#d0fcff] rounded-full w-[13.72%] h-[35.80%] absolute left-[4.70%] top-[44.54%]" style="filter: blur(149.65px)"></div>
+		<div class="bg-[#b4effc] rounded-full w-[9.34%] h-[24.37%] absolute left-0 top-[20.17%]" style="filter: blur(149.65px)"></div>
+		<div class="bg-[#fff6d8] rounded-full w-[17.51%] h-[45.71%] absolute left-[66.31%] top-[54.29%]" style="filter: blur(149.65px)"></div>
+		<div class="bg-[#fff6d8] rounded-full w-[15.83%] h-[41.34%] absolute left-0 top-[3.19%]" style="filter: blur(149.65px)"></div>
+		<div class="bg-[#fff6d8] rounded-full w-[13.00%] h-[33.95%] absolute left-[59.81%] top-[0.59%]" style="filter: blur(149.65px)"></div>
+	</div>
+	<div class="relative z-[1] max-w-screen-xl mx-auto py-10 px-6 lg:py-16 lg:px-24">
+		<div class="max-w-screen-xl">
+			<p k-content="item.Heading" class="mb-8 before:content-empty before:w-2 before:h-4 before:mr-2 before:bg-gradient-to-b before:from-blue-500 before:to-cyan-500 before:inline-block before:relative before:top-0.5 before:rounded-[1px]">
+				专业开发 立等可取</p>
+			<h1 class="text-5xl lg:text-7xl" k-content="item.Title">独立站 黑科技</h1>
+			<p class="text-2xl font-light mt-2 text-gray-500" k-content="item.SubTitle">一分钟建站，点哪里改哪里，全球部署，CDN 加速</p>
+		</div>
+	</div>
+</section>
+
+<div env="server" class="relative z-[1] max-w-screen-xl mx-auto lg:px-24 px-6">
+
+	<div class="p-8 shadow-[0_0_5px_2px_rgba(0,0,0,0.1)] bg-white mb-[20px]">
+		<div class="p-1 inline-block bg-[#EDF1F5] rounded-5 mb-6 md:w-auto w-full">
+			<div class="inline-flex flex-wrap gap-y-2 text-4 justify-start md:flex-nowrap w-full">
+				<label v-for="(item, index) in jobQuestions" class="cursor-pointer md:w-auto w-full md:min-w-0 min-w-[120px]">
+					<input type="radio" :checked="key === item.key" :value="item.key" name="_job" onchange="handleChange(event)" class="absolute hidden peer">
+					<div class="px-4 py-2.5  w-full text-center md:text-left truncate text-sm md:text-base rounded-5 text-[#6B7280] peer-checked:bg-white peer-checked:text-[#374151] transition-colors duration-200  hover:bg-gray-100 md:hover:bg-transparent">
+						{{ item.name }}
+					</div>
+				</label>
+			</div>
+		</div>
+
+		<div v-for="(item, index) in jobQuestions">
+			<input type="radio" :checked="key === item.key" :value="item.key" name="sync-job" :id="`_sync_job_${item.key}`" class="peer hidden">
+			<form novalidate="" class="hidden peer-checked:block content-item">
+				<input type="hidden" name="jobQuestionId" :value="item.id">
+				<div class="space-y-6">
+					<div class="py-5 px-2 space-y-4">
+						<div class="text-[16px]">
+							<img src="/icon/Vector.svg" class="inline-block mr-2 text-[#374151]">
+							<span k-label="Job Description">岗位介绍</span>
+						</div>
+						<div class="text-[14px] text-[#374151]">{{item.title}}</div>
+						<div class="text-[#646A73]">
+							<div k-content="item.description" class="spanText"></div>
+						</div>
+
+					</div>
+
+					<div class="h-px w-full bg-[#E0E9F3]"></div>
+
+					<div class="flex flex-wrap gap-x-8 md:flex-row flex-col">
+						<label class="block flex-1 mb-4 md:mb-0 form-item [&.error_.error-message]:block" v-for="(question, index) in baseQuestions" :id="`question-${question.id}-${item.key}`" onchange="handleInputChange(event)" oninput="handleInputChange(event)">
+							<div class="mb-1 text-sm text-gray-700 mb-3">
+								<span v-if="question.is_required === 'true'" class="text-[#FF6F5C]">*</span>
+								<span class="text-[#374151]">{{question.text}}</span>
+							</div>
+							<input :type="question.input_type || 'text'" :name="question.name" :required="question.is_required" class="border border-gray-300 rounded-2 w-full h-[38px] py-[3px] px-3 focus:outline-none">
+
+							<div class="error-message hidden mt-1 text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-1 shadow-sm mb-2">
+								{{ question.errorMessage }}
+							</div>
+
+						</label>
+					</div>
+
+					<div class="h-px w-full bg-[#E0E9F3]"></div>
+
+					<div class="space-y-[40px]">
+						<div v-for="(question, index) in item.questions" :id="`question-${question.id}-${item.key}`" class="form-item [&.error_.error-message]:block" onchange="handleInputChange(event)" oninput="handleInputChange(event)">
+							<!-- 题目 -->
+							<label class="block text-sm text-gray-700 mb-5">
+								<span v-if="question.is_required === 'true'" class="text-[#FF6F5C]">*</span>
+								<span class="text-[18px] text-[#374151]">
+									<span class="text-[#646A73] text-[16px]">{{ index + 1 }}</span>
+									<span>、</span>
+									<span class="text-[#646A73] text-[16px]">{{ question.text }}</span>
+								</span>
+							</label>
+
+							<div k-if="question.errorMessage" class="error-message hidden mt-1 text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-1 shadow-sm mb-2">
+								{{ question.errorMessage }}
+							</div>
+							<div class="space-y-3 " v-if="question.type == 'radio'">
+								<label class="flex items-center gap-2" v-for="option in question.options">
+									<input type="radio" :required="question.is_required" :name="question.name" class="accent-[#0087C2]" :value="option.key">
+									<span class="text-[14px] text-[#374151]">
+										{{option.value}}
+									</span>
+								</label>
+							</div>
+
+							<div class="space-y-3" v-else-if="question.type=='checkbox'">
+								<div class="flex items-center gap-2" v-for="(option,index) in question.options">
+									<label class="flex items-center space-x-3 cursor-pointer group">
+										<div class="relative w-5 h-5 flex items-center justify-center">
+											<input type="checkbox" :value="option.key" :name="question.name" class="hidden peer">
+											<!-- 未选中状态 - 圆形边框 -->
+											<img class="absolute w-[12px] h-[12px] text-gray-400 peer-checked:opacity-0 transition-opacity duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" src="/icon/unchecked.svg">
+											<!-- 选中状态 - 带勾的填充圆 -->
+											<img class="absolute w-[12px] h-[12px] text-indigo-600 opacity-0 peer-checked:opacity-100 transition-opacity duration-200" viewBox="0 0 24 24" fill="currentColor" src="/icon/check.svg">
+										</div>
+										<span class="text-gray-700 group-hover:text-gray-900">{{option.value}}</span>
+									</label>
+								</div>
+							</div>
+
+							<div class="space-y-3" v-else-if="question.type=='input'">
+								<label class="block">
+									<input :id="`input-${question.id}`" :required="question.is_required" :type="question.input_type || 'text'" :name="question.name" class="border border-gray-300 rounded-2 w-full h-[38px] py-[3px] px-3 focus:outline-none">
+
+								</label>
+							</div>
+
+							<div class="space-y-3" v-else-if="question.type=='textarea'">
+								<label class="block">
+									<textarea :id="`input-${question.id}`" :required="question.is_required" class="border border-gray-300 rounded-2 w-full h-[114px] py-[3px] px-3 focus:outline-none" :name="question.name" rows="4" cols="50"></textarea>
+
+								</label>
+							</div>
+
+							<div v-else-if="question.type=='file'">
+								<label class=" w-full max-w-[360px] h-[206px] max-h-[206px] sm:h-[206px]  border-2 border-dashed border-gray-300 rounded-xl p-6 mb-[10px] flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:border-blue-400 transition [&.drag]:border-blue-400" ondrop="handleFileDrop(event)" ondragover="handleFileDragover(event)" ondragenter="handleFileDragenter(event)" ondragleave="handleFileDragleave(event)">
+									<img src="/icon/Union.svg" class="h-12 w-12 mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0l-4 4m4-4v12">
+									
+									<p class="text-[14px] text-[#6B7280]" k-label="File Alart">
+										将文件拖拽到此处，或请点击上传</p>
+									<input :id="`input-${question.id}`" type="file" :accept="question.input_accept" class="hidden" :data-id="question.id" :data-type="question.input_accept" :data-name="question.name" :data-size="question.file_size" onchange="handleFileChange(event)">
+								</path></label>
+
+								<div class="text-[#6B7280] text-[12px] fileError">
+									{{question.description}}
+								</div>
+
+								<div class="file-list mt-3 space-y-3" :id="`fileList-${question.id}`">
+									<div class="hidden">
+
+										<div class="flex items-center justify-between w-[302px] p-[10px] gap-x-3 bg-[#F4F6F9]">
+											<div>
+												<img class="inline-block mr-3 w-[28.53px] h-[32.91px]" src="/icon/file.svg">
+												<span id="fileName" class="text-[14px] text-[#374151]">xx作品集.pdf</span>
+											</div>
+											<div>
+												<img src="/icon/Frame.svg">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<button type="submit" class="group flex justify-center shadow-[0_0_0_1px_rgba(0,0,0,0.1)]  bg-[#111a4a] items-center text-white rounded-lg py-[10px] px-[14px] transition-all hover:shadow-sm w-[186px] h-[40px] mt-[40px]" k-label="btnSubmit">提交申请</button>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="hidden -top-1"></div>
+	</div>
+
+	<script env="client">
+		let key = currentKey
+		function handleChange(e) {
+			key = event.target.defaultValue
+
+			// 更新key
+			const url = new URL(window.location.href);
+			url.searchParams.set('key', key)
+			window.history.pushState({}, '', url);
+			
+			const checkbox = document.getElementById(`_sync_job_${key}`);
+			if (checkbox) {
+				checkbox.checked = true;
+			}
+		}
+		
+		let fileList = {}
+		
+		function renderFileListById(id) {
+			const el = document.getElementById(`fileList-${id}`)
+			if (el) {
+				el.innerHTML = (fileList[id] || []).map(i => {
+					return `<div class="relative  flex items-center justify-between w-[302px] p-[10px] gap-x-3 bg-[#F4F6F9] overflow-visible">
+																		<div class="flex items-center">
+																			<img class="inline-block mr-3 w-[28.53px] h-[32.91px]" src="/icon/file.svg" />
+																			<span class="text-[14px] text-[#374151]">${i.name}</span>
+																		</div>
+																		<div>
+																			<img src="/icon/Frame.svg" />
+																		</div>
+																		<div class="" onclick="removeFile('${id}', '${i.fullName}')">
+																			<img class="absolute -top-1 right-1 p-1 cursor-pointer bg-white rounded-full shadow-sm border border-gray-200 w-5 h-5"
+																				src="/icon/delete.svg" />
+																		</div>
+																	</div> `
+				}).join('\n')
+		
+				// 如果有错误清除
+				const element = document.getElementById(`question-${id}-${key}`);
+				element?.classList?.remove('error');
+			}
+		}
+		
+		function removeFile(id, fullName) {
+			if (Array.isArray(fileList[id])) {
+				fileList[id] = fileList[id].filter(i => i.fullName !== fullName)
+				renderFileListById(id)
+			}
+		}
+		
+		let isSubmitting = false; // Global state flag
+		function submit(form) {
+			if (isSubmitting) return;
+    		isSubmitting = true;
+
+			try {
+				const formData = new FormData(form);
+				const body = {};
+			
+				// 遍历所有表单条目，处理多选
+				for (const [name, value] of formData.entries()) {
+					// console.log(name, value);
+					if (body.hasOwnProperty(name)) {
+						if (Array.isArray(body[name])) {
+							body[name].push(value);
+						} else {
+							body[name] = [body[name], value];
+						}
+					} else {
+						body[name] = value;
+					}
+				}
+			
+				const currentQuestions = jobQuestions[body.jobQuestionId];
+			
+				if (!currentQuestions) return;
+			
+				// 校验必填项：收集所有错误
+				let hasError = false;
+			
+				[...currentQuestions, ...baseQuestions]
+					.filter(i => i.is_required === 'true' && i.type !== 'file')
+					.forEach(item => {
+						const value = body[item.name];
+						const element = document.getElementById(`question-${item.id}-${key}`);
+			
+						if (!value || (Array.isArray(value) && !value.length)) {
+							hasError = true;
+							// 添加错误样式
+							element.classList.add('error');
+			
+						} else {
+							// 如果填写了，清理错误样式
+							element.classList.remove('error');
+						}
+					});
+
+				if (hasError) {
+					// 如果有任何错误，滚动到第一个错误处
+					const firstErrorElement = document.querySelector('.form-item.error');
+					if (firstErrorElement) {
+						firstErrorElement.style.scrollMarginTop = '80px';
+						firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					}
+					// 阻止表单提交
+					throw new Error('有必填项未填写');
+				}
+			
+				// 将文件写入body
+				const fileAnswers = []
+				currentQuestions.filter(i => i.type === 'file').forEach(item => {
+					if (fileList[item.id]?.length) {
+						fileAnswers.push({
+							files: fileList[item.id],
+							name: item.name,
+							id: item.id,
+						})
+					} else {
+						if (item.is_required === 'true') {
+							const element = document.getElementById(`question-${item.id}-${key}`);
+							element.classList.add('error');
+			
+							// 滚动到该元素（平滑滚动）
+							element.style.scrollMarginTop = '72px';
+							element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+							throw new Error('文件不能为空')
+						}
+					}
+				})
+			
+				body.fileAnswers = fileAnswers
+			
+				fetch('/api/join-us/post', {
+					method: 'POST',
+					body: JSON.stringify(body)
+				}).then(() => {
+					// 重置表单
+					form.reset()
+					isSubmitting = false
+					// 清空全局文件列表
+					fileList = {}
+					document.querySelectorAll('.file-list').forEach(el => el.innerHTML = '')
+					notyf?.success(t('submit success'))
+				})
+				
+			} catch (error) {
+				isSubmitting = false
+			}
+
+		}
+		
+		// 事件委托
+		document.addEventListener('submit', function (event) {
+			const form = event.target.closest('form');
+			// console.log(form);
+			if (form && form.matches('.content-item')) {
+				event.preventDefault();
+				submit(form);
+			}
+		});
+		
+		function handleFileChange(e) {
+			// 获取文件
+			const file = event.target.files[0];
+			uploadFile(file, event.target);
+			event.target.value = '';
+		}
+		
+		function handleFileDrop(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			e.target.classList.remove('drag');
+		
+			const files = e.dataTransfer.files;
+			const inputEl = e.target.querySelector('input');
+		
+			if (files.length > 0) {
+				// console.log('拖拽获取的文件:', files, inputEl);
+				Array.from(files).forEach(file => {
+					uploadFile(file, inputEl);
+				})
+			}
+		}
+		
+		function handleFileDragover(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			e.target.classList.add('drag');
+		}
+		
+		function handleFileDragenter(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			e.target.classList.add('drag'); // 拖入时高亮
+		}
+		
+		function handleFileDragleave(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			e.target.classList.remove('drag'); // 拖出时取消高亮
+		}
+		
+		function uploadFile(file, inputEl) {
+			if (!inputEl) return
+		
+			const id = inputEl.dataset.id
+			const allowedTypes = inputEl.dataset.type?.trim()?.split(',') || []
+			const fileSize = inputEl.dataset.size
+		
+			// 1. 处理文件类型
+			function isFileTypeAllowed(file, allowedTypes) {
+				const fileName = file.name.toLowerCase();
+				const fileType = file.type.toLowerCase();
+		
+				return allowedTypes.some(type => {
+					if (type.startsWith('.')) {
+						return fileName.endsWith(type.toLowerCase());
+					}
+					if (type.endsWith('/*')) {
+						const prefix = type.slice(0, -1); // 去掉最后的'*'
+						return fileType.startsWith(prefix);
+					}
+					return fileType === type.toLowerCase();
+				});
+			}
+		
+			// 2. 检查文件类型
+			const formItem = inputEl.closest('.form-item')
+			const fileError = formItem.querySelector('.error-message')
+			const errorMessage = document.querySelector('.fileError').innerHTML
+			if (!isFileTypeAllowed(file, allowedTypes)) {
+				// 添加 验证失败错误
+				if (fileError) {
+					fileError.classList.remove('hidden');
+					fileError.innerHTML = errorMessage
+				}
+				return;
+			} else {
+				fileError?.classList.add('hidden')
+			}
+		
+			// 3. 处理文件大小（单位KB）
+			const maxSize = Number(fileSize) * 1024; // 转换为字节
+			const isUnderLimit = file.size <= maxSize;
+		
+			if (!isUnderLimit) {
+				return;
+			}
+		
+			// 构造表单上传
+			const formData = new FormData();
+			formData.append('file', file);
+		
+			fetch('/api/join-us/file', {
+				method: 'POST',
+				body: formData
+			})
+				.then(res => res.json())
+				.then(data => {
+					if (data) {
+						!fileList[id] && (fileList[id] = [])
+						fileList[id].push(data)
+						renderFileListById(id)
+					}
+				})
+		}
+		
+		function handleInputChange(event) {
+			if (event.target.matches('input, textarea')) {
+				const formItem = event.target.closest('.form-item');
+				if (event.target.type === 'file') {
+					return
+				}
+				formItem?.classList.remove('error')
+			}
+		}
+	</script>
+</div>
+
+<view id="common/notyfjs"></view>

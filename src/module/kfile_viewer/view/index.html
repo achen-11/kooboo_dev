@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KFile 文件管理</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/marked.min.js"></script>
+  <script src="/js/vue-prod.js"></script>
+  <script src="/js/vue-router.js"></script>
+  <script src="/js/axios.min.js"></script>
+  <script env="server">
+    const baseUrl = (k.module.baseUrl.startsWith('http:') ? 'https:' + k.module.baseUrl.slice(5) : k.module.baseUrl) + '/api/files'
+    k.utils.clientJS.setVariable("baseUrl", { value: baseUrl})
+  </script>
+  <script>
+    /* 
+    针对kooboo的vue组件注册
+     
+    组件使用以下方法会自动注册该组件, 减少重复配置components
+    defineComponent('my-component', {...})
+    */
+    var { definePage, defineComponent, getComponents } = (() => {
+      const components = {}
+
+      return {
+        /**
+         * definePage
+         * @param {object} component vue组件
+         */
+        definePage(component) {
+          const key = 'main-component'
+          if (components[key]) {
+            console.warn(`components ${key} multiple registration`)
+          }
+          components[key] = { ...component, template: '#main-component' }
+          return components[key]
+        },
+        /**
+         * defineComponent
+         * @param {string} key 组件名称
+         * @param {object} component vue组件
+         */
+        defineComponent(key, component) {
+          if (components[key]) {
+            console.warn(`components ${key} multiple registration`)
+          }
+          components[key] = component
+          return components[key]
+        },
+        /**
+         * getComponents
+         * @param {string} key 组件名称
+         * @return {{[key:string]: any}[]} 所有组件
+         */
+        getComponents() {
+          return components
+        }
+
+      }
+    })()
+
+    /**
+     *  vue 常用方法扁平化
+     */
+    var { getCurrentInstance, ref, reactive, watch, computed,
+      onMounted, onUnmounted, nextTick, unref, toRef, toRaw, provide, inject, toValue } = Vue
+
+
+  </script>
+  <script src="/js/http.js"></script>
+  <script src="/js/store.js"></script>
+  <script src="/js/vue-router.js"></script>
+  <style>
+    .preview-markdown {
+      color: #334155;
+      line-height: 1.6;
+    }
+
+    .preview-markdown h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 1rem 0 0.5rem;
+    }
+
+    .preview-markdown h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0.75rem 0 0.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 0.25rem;
+    }
+
+    .preview-markdown h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0.5rem 0;
+    }
+
+    .preview-markdown p {
+      margin: 0.5rem 0;
+    }
+
+    .preview-markdown ul,
+    .preview-markdown ol {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+    }
+
+    .preview-markdown table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 0.5rem 0;
+      font-size: 0.875rem;
+    }
+
+    .preview-markdown th,
+    .preview-markdown td {
+      border: 1px solid #e2e8f0;
+      padding: 0.25rem 0.5rem;
+      text-align: left;
+    }
+
+    .preview-markdown th {
+      background: #f1f5f9;
+      font-weight: 600;
+    }
+
+    .preview-markdown code {
+      background: #f1f5f9;
+      padding: 0.125rem 0.25rem;
+      border-radius: 0.25rem;
+      font-size: 0.875em;
+    }
+
+    .preview-markdown pre {
+      background: #f1f5f9;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      overflow-x: auto;
+      margin: 0.5rem 0;
+    }
+
+    .preview-markdown pre code {
+      background: none;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-100 text-slate-900 min-h-screen">
+  <div id="app" class="dark:bg-[#252526] dark:text-neutral-200 flex flex-col h-screen">
+    <router-view>
+    </router-view>
+  </div>
+  <view id="entrance"></view>
+  <view id="app-header"></view>
+  <view id="file-tree"></view>
+  <view id="file-list"></view>
+  <view id="preview-panel"></view>
+  <view id="modals"></view>
+  <view id="test-view"></view>
+  <script>
+    const app = Vue.createApp({
+      setup() { return {} }
+    })
+    for (const [key, component] of Object.entries(getComponents())) {
+      app.component(key, component)
+    }
+    const { createWebHashHistory, createRouter } = VueRouter
+    const routes = [
+      { path: '/', component: getComponents()['main-component'], name: 'file-viewer' },
+      { path: '/test', component: getComponents()['kfile-viewer-test-view'], name: 'test' },
+      { path: '/:pathMatch(.*)*', component: getComponents()['main-component'], name: 'fallback' }
+    ]
+    var router = createRouter({
+      history: createWebHashHistory(),
+      routes
+    })
+    app.use(router).mount("#app")
+  </script>
+
+</body>
+
+</html>
