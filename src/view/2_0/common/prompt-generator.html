@@ -1,0 +1,25 @@
+<div class="prompt-generator mt-4 w-full rounded-2xl border border-white/40 p-4 max-[640px]:p-2.5"
+    data-figma-node="275:7085">
+    <div class="flex min-h-[183px] flex-col gap-4 rounded-xl bg-[var(--color-white)] p-4 max-[640px]:min-h-[220px]">
+        <label class="sr-only" for="website-prompt">Website prompt</label>
+        <textarea id="website-prompt"
+            class="min-h-[95px] w-full flex-auto resize-none border-0 text-[15px] leading-[1.45] text-[#606266] outline-0"
+            rows="4">What kind of website do you need? Try this: help me generate a coffee website...</textarea>
+        <div class="flex items-center justify-end gap-4 max-[960px]:flex-col max-[960px]:items-stretch">
+            <div
+                class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm text-[#646c7d] max-[960px]:justify-end max-[640px]:flex-col max-[640px]:items-stretch max-[640px]:text-left">
+                <span>Model setting：</span>
+                <button
+                    class="inline-flex h-[38px] cursor-pointer items-center gap-2 rounded-lg border border-[#dcdfe6] bg-[var(--color-white)] px-[11px] py-[9px] text-[#606266] max-[640px]:justify-between"
+                    type="button">
+                    <span class="min-w-20 text-left text-sm">Low mode</span>
+                    <span class="h-0 w-0 border-x-4 border-t-[5px] border-x-transparent border-t-[#606266]"
+                        aria-hidden="true"></span>
+                </button>
+            </div>
+            <button
+                class="inline-flex h-10 w-[180px] cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-[50px] prompt-generator__btn px-4 py-2.5 text-sm font-medium leading-none text-[var(--color-white)] max-[960px]:w-full"
+                type="button">Generate now</button>
+        </div>
+    </div>
+</div>
