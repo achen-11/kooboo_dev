@@ -835,6 +835,113 @@ a {
     margin-top: 48px;
 }
 
+.innovation-page {
+    padding-bottom: 120px;
+}
+
+.innovation-hero__panel {
+    min-height: 236px;
+    border-radius: 24px;
+    background: url("./2_0/home-innovation-hero-background.png") center / 100% 100% no-repeat;
+}
+
+.innovation-hero__decor {
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    width: min(886px, 76vw);
+    height: auto;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.innovation-hero__content {
+    width: min(626px, calc(100% - 48px));
+    padding-top: 58px;
+}
+
+.innovation-hero__title {
+    color: var(--color-title);
+    font-size: 48px;
+    line-height: 1.21;
+    letter-spacing: 0;
+}
+
+.innovation-hero__subtitle {
+    margin-top: 24px;
+    max-width: 626px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0;
+}
+
+.innovation-grid {
+    width: min(1124px, calc(100vw - 48px));
+    margin-top: 38px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.innovation-card {
+    min-height: 269px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 24px;
+    background: #f5f8f9;
+}
+
+.innovation-card__icon {
+    width: 48px;
+    height: 48px;
+    flex: none;
+    display: block;
+}
+
+.innovation-card h2 {
+    margin: 24px 0 0;
+    color: var(--color-title);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0;
+}
+
+.innovation-card p {
+    margin: 8px 0 0;
+    color: var(--color-muted);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0;
+}
+
+.innovation-card__link {
+    width: fit-content;
+    min-height: 40px;
+    margin-top: auto;
+    padding: 10px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-white);
+    color: var(--color-title);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0;
+}
+
+.innovation-card__link:focus-visible {
+    outline: 3px solid rgba(17, 70, 255, 0.28);
+    outline-offset: 3px;
+}
+
 @media (max-width: 960px) {
     .site-header {
         height: 56px;
@@ -1047,6 +1154,33 @@ a {
 
     .home-start-building__header h2 {
         font-size: 40px;
+    }
+
+    .innovation-page {
+        padding-bottom: 88px;
+    }
+
+    .innovation-hero__panel {
+        min-height: 248px;
+    }
+
+    .innovation-hero__decor {
+        top: 8px;
+        width: min(780px, 108vw);
+    }
+
+    .innovation-hero__content {
+        padding-top: 62px;
+    }
+
+    .innovation-hero__title {
+        font-size: 40px;
+    }
+
+    .innovation-grid {
+        width: min(640px, calc(100vw - 48px));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
     }
 }
 
@@ -1336,5 +1470,63 @@ a {
 
     .home-start-building__prompt {
         margin-top: 34px;
+    }
+
+    .innovation-page {
+        padding-bottom: 64px;
+    }
+
+    .innovation-hero {
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+
+    .innovation-hero__panel {
+        min-height: 276px;
+        border-radius: 18px;
+        background-size: cover;
+    }
+
+    .innovation-hero__decor {
+        top: 18px;
+        width: 720px;
+        max-width: none;
+        opacity: 0.86;
+    }
+
+    .innovation-hero__content {
+        width: min(100% - 32px, 626px);
+        padding-top: 54px;
+    }
+
+    .innovation-hero__title {
+        font-size: 34px;
+        line-height: 1.22;
+    }
+
+    .innovation-hero__subtitle {
+        margin-top: 18px;
+        font-size: 14px;
+    }
+
+    .innovation-grid {
+        width: min(100% - 32px, 360px);
+        margin-top: 28px;
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .innovation-card {
+        min-height: 0;
+        padding: 24px 22px;
+        border-radius: 18px;
+    }
+
+    .innovation-card h2 {
+        margin-top: 20px;
+    }
+
+    .innovation-card__link {
+        margin-top: 22px;
     }
 }
