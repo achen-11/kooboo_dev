@@ -942,6 +942,76 @@ a {
     outline-offset: 3px;
 }
 
+.innovation-detail-page {
+    padding: 40px 0 120px;
+    background: var(--color-white);
+}
+
+.innovation-detail-page__inner {
+    width: min(1125px, calc(100vw - 48px));
+    margin: 0 auto;
+}
+
+.innovation-detail-header {
+    min-height: 140px;
+    padding: 33px 40px;
+    display: grid;
+    grid-template-columns: 24px 48px minmax(0, 1fr);
+    align-items: center;
+    gap: 24px;
+    border-radius: 24px;
+    background: #eaf8fb url("./2_0/innovation-detail-header-background.png") center / 100% 100% no-repeat;
+}
+
+.innovation-detail-header__back {
+    width: 44px;
+    height: 44px;
+    margin: -10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.innovation-detail-header__back img,
+.innovation-detail-header__icon {
+    display: block;
+    flex: none;
+}
+
+.innovation-detail-header__back:focus-visible {
+    outline: 3px solid rgba(17, 70, 255, 0.28);
+    outline-offset: 2px;
+}
+
+.innovation-detail-header__copy {
+    min-width: 0;
+}
+
+.innovation-detail-header__copy h1 {
+    margin: 0;
+    color: var(--color-title);
+    font-family: "PingFang SC", Inter, "Microsoft YaHei", Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0;
+}
+
+.innovation-detail-header__copy p {
+    margin: 8px 0 0;
+    color: var(--color-muted);
+    font-family: "PingFang SC", Inter, "Microsoft YaHei", Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0;
+}
+
+.innovation-detail-page__content-slot {
+    margin-top: 32px;
+}
+
 @media (max-width: 960px) {
     .site-header {
         height: 56px;
@@ -1181,6 +1251,17 @@ a {
         width: min(640px, calc(100vw - 48px));
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 20px;
+    }
+
+    .innovation-detail-page {
+        padding-top: 32px;
+        padding-bottom: 88px;
+    }
+
+    .innovation-detail-header {
+        padding-right: 32px;
+        padding-left: 32px;
+        background-size: cover;
     }
 }
 
@@ -1528,5 +1609,48 @@ a {
 
     .innovation-card__link {
         margin-top: 22px;
+    }
+
+    .innovation-detail-page {
+        padding-top: 24px;
+        padding-bottom: 64px;
+    }
+
+    .innovation-detail-page__inner {
+        width: min(100% - 32px, 1125px);
+    }
+
+    .innovation-detail-header {
+        min-height: 0;
+        padding: 24px 22px;
+        grid-template-columns: 24px minmax(0, 1fr);
+        align-items: start;
+        gap: 18px;
+        border-radius: 18px;
+    }
+
+    .innovation-detail-header__icon {
+        grid-column: 2;
+        grid-row: 1;
+        width: 44px;
+        height: 44px;
+    }
+
+    .innovation-detail-header__copy {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    .innovation-detail-header__copy h1 {
+        font-size: 28px;
+        line-height: 1.25;
+    }
+
+    .innovation-detail-header__copy p {
+        margin-top: 10px;
+    }
+
+    .innovation-detail-page__content-slot {
+        margin-top: 24px;
     }
 }
