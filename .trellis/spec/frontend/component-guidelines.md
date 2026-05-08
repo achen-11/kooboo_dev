@@ -17,7 +17,7 @@
 新增区块 view 使用以下结构：
 
 ```html
-<section class="feature-section" data-figma-node="optional-node-id">
+<section class="feature-section">
     <div class="site-container">
         <!-- content -->
     </div>
@@ -27,7 +27,7 @@
 较小的嵌入式 view 使用以下结构：
 
 ```html
-<div class="prompt-generator" data-figma-node="275:7085">
+<div class="prompt-generator">
     <!-- content -->
 </div>
 ```
@@ -38,7 +38,7 @@
 - 页面级组合保留在 `src/page/*.html`。
 - 区块标记保留在 `src/view/*.html`。
 - 共享外壳标记保留在 `src/layout/*.html`。
-- 当标记可以追溯到某个设计节点时，保留 `data-figma-node`；这有助于后续设计 review。
+- 最终提交到站点运行时的 HTML 不保留 `data-figma-node`、`figma-node` 或类似设计追踪属性；Figma node 对应关系应记录在任务研究文档或 PRD 中，方便 review 时追溯。
 
 ---
 
@@ -49,6 +49,7 @@
 - 在 page 文件中使用 `<placeholder id="Main">...</placeholder>` 填充 layout placeholder。
 - Placeholder ID 必须与 layout 的 `k-placeholder` 值完全一致。当前共享 layout 暴露的是 `Main`。
 - 不要在 page 中复制共享 header 或 footer 标记；应由 layout 组合 `site-header` 和 `site-footer`。
+- 可能在同一页面出现多次的共享 view，不要硬编码会重复的全局 `id`。表单 label 优先使用包裹式 `<label>...</label>`，或在引入实例化参数前避免 `for`/`id` 绑定，防止重复 ID 破坏可访问性和脚本选择器。
 
 ---
 

@@ -472,6 +472,125 @@ a {
     letter-spacing: 0;
 }
 
+.home-performance__stage {
+    position: relative;
+    min-height: 598px;
+    overflow: hidden;
+    border-radius: 24px;
+}
+
+.home-performance__visual {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.home-performance__title {
+    position: absolute;
+    top: 79px;
+    left: 94px;
+    z-index: 1;
+    margin: 0;
+    color: var(--color-title);
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 1.22;
+    letter-spacing: 0;
+}
+
+.home-performance__features {
+    position: absolute;
+    top: 174px;
+    right: 80px;
+    z-index: 1;
+    width: min(370px, calc(100% - 48px));
+    display: grid;
+    gap: 56px;
+}
+
+.home-performance-feature {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 16px;
+}
+
+.home-performance-feature__icon {
+    width: 32px;
+    height: 32px;
+    display: block;
+}
+
+.home-performance-feature h3 {
+    margin: 0;
+    color: var(--color-title);
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0;
+}
+
+.home-performance-feature p {
+    margin: 8px 0 0;
+    color: var(--color-body);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0;
+}
+
+.home-start-building {
+    position: relative;
+    min-height: 641px;
+    overflow: hidden;
+}
+
+.home-start-building__glow {
+    position: absolute;
+    left: 50%;
+    bottom: -150px;
+    width: 100%;
+    height: 600px;
+    transform: translateX(-50%);
+    background: url("./2_0/home-building-banner-bg.svg") center / 100% 100% no-repeat;
+}
+
+.home-start-building__content {
+    position: relative;
+    z-index: 1;
+    width: min(811px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 153px 0 0;
+}
+
+.home-start-building__header {
+    text-align: center;
+}
+
+.home-start-building__header h2 {
+    margin: 0;
+    color: var(--color-title);
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: 0;
+}
+
+.home-start-building__header p {
+    margin: 24px 0 0;
+    color: #1f2d46;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0;
+}
+
+.home-start-building__prompt {
+    margin-top: 48px;
+}
+
 @media (max-width: 960px) {
     .home-publish-banner__flow {
         grid-template-columns: 1fr;
@@ -530,6 +649,47 @@ a {
     .home-production-card {
         min-height: 0;
         padding: 40px 28px;
+    }
+
+    .home-performance__stage {
+        min-height: 0;
+        padding: 54px 32px;
+    }
+
+    .home-performance__visual {
+        opacity: 0.44;
+        object-position: 35% center;
+    }
+
+    .home-performance__title,
+    .home-performance__features {
+        position: relative;
+        top: auto;
+        right: auto;
+        left: auto;
+    }
+
+    .home-performance__title {
+        max-width: 606px;
+        font-size: 32px;
+    }
+
+    .home-performance__features {
+        width: min(420px, 100%);
+        margin: 48px 0 0 auto;
+        gap: 32px;
+    }
+
+    .home-start-building {
+        min-height: 560px;
+    }
+
+    .home-start-building__content {
+        padding-top: 112px;
+    }
+
+    .home-start-building__header h2 {
+        font-size: 40px;
     }
 }
 
@@ -624,5 +784,61 @@ a {
 
     .home-production-card p {
         font-size: 14px;
+    }
+
+    .home-performance__stage {
+        min-height: 0;
+        border-radius: 18px;
+        padding: 36px 18px;
+    }
+
+    .home-performance__title {
+        font-size: 28px;
+        line-height: 1.25;
+    }
+
+    .home-performance__features {
+        margin-top: 36px;
+        gap: 26px;
+    }
+
+    .home-performance-feature {
+        grid-template-columns: 28px minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .home-performance-feature__icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .home-performance-feature h3 {
+        font-size: 20px;
+    }
+
+    .home-performance-feature p {
+        font-size: 14px;
+    }
+
+    .home-start-building {
+        min-height: 520px;
+    }
+
+    .home-start-building__content {
+        width: min(100% - 32px, 811px);
+    }
+
+    .home-start-building__header h2 {
+        font-size: 34px;
+        line-height: 1.24;
+    }
+
+    .home-start-building__header p {
+        margin-top: 18px;
+        font-size: 15px;
+    }
+
+    .home-start-building__prompt {
+        margin-top: 34px;
     }
 }
