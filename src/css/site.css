@@ -258,7 +258,7 @@ a {
 
 .home-hero__stage {
     background:
-        url("./2_0/home-hero-background.svg") center / 100% 100% no-repeat,
+        url("/2_0/home-hero-background.svg") center / 100% 100% no-repeat,
         #ffffff;
 }
 
@@ -336,7 +336,7 @@ a {
     list-style: none;
     overflow: hidden;
     border-radius: 24px;
-    background: url("./2_0/home-publish-banner-bg.svg") center / cover no-repeat;
+    background: url("/2_0/home-publish-banner-bg.svg") center / cover no-repeat;
 }
 
 .publish-step {
@@ -361,7 +361,7 @@ a {
 .home-productivity__background {
     position: absolute;
     inset: 0;
-    background: url("./2_0/home-productivity-background.svg") center top / 1512px 730px no-repeat;
+    background: url("/2_0/home-productivity-background.svg") center top / 1512px 730px no-repeat;
     pointer-events: none;
 }
 
@@ -655,15 +655,15 @@ a {
 }
 
 .home-production-card--deploy {
-    background: url("./2_0/home-production-deploy-background.png") center / cover no-repeat;
+    background: url("/2_0/home-production-deploy-background.png") center / cover no-repeat;
 }
 
 .home-production-card--domain {
-    background: url("./2_0/home-production-domain-background.png") center / cover no-repeat;
+    background: url("/2_0/home-production-domain-background.png") center / cover no-repeat;
 }
 
 .home-production-card--platform {
-    background: url("./2_0/home-production-platform-background.png") center / cover no-repeat;
+    background: url("/2_0/home-production-platform-background.png") center / cover no-repeat;
 }
 
 .home-production-card__icon-wrap {
@@ -798,7 +798,7 @@ a {
     width: 100%;
     height: 600px;
     transform: translateX(-50%);
-    background: url("./2_0/home-building-banner-bg.svg") center / 100% 100% no-repeat;
+    background: url("/2_0/home-building-banner-bg.svg") center / 100% 100% no-repeat;
 }
 
 .home-start-building__content {
@@ -842,7 +842,7 @@ a {
 .innovation-hero__panel {
     min-height: 236px;
     border-radius: 24px;
-    background: url("./2_0/home-innovation-hero-background.png") center / 100% 100% no-repeat;
+    background: url("/2_0/home-innovation-hero-background.png") center / 100% 100% no-repeat;
 }
 
 .innovation-hero__decor {
@@ -960,7 +960,7 @@ a {
     align-items: center;
     gap: 24px;
     border-radius: 24px;
-    background: #eaf8fb url("./2_0/innovation-detail-header-background.png") center / 100% 100% no-repeat;
+    background: #eaf8fb url("/2_0/innovation-detail-header-background.png") center / 100% 100% no-repeat;
 }
 
 .innovation-detail-header__back {
@@ -1284,7 +1284,7 @@ a {
         min-height: 620px;
         border-radius: 18px;
         background:
-            url("./2_0/home-hero-mobile-background.png") center top / cover no-repeat,
+            url("/2_0/home-hero-mobile-background.png") center top / cover no-repeat,
             #ffffff;
     }
 
@@ -1385,7 +1385,7 @@ a {
     .home-publish-banner__flow {
         border-radius: 18px;
         padding: 24px 16px;
-        background: url("./2_0/home-publish-banner-mobile-bg.png") center / cover no-repeat;
+        background: url("/2_0/home-publish-banner-mobile-bg.png") center / cover no-repeat;
     }
     .home-publish-banner__claim-btn {
         background: var(--gradient-brand);
@@ -1406,7 +1406,7 @@ a {
     .home-productivity__background {
         inset: 0 16px;
         border-radius: 24px;
-        background: url("./2_0/home-productivity-background.svg") center center no-repeat;
+        background: url("/2_0/home-productivity-background.svg") center center no-repeat;
 
     }
 
