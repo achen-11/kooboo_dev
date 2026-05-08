@@ -39,7 +39,7 @@ images/
 ### Layout
 
 - 将可复用页面外壳放在 `src/layout/`。
-- `src/layout/main.html` 是默认外壳。它加载 Tailwind CDN runtime 和 `./site.css`，渲染共享 header/footer 视图，暴露 `<div k-placeholder="Main"></div>`，并加载 `./site.js`。
+- `src/layout/main.html` 是默认外壳。Kooboo 运行环境提供 Tailwind 支持；layout 只加载 `./site.css`，渲染共享 header/footer 视图，暴露 `<div k-placeholder="Main"></div>`，并加载 `./site.js`。
 - 只有当某个页面确实需要明显不同的外壳、脚本集合或 placeholder 结构时，才新增 layout。
 - Layout placeholder 名称属于页面契约。页面中的 `<placeholder id="...">` 必须与 layout 的 `k-placeholder` 值完全一致，包括大小写。
 
@@ -76,7 +76,7 @@ images/
 
 ### CSS
 
-- Tailwind runtime 只在共享 `main` layout 中加载一次，并位于 `./site.css` 之前。
+- 不要在共享 `main` layout 中加载 Tailwind CDN；Kooboo 运行环境负责 Tailwind 支持，layout 只加载 `./site.css` 和 `./site.js`。
 - 将共享样式放在 `src/css/site.css`。
 - 将项目级 token 保留在 `:root`。
 - 普通布局、间距、字体、颜色、尺寸、边框、圆角和简单响应式状态优先使用 Tailwind utilities 写在 HTML class 中。

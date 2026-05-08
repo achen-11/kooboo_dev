@@ -77,7 +77,7 @@ Kooboo 模板绑定只用于服务端渲染的动态内容。
 
 ## 样式模式
 
-当前站点通过共享 layout 中的 Tailwind CDN runtime 支持 Tailwind CSS，同时保留 `src/css/site.css` 作为全局 token 和复杂样式入口。样式选择需要平衡可读性和复用性，而不是强制所有样式都写成 Tailwind。
+当前站点依赖 Kooboo 运行环境提供的 Tailwind 支持，不在共享 layout 中加载 Tailwind CDN，同时保留 `src/css/site.css` 作为全局 token 和复杂样式入口。样式选择需要平衡可读性和复用性，而不是强制所有样式都写成 Tailwind。
 
 必须遵循的模式：
 
@@ -96,6 +96,7 @@ Kooboo 模板绑定只用于服务端渲染的动态内容。
 - 尽量按 block 分组组件样式：header 样式放一起，footer 样式放一起，hero 样式放一起。
 - 复杂或与原生 CSS 强绑定的响应式行为通过 media query 添加，并尽量放在 `site.css` 靠近底部的位置。
 - 若响应式只是简单的断点切换，优先使用 Tailwind responsive utilities；只有复杂布局或与原生 CSS mockup 强相关时才使用 media query。
+- Kooboo 当前 Tailwind 处理不支持 `max-[960px]:...`、`min-[720px]:...` 这类任意断点变体。需要非标准断点时，使用 `site.css` 中的 `@media`。
 
 禁止的模式：
 
@@ -103,6 +104,7 @@ Kooboo 模板绑定只用于服务端渲染的动态内容。
 - 不要创建 `.title`、`.content`、`.button2` 这类页面专用但过于泛化的全局 class。
 - 不要为了只用一次的普通样式新增 CSS class；这类样式应优先写成 Tailwind utilities。
 - 不要为了“全 Tailwind”而把复杂渐变背景、长伪元素图形或强复用样式硬塞进不可读的 class 字符串。
+- 不要在 HTML class 中使用 Tailwind 任意断点变体，例如 `max-[960px]:flex-wrap`；这些规则在 Kooboo 当前 Tailwind 环境中不会可靠生效。
 
 ---
 

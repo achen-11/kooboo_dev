@@ -15,7 +15,7 @@
 - `src/js/` 存放全局 JavaScript。
 - `images/` 存放 HTML 或 CSS 引用的图片与图标资源；Kooboo CLI 当前将图片同步目录映射到仓库根目录的 `images/`，不是 `src/images/`。
 
-当前站点包含共享的 `main` 布局、共享 header/footer 视图、`/` 首页，以及 hero/prompt-generator 区块。在功能明确需要更多 JavaScript 之前，继续遵循现有的静态 HTML/CSS 优先方式。样式层通过 `src/layout/main.html` 加载 Tailwind CDN runtime，再加载 `site.css`；普通布局、间距、字体、颜色、尺寸和响应式状态优先写为 Tailwind utilities，复杂渐变背景、较长 CSS、伪元素 mockup、强复用样式或 Tailwind 表达会明显变长/不清晰的样式保留在 `src/css/site.css`。
+当前站点包含共享的 `main` 布局、共享 header/footer 视图、`/` 首页，以及 hero/prompt-generator 区块。在功能明确需要更多 JavaScript 之前，继续遵循现有的静态 HTML/CSS 优先方式。Kooboo 运行环境提供 Tailwind 支持，`src/layout/main.html` 不加载 Tailwind CDN；普通布局、间距、字体、颜色、尺寸和标准响应式状态优先写为 Tailwind utilities，复杂渐变背景、较长 CSS、伪元素 mockup、强复用样式、非标准断点或 Tailwind 表达会明显变长/不清晰的样式保留在 `src/css/site.css`。
 
 Kooboo 模板绑定是服务端渲染能力，使用 `env="server"` 和 `k-*` 指令。应将这些指令视为 Kooboo 模板语法，而不是浏览器 JavaScript、客户端框架，也不是语义化 HTML 的替代品。
 
