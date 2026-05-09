@@ -1,3 +1,7 @@
+<script env="server">
+    var productivityBanner = k.content.ProductivityBanner.all();
+</script>
+
 <section class="home-productivity relative overflow-hidden bg-[var(--color-white)]" aria-labelledby="home-productivity-title">
     <div class="home-productivity__background" aria-hidden="true"></div>
 
@@ -5,50 +9,18 @@
         <h2 id="home-productivity-title" class="home-productivity__title m-0 text-center text-2xl font-semibold leading-[1.21] tracking-normal text-[var(--color-title)]">One underlying architecture, three productivity limits</h2>
 
         <div class="home-productivity__grid mt-10 lg:grid grid-cols-3 gap-8 flex flex-col">
-            <article class="home-productivity-card">
+            <article class="home-productivity-card" k-for="item in productivityBanner" repeat-self="true">
                 <div class="home-productivity-card__inner">
                     <div class="home-productivity-card__media">
-                        <img class="home-productivity-card__image home-productivity-card__image--designer" src="/2_0/home-productivity-designer.svg" width="177" height="142" alt="" aria-hidden="true" />
+                        <img class="home-productivity-card__image" k-attribute="src item.Image" width="177" height="142" alt="" aria-hidden="true" />
                     </div>
 
                     <div class="home-productivity-card__body">
                         <h3 class="home-productivity-card__title">
                             <img class="home-productivity-card__check" src="/2_0/home-productivity-check.svg" width="32" height="32" alt="" aria-hidden="true" />
-                            <span>Designer</span>
+                            <span k-content="item.Title">Designer</span>
                         </h3>
-                        <p class="home-productivity-card__description">A website generator that allows you to create websites with a single sentence and edit them at will</p>
-                    </div>
-                </div>
-            </article>
-
-            <article class="home-productivity-card">
-                <div class="home-productivity-card__inner">
-                    <div class="home-productivity-card__media">
-                        <img class="home-productivity-card__image home-productivity-card__image--operations" src="/2_0/home-productivity-operations.svg" width="177" height="160" alt="" aria-hidden="true" />
-                    </div>
-
-                    <div class="home-productivity-card__body">
-                        <h3 class="home-productivity-card__title">
-                            <img class="home-productivity-card__check" src="/2_0/home-productivity-check.svg" width="32" height="32" alt="" aria-hidden="true" />
-                            <span>Operations</span>
-                        </h3>
-                        <p class="home-productivity-card__description">Start your email marketing and behavioral analytics journey. Understand every visitor and conver</p>
-                    </div>
-                </div>
-            </article>
-
-            <article class="home-productivity-card">
-                <div class="home-productivity-card__inner">
-                    <div class="home-productivity-card__media">
-                        <img class="home-productivity-card__image home-productivity-card__image--developers" src="/2_0/home-productivity-developers.svg" width="177" height="142" alt="" aria-hidden="true" />
-                    </div>
-
-                    <div class="home-productivity-card__body">
-                        <h3 class="home-productivity-card__title">
-                            <img class="home-productivity-card__check" src="/2_0/home-productivity-check.svg" width="32" height="32" alt="" aria-hidden="true" />
-                            <span>Developers</span>
-                        </h3>
-                        <p class="home-productivity-card__description">Extremely low memory footprint of 12MB. DOM-based compile-and-render delivers physical-level responsiveness</p>
+                        <p class="home-productivity-card__description" k-content="item.Description">A website generator that allows you to create websites with a single sentence and edit them at will</p>
                     </div>
                 </div>
             </article>

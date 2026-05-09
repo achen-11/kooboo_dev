@@ -1,10 +1,14 @@
+<script env="server">
+    var startBuilding = k.content.StartBuildingBanner;
+</script>
+
 <section class="home-start-building" aria-labelledby="home-start-building-title">
     <div class="home-start-building__glow" aria-hidden="true"></div>
 
     <div class="home-start-building__content">
         <header class="home-start-building__header">
-            <h2 id="home-start-building-title">Start Building Now !</h2>
-            <p>No setup. No friction. Just describe and generate.</p>
+            <h2 id="home-start-building-title" k-content="startBuilding.Title">Start Building Now !</h2>
+            <p k-content="startBuilding.Description">No setup. No friction. Just describe and generate.</p>
         </header>
 
         <div class="home-start-building__prompt">
