@@ -1,3 +1,7 @@
+<script env="server">
+    var businessBanner = k.content.BusinessBanner.all();
+</script>
+
 <section class="home-business" aria-labelledby="home-business-title">
     <div class="site-container">
         <h2 id="home-business-title" class="home-business__title">It doesn't just build your site&mdash;it runs your business</h2>
@@ -29,49 +33,41 @@
             <div class="home-business__accordion" aria-label="Business capabilities">
                 <article class="home-business__item" data-business-item="ai-generated">
                     <h3 class="home-business__item-title">
-                        <button class="home-business__trigger" id="home-business-trigger-ai-generated" type="button" aria-expanded="true" aria-controls="home-business-panel-ai-generated">
-                            AI-generated or directly cloned websites
-                        </button>
+                        <button class="home-business__trigger" id="home-business-trigger-ai-generated" type="button" aria-expanded="true" aria-controls="home-business-panel-ai-generated" k-content="businessBanner[0].Title">AI-generated or directly cloned websites</button>
                     </h3>
                     <div class="home-business__panel" id="home-business-panel-ai-generated" role="region" aria-labelledby="home-business-trigger-ai-generated">
-                        <p>You can choose to generate a website directly using AI or use our cloning feature: simply enter the URL of the website you want to create an identical, editable copy.</p>
-                        <a class="home-business__action" href="/start">Build a website now <span aria-hidden="true">&rsaquo;</span></a>
+                        <p k-content="businessBanner[0].Description">You can choose to generate a website directly using AI or use our cloning feature: simply enter the URL of the website you want to create an identical, editable copy.</p>
+                        <a class="home-business__action" k-attribute="href businessBanner[0].Url" k-content="businessBanner[0].UrlName">Build a website now <span aria-hidden="true">&rsaquo;</span></a>
                     </div>
                 </article>
 
                 <article class="home-business__item" data-business-item="ai-controls">
                     <h3 class="home-business__item-title">
-                        <button class="home-business__trigger" id="home-business-trigger-ai-controls" type="button" aria-expanded="true" aria-controls="home-business-panel-ai-controls">
-                            AI controls everything
-                        </button>
+                        <button class="home-business__trigger" id="home-business-trigger-ai-controls" type="button" aria-expanded="true" aria-controls="home-business-panel-ai-controls" k-content="businessBanner[1].Title">AI controls everything</button>
                     </h3>
                     <div class="home-business__panel" id="home-business-panel-ai-controls" role="region" aria-labelledby="home-business-trigger-ai-controls">
-                        <p>Our AI is more than just a chatbot. Through MCP (Model Context Protocol), AI can deeply understand your design architecture and business code. Whether adjusting global design tokens or integrating complex third-party APIs, production deployment can be completed with just natural language commands</p>
-                        <a class="home-business__action" href="/start">Experience AI deployment <span aria-hidden="true">&rsaquo;</span></a>
+                        <p k-content="businessBanner[1].Description">Our AI is more than just a chatbot. Through MCP (Model Context Protocol), AI can deeply understand your design architecture and business code. Whether adjusting global design tokens or integrating complex third-party APIs, production deployment can be completed with just natural language commands</p>
+                        <a class="home-business__action" k-attribute="href businessBanner[1].Url" k-content="businessBanner[1].UrlName">Experience AI deployment <span aria-hidden="true">&rsaquo;</span></a>
                     </div>
                 </article>
 
                 <article class="home-business__item is-active" data-business-item="growth">
                     <h3 class="home-business__item-title">
-                        <button class="home-business__trigger" id="home-business-trigger-growth" type="button" aria-expanded="true" aria-controls="home-business-panel-growth">
-                            Deep insights into growth
-                        </button>
+                        <button class="home-business__trigger" id="home-business-trigger-growth" type="button" aria-expanded="true" aria-controls="home-business-panel-growth" k-content="businessBanner[2].Title">Deep insights into growth</button>
                     </h3>
                     <div class="home-business__panel" id="home-business-panel-growth" role="region" aria-labelledby="home-business-trigger-growth">
-                        <p>It features a built-in end-to-end growth suite, encompassing high-precision access log analysis and A/B testing experiments. Through simulator logic, it predicts conversion rates in real time, revealing visitor hesitation and preferences at every step, ensuring that each product iteration is based on real data feedback rather than blind guesswork</p>
-                        <a class="home-business__action" href="/start">Start Growing <span aria-hidden="true">&rsaquo;</span></a>
+                        <p k-content="businessBanner[2].Description">It features a built-in end-to-end growth suite, encompassing high-precision access log analysis and A/B testing experiments. Through simulator logic, it predicts conversion rates in real time, revealing visitor hesitation and preferences at every step, ensuring that each product iteration is based on real data feedback rather than blind guesswork</p>
+                        <a class="home-business__action" k-attribute="href businessBanner[2].Url" k-content="businessBanner[2].UrlName">Start Growing <span aria-hidden="true">&rsaquo;</span></a>
                     </div>
                 </article>
 
                 <article class="home-business__item" data-business-item="protection">
                     <h3 class="home-business__item-title">
-                        <button class="home-business__trigger" id="home-business-trigger-protection" type="button" aria-expanded="true" aria-controls="home-business-panel-protection">
-                            Website operation protection
-                        </button>
+                        <button class="home-business__trigger" id="home-business-trigger-protection" type="button" aria-expanded="true" aria-controls="home-business-panel-protection" k-content="businessBanner[3].Title">Website operation protection</button>
                     </h3>
                     <div class="home-business__panel" id="home-business-panel-protection" role="region" aria-labelledby="home-business-trigger-protection">
-                        <p>System-level "resource guardians" and error monitoring mechanisms provide 24/7 stability protection for your digital assets. With extremely low memory usage and optimized GC (garbage collection) environment, AI intercepts operational risks in real time, ensuring enterprise-level operational reliability even at a very low cost of $1/year</p>
-                        <a class="home-business__action" href="/start">Claim My $1 Protection <span aria-hidden="true">&rsaquo;</span></a>
+                        <p k-content="businessBanner[3].Description">System-level "resource guardians" and error monitoring mechanisms provide 24/7 stability protection for your digital assets. With extremely low memory usage and optimized GC (garbage collection) environment, AI intercepts operational risks in real time, ensuring enterprise-level operational reliability even at a very low cost of $1/year</p>
+                        <a class="home-business__action" k-attribute="href businessBanner[3].Url" k-content="businessBanner[3].UrlName">Claim My $1 Protection <span aria-hidden="true">&rsaquo;</span></a>
                     </div>
                 </article>
             </div>
