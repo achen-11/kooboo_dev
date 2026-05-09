@@ -3,13 +3,13 @@
         <label class="flex min-h-[95px] w-full flex-auto">
             <span class="sr-only">Website prompt</span>
             <textarea
-                class="min-h-[95px] w-full flex-auto resize-none border-0 text-[15px] leading-[1.45] text-[#606266] outline-0"
-                rows="4">What kind of website do you need? Try this: help me generate a coffee website...</textarea>
+                class="min-h-[95px] w-full flex-auto resize-none border-0 text-[15px] leading-[1.45] text-[#606266] outline-none"
+                rows="4" k-label="Website prompt">What kind of website do you need? Try this: help me generate a coffee website...</textarea>
         </label>
         <div class="prompt-generator__controls flex gap-4">
             <div
                 class="prompt-generator__model gap-2 text-sm text-[#646c7d]">
-                <span>Model setting:</span>
+                <span k-label="Model setting:">模型设置:</span>
                 <button
                     class="prompt-generator__model-select inline-flex h-[38px] cursor-pointer items-center gap-2 rounded-lg border border-[#dcdfe6] bg-[var(--color-white)] px-[11px] py-[9px] text-[#606266]"
                     type="button">
@@ -20,7 +20,7 @@
             </div>
             <button
                 class="inline-flex h-10 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-[50px] prompt-generator__btn px-4 py-2.5 text-sm font-medium leading-none text-[var(--color-white)]"
-                type="button">Generate now</button>
+                type="button" k-label="Generate now">立即生成</button>
         </div>
     </div>
 </div>

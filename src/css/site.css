@@ -275,6 +275,9 @@ a {
 
 .home-hero__top-title {
     background-image: var(--gradient-brand);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
 
 .home-hero__top-title-wrap {
@@ -540,6 +543,7 @@ a {
 
 .home-business__item-title {
     margin: 0;
+    display: inline-flex;
 }
 
 .home-business__trigger {
@@ -1281,6 +1285,11 @@ a {
     letter-spacing: 0;
 }
 
+
+.home-publish-banner__claim-btn {
+    background: var(--gradient-brand);
+}
+
 @media (max-width: 960px) {
     .site-header {
         height: 56px;
@@ -1680,9 +1689,6 @@ a {
         border-radius: 18px;
         padding: 24px 16px;
         background: url("/2_0/home-publish-banner-mobile-bg.png") center / cover no-repeat;
-    }
-    .home-publish-banner__claim-btn {
-        background: var(--gradient-brand);
     }
 
     .publish-step__image {

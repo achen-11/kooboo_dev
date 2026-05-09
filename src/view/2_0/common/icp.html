@@ -1,0 +1,67 @@
+<script env="server">
+	var icpTxt = null;
+	
+	var ipCity = k.net.IP.getCountry(k.request.clientIp); 
+	
+	if (ipCity != null && ipCity.countryCode == "CN") {
+	
+		var host = k.request.host;
+		if (host) {
+			host = host.toLocaleLowerCase();
+			if (host.startsWith("www.")) {
+				host = host.substring(4);
+			}
+		} 
+	
+		if (host === "kooboo.site") {
+			icpTxt = "闽ICP备11017382号-1"
+		}
+		else if (host === "kooboo.com.cn") {
+			icpTxt = "闽ICP备11017382号-1"
+		}
+		else if (host === "kooboo.cn") {
+			icpTxt = "闽ICP备11017382号-2"
+		}
+		else if (host === "kauthserver.com") {
+			icpTxt = "闽ICP备11017382号-8"
+		}
+		else if (host === "sitepapa.com") {
+			icpTxt = "闽ICP备11017382号-9"
+		}
+		else if (host === "redev.cn") {
+			icpTxt = "闽ICP备11017382号-10"
+		}
+		else if (host === "cdnpapa.com") {
+			icpTxt = "闽ICP备11017382号-11"
+		}
+		else if (host === "	devday.cn") {
+			icpTxt = "闽ICP备11017382号-12"
+		}
+		else if (host === "imapsetting.com") {
+			icpTxt = "闽ICP备11017382号-13"
+		}
+		else if (host === "sharestaging.com") {
+			icpTxt = "闽ICP备11017382号-14"
+		}
+		else if (host === "kooboo.com") {
+			icpTxt = "闽ICP备11017382号-16"
+		} else {
+			icpTxt = "闽ICP备11017382号-16"
+		}
+	}
+	
+		// 闽ICP备11017382号-1	"kooboo.site;
+		// 闽ICP备11017382号-1	"kooboo.com.cn;
+		// 闽ICP备11017382号-2	kooboo.cn
+		// 闽ICP备11017382号-8	kauthserver.com
+		// 闽ICP备11017382号-9	sitepapa.com
+		// 闽ICP备11017382号-10	redev.cn
+		// 闽ICP备11017382号-11	cdnpapa.com
+		// 闽ICP备11017382号-12	devday.cn
+		// 闽ICP备11017382号-13	imapsetting.com
+		// 闽ICP备11017382号-14	sharestaging.com
+		// 闽ICP备11017382号-16 kooboo.com
+	
+</script>
+
+<a class="inline-flex min-h-10 items-center whitespace-nowrap rounded px-3.5 py-2.5 text-[var(--color-title)]" href="https://beian.miit.gov.cn/" k-content="icpTxt" title="China ICP">闽ICP备</a>

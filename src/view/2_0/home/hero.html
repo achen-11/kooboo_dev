@@ -7,7 +7,13 @@
     <div class="home-hero__stage relative mx-auto min-h-[722px] max-w-[1480px] overflow-hidden rounded-3xl">
         <div class="home-hero__content relative z-[1] mx-auto text-center">
             <div class="text-center">
-                <h1 class="home-hero__title m-0 font-extrabold tracking-normal text-[var(--color-title)]">Build a Real Website <span class="home-hero__top-title-wrap"><span class="home-hero__top-title bg-clip-text text-transparent">in Seconds</span><img class="home-hero__title-icon" src="/2_0/icons/icon-hero-arrow.svg" alt="" aria-hidden="true" width="41" height="40" /></span></h1>
+                <h1 class="home-hero__title m-0 font-extrabold tracking-normal text-[var(--color-title)]">
+                    <span class="home-hero__top-title-wrap">
+                        <span k-html="hero.Title">Build a Real Website <span class="home-hero__top-title">in Seconds</span></span>
+                        <img class="home-hero__title-icon" src="/2_0/icons/icon-hero-arrow.svg" alt="" aria-hidden="true" width="41"
+                            height="40" />
+                    </span>
+                </h1>
             </div>
 
             <p class="home-hero__subtitle mt-6 mb-0 text-lg leading-normal text-[var(--color-body)]" k-content="hero.Description">Production-ready , AI generated , Runs at extreme scale</p>
