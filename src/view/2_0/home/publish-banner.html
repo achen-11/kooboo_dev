@@ -1,29 +1,23 @@
+<script env="server">
+    var publishBanner = k.content.PublishBanner.all();
+</script>
+
 <section class="home-publish-banner bg-[var(--color-white)]" aria-labelledby="home-publish-banner-title">
     <div class="home-publish-banner__container site-container flex flex-col items-center gap-10">
         <div class="w-[min(523px,100%)] text-center">
-            <h2 id="home-publish-banner-title" class="home-publish-banner__title m-0 text-[32px] font-semibold leading-[1.22] tracking-normal text-[var(--color-title)]">Try free → Login to save & publish</h2>
+            <h2 id="home-publish-banner-title" class="home-publish-banner__title m-0 text-[32px] font-semibold leading-[1.22] tracking-normal text-[var(--color-title)]" k-label="Try free → Login to save & publish">免费试用 → 登录即可保存并发布</h2>
             <p class="home-publish-banner__price my-4 mb-6 flex flex-col items-center justify-center gap-1 text-2xl font-medium leading-tight text-[var(--color-title)]">
-                <span>Only need</span>
+                <span k-label="Only need">仅仅需要</span>
                 <strong class="home-publish-banner__price-value text-[56px] font-bold leading-none">$1</strong>
-                <span>/ site / year</span>
+                <span k-label="/ site / year">/ 网站 / 年</span>
             </p>
             <a class="home-publish-banner__claim-btn mx-auto inline-flex h-[54px] w-[min(269px,100%)] items-center justify-center gap-2 whitespace-nowrap rounded-[50px] px-4 py-2.5 text-lg font-medium leading-none text-[var(--color-white)]" href="/claim">Claim your website now</a>
         </div>
 
         <ol class="home-publish-banner__flow" aria-label="Publish website steps">
-            <li class="publish-step flex min-w-0 flex-col">
-                <h3 class="publish-step__title px-4 mb-[30px] mt-0 min-h-[42px] text-[15px] font-normal leading-[1.4] tracking-normal text-[var(--color-body)]">1、Enter the type of website you want</h3>
-                <img class="publish-step__image publish-step__image--prompt" src="/2_0/home-publish-prompt-input.png" width="344" height="222" alt="" aria-hidden="true" />
-            </li>
-
-            <li class="publish-step flex min-w-0 flex-col items-center">
-                <h3 class="publish-step__title px-4 publish-step__title--center publish-step__title--nowrap mb-[30px] mt-0 min-h-[42px] lg:whitespace-nowrap text-center text-[15px] font-normal leading-[1.4] tracking-normal text-[var(--color-body)]">2、Wait a few seconds to get the website you want</h3>
-                <img class="publish-step__image" src="/2_0/home-publish-website-skeleton.png" width="306" height="276" alt="" aria-hidden="true" />
-            </li>
-
-            <li class="publish-step flex min-w-0 flex-col items-center">
-                <h3 class="publish-step__title px-4 publish-step__title--center mb-[30px] mt-0 min-h-[42px] text-center text-[15px] font-normal leading-[1.4] tracking-normal text-[var(--color-body)]">3、Connect domain and deploy immediately</h3>
-                <img class="publish-step__image" src="/2_0/home-publish-domain-deploy.png" width="306" height="276" alt="" aria-hidden="true" />
+            <li class="publish-step flex min-w-0 flex-col" k-for="item in publishBanner" repeat-self="true">
+                <h3 class="publish-step__title px-4 mb-[30px] mt-0 min-h-[42px] text-[15px] font-normal leading-[1.4] tracking-normal text-[var(--color-body)]" k-content="item.Title">1、Enter the type of website you want</h3>
+                <img class="publish-step__image" k-attribute="src item.Image" width="306" height="276" alt="" aria-hidden="true" />
             </li>
         </ol>
     </div>

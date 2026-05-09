@@ -1,39 +1,43 @@
+<script env="server">
+    var productionBanner = k.content.ProductionBanner.all();
+</script>
+
 <section class="home-production bg-[var(--color-white)]" aria-labelledby="home-production-title">
     <div class="site-container">
         <h2 id="home-production-title" class="home-production__title">
-            <span>Not a Demo.</span>
+            <span k-label="Not a Demo.">并非演示</span>
             <img class="home-production__live" src="/2_0/home-production-live.svg" width="40" height="40" alt="" aria-hidden="true" />
-            <span>Real Production System</span>
+            <span k-label="Real Production System">真正的生产系统</span>
         </h2>
 
         <div class="home-production__grid" aria-label="Production system capabilities">
             <article class="home-production-card home-production-card--deploy">
                 <div class="home-production-card__icon-wrap">
-                    <img class="home-production-card__icon home-production-card__icon--deploy" src="/2_0/home-production-deploy.svg" width="173" height="158" alt="" aria-hidden="true" />
+                    <img class="home-production-card__icon home-production-card__icon--deploy" k-attribute="src productionBanner[0].Image" width="173" height="158" alt="" aria-hidden="true" />
                 </div>
                 <div class="home-production-card__body">
-                    <h3>Deploy Immediately</h3>
-                    <p>Your generated site is fully functional and ready for real users</p>
+                    <h3 k-content="productionBanner[0].Title">Deploy Immediately</h3>
+                    <p k-content="productionBanner[0].Description">Your generated site is fully functional and ready for real users</p>
                 </div>
             </article>
 
             <article class="home-production-card home-production-card--domain">
                 <div class="home-production-card__icon-wrap">
-                    <img class="home-production-card__icon home-production-card__icon--domain" src="/2_0/home-production-domain.svg" width="185" height="126" alt="" aria-hidden="true" />
+                    <img class="home-production-card__icon home-production-card__icon--domain" k-attribute="src productionBanner[1].Image" width="185" height="126" alt="" aria-hidden="true" />
                 </div>
                 <div class="home-production-card__body">
-                    <h3>Connect Domain</h3>
-                    <p>Point your DNS and go live instantly. No migration needed</p>
+                    <h3 k-content="productionBanner[1].Title">Connect Domain</h3>
+                    <p k-content="productionBanner[1].Description">Point your DNS and go live instantly. No migration needed</p>
                 </div>
             </article>
 
             <article class="home-production-card home-production-card--platform">
                 <div class="home-production-card__icon-wrap">
-                    <img class="home-production-card__icon home-production-card__icon--platform" src="/2_0/home-production-platform.svg" width="150" height="128" alt="" aria-hidden="true" />
+                    <img class="home-production-card__icon home-production-card__icon--platform" k-attribute="src productionBanner[2].Image" width="150" height="128" alt="" aria-hidden="true" />
                 </div>
                 <div class="home-production-card__body">
-                    <h3>Full Platform Included</h3>
-                    <p>CMS, email marketing, templates, API - everything built-in</p>
+                    <h3 k-content="productionBanner[2].Title">Full Platform Included</h3>
+                    <p k-content="productionBanner[2].Description">CMS, email marketing, templates, API - everything built-in</p>
                 </div>
             </article>
         </div>

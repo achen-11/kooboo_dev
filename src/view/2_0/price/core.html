@@ -1,96 +1,67 @@
+<script env="server">
+	var pricingPlans = k.content.Pricing.all()
+	var faqItems = k.content.Faq.all()
+</script>
+
+<script env="client">
+	document.addEventListener('DOMContentLoaded', function () {
+		var cards = document.querySelectorAll('.price-plan-card')
+		var faqs = document.querySelectorAll('.price-faq__item')
+
+		function setFeatured(card) {
+			cards.forEach(function (c) {
+				c.classList.remove('price-plan-card--featured')
+				var btn = c.querySelector('.price-plan-card__button')
+				if (btn) btn.classList.remove('price-plan-card__button--primary')
+				var arrow = c.querySelector('.featured-arrow')
+				if (arrow) arrow.removeAttribute('hidden')
+			})
+			card.classList.add('price-plan-card--featured')
+			var btn = card.querySelector('.price-plan-card__button')
+			if (btn) btn.classList.add('price-plan-card__button--primary')
+			var arrow = card.querySelector('.featured-arrow')
+			if (arrow) arrow.setAttribute('hidden', '')
+		}
+
+		cards.forEach(function (card, index) {
+			card.style.cursor = 'pointer'
+			if (index === 1) setFeatured(card)
+			card.addEventListener('click', function () { setFeatured(card) })
+		})
+
+		if (faqs.length > 0) {
+			faqs[0].setAttribute('open', '')
+		}
+	})
+</script>
+
 <section class="price-page bg-[var(--color-white)]" aria-labelledby="price-title">
     <div class="price-plans site-container" aria-labelledby="price-title">
-        <h1 id="price-title" class="price-page__title">Pricing</h1>
+        <h1 id="price-title" class="price-page__title" k-label="Pricing">定价</h1>
 
         <div class="price-plan-grid" aria-label="Kooboo pricing plans">
-            <article class="price-plan-card">
+            <article class="price-plan-card" k-for="plan in pricingPlans" repeat-self="true">
                 <div class="price-plan-card__content">
                     <header class="price-plan-card__header">
                         <div class="price-plan-card__heading">
-                            <img class="price-plan-card__icon" src="/2_0/icons/icon-price-test.svg" width="32" height="32" alt="" aria-hidden="true" />
-                            <h2>Test</h2>
+                            <img class="price-plan-card__icon" k-attribute="src plan.Icon" width="32" height="32" alt="" aria-hidden="true" />
+                            <h2 k-content="plan.Title">Test</h2>
                         </div>
-                        <p>Discover what kooboo can do for you</p>
+                        <p k-content="plan.Description">Discover what kooboo can do for you</p>
                     </header>
 
                     <p class="price-plan-card__price">
-                        <span class="price-plan-card__amount">$ 9.9</span>
-                        <span class="price-plan-card__period">/year</span>
+                        <span class="price-plan-card__amount" k-content="plan.Price">$ 9.9</span>
+                        <span class="price-plan-card__period" k-label="/year">/年</span>
                     </p>
 
                     <a class="price-plan-card__button" href="/claim">
-                        <span>Get started</span>
-                        <span aria-hidden="true">&rarr;</span>
+                        <span k-label="Get started">立即订阅</span>
+                        <span class="featured-arrow" aria-hidden="true">&rarr;</span>
                     </a>
 
-                    <ul class="price-plan-card__features" aria-label="Test plan features">
-                        <li>3 sites</li>
-                        <li>1 Data Center</li>
-                        <li>Free Template</li>
-                        <li>Domainless Email</li>
-                        <li>Forum Community Support</li>
-                        <li>Expires in 30 Days</li>
-                    </ul>
-                </div>
-            </article>
-
-            <article class="price-plan-card price-plan-card--featured">
-                <div class="price-plan-card__content">
-                    <header class="price-plan-card__header">
-                        <div class="price-plan-card__heading">
-                            <img class="price-plan-card__icon" src="/2_0/icons/icon-price-website.svg" width="32" height="32" alt="" aria-hidden="true" />
-                            <h2>Website</h2>
-                        </div>
-                        <p>Discover what kooboo can do for you</p>
-                    </header>
-
-                    <p class="price-plan-card__price">
-                        <span class="price-plan-card__amount">$ 350</span>
-                        <span class="price-plan-card__period">/year</span>
-                    </p>
-
-                    <a class="price-plan-card__button price-plan-card__button--primary" href="/claim">
-                        <span>Get started</span>
-                    </a>
-
-                    <ul class="price-plan-card__features" aria-label="Website plan features">
-                        <li>20 sites</li>
-                        <li>2 Data Center</li>
-                        <li><strong>Member-exclusive template</strong></li>
-                        <li><strong>Corporate Email</strong></li>
-                        <li>Forum Community Support</li>
-                        <li><strong>Can be used on official sites</strong></li>
-                    </ul>
-                </div>
-            </article>
-
-            <article class="price-plan-card">
-                <div class="price-plan-card__content">
-                    <header class="price-plan-card__header">
-                        <div class="price-plan-card__heading">
-                            <img class="price-plan-card__icon" src="/2_0/icons/icon-price-business.svg" width="32" height="32" alt="" aria-hidden="true" />
-                            <h2>Website</h2>
-                        </div>
-                        <p>Discover what kooboo can do for you</p>
-                    </header>
-
-                    <p class="price-plan-card__price">
-                        <span class="price-plan-card__amount">$ 350</span>
-                        <span class="price-plan-card__period">/year</span>
-                    </p>
-
-                    <a class="price-plan-card__button" href="/claim">
-                        <span>Get started</span>
-                        <span aria-hidden="true">&rarr;</span>
-                    </a>
-
-                    <ul class="price-plan-card__features" aria-label="Website plan features">
-                        <li>20 sites</li>
-                        <li>2 Data Center</li>
-                        <li><strong>Member-exclusive template</strong></li>
-                        <li><strong>Corporate Email</strong></li>
-                        <li>Forum Community Support</li>
-                        <li><strong>Can be used on official sites</strong></li>
+                    <ul class="price-plan-card__features" aria-label="Kooboo pricing plan features">
+                        <li k-for="item in plan.Items" k-html="item" repeat-self="true">3 sites</li>
                     </ul>
                 </div>
             </article>
@@ -101,23 +72,15 @@
         <h2 id="price-faq-title" class="price-page__title">FAQ</h2>
 
         <div class="price-faq__list">
-            <details class="price-faq__item" name="price-faq" open>
+            <details class="price-faq__item" k-for="faq in faqItems" name="price-faq" repeat-self="true">
                 <summary class="price-faq__summary">
-                    <span>How can you support high-performance sites for only $1/year?</span>
+                    <span k-content="faq.Title">How can you support high-performance sites for only $1/year?</span>
                     <span class="price-faq__marker" aria-hidden="true"></span>
                 </summary>
-                <div class="price-faq__panel">
-                    <p>Traditional platforms rely on heavy virtual machines or containers. We built the Extreme Performance Architecture. By leveraging our proprietary DOM-based engine, we&rsquo;ve achieved a massive density of 2000+ sites per server. This slashes hardware overhead to the physical limit, allowing us to pass the &quot;Technical Dividend&quot; directly to you.</p>
+                <div k-if="faq.Description" class="price-faq__panel">
+                    <p k-content="faq.Description">Traditional platforms rely on heavy virtual machines or containers...</p>
                 </div>
             </details>
-
-            <div class="price-faq__item price-faq__item--static">
-                <p class="price-faq__question">Do you support code export or custom development?</p>
-            </div>
-
-            <div class="price-faq__item price-faq__item--static">
-                <p class="price-faq__question">What is the actual benefit of &quot;Compiled Rendering&quot; over templates?</p>
-            </div>
         </div>
     </div>
 </section>

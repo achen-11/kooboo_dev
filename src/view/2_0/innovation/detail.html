@@ -1,3 +1,7 @@
+<script env="server">
+    var coreDetail = k.content.KoobooCore.find(`Name == '${decodeURIComponent(k.request.queryString.p)}'`);
+</script>
+
 <section class="innovation-detail-page" aria-labelledby="innovation-detail-title">
     <div class="innovation-detail-page__inner">
         <header class="innovation-detail-header">
@@ -5,14 +9,16 @@
                 <img src="/2_0/icons/icon-innovation-detail-back.svg" width="24" height="24" alt="" aria-hidden="true" />
             </a>
 
-            <img class="innovation-detail-header__icon" src="/2_0/icons/icon-innovation-detail-marketing.svg" width="48" height="48" alt="" aria-hidden="true" />
+            <img class="innovation-detail-header__icon" k-attribute="src coreDetail.Icon" width="48" height="48" alt="" aria-hidden="true" />
 
             <div class="innovation-detail-header__copy">
-                <h1 id="innovation-detail-title">Marketing</h1>
-                <p>A/B testing is integrated into the OS kernel.No external scripts or performance hits</p>
+                <h1 id="innovation-detail-title" k-content="coreDetail.Title">Marketing</h1>
+                <p k-content="coreDetail.Description">A/B testing is integrated into the OS kernel.No external scripts or performance hits</p>
             </div>
         </header>
 
-        <div class="innovation-detail-page__content-slot" aria-label="Innovation detail content"></div>
+        <div class="innovation-detail-page__content-slot" aria-label="Innovation detail content">
+            <p k-content="coreDetail.Body"></p>
+        </div>
     </div>
 </section>
