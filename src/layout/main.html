@@ -12,6 +12,13 @@
         <div k-placeholder="Main"></div>
     </main>
     <view id="2_0/common/site-footer"></view>
+    <script env="server" type="module">
+        import { resolveAdminBaseFromToken } from "./utils.admin-url-from-token";
+
+        const adminBaseUrl =
+            resolveAdminBaseFromToken(k.account.getAccessToken()) || "/_Admin";
+        k.utils.clientJS.setVariable("koobooAdminBaseUrl", { value: adminBaseUrl });
+    </script>
     <script src="/site.js"></script>
 </body>
 </html>

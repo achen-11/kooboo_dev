@@ -1,4 +1,59 @@
-<header class="site-header">
+<script env="server" type="module">
+    import {
+        resolveAdminBaseFromToken,
+        userDisplayFromToken,
+    } from "./utils.admin-url-from-token";
+
+    const loginReturnUrl = "/";
+    const accessToken = k.account.getAccessToken();
+    const isLoggedIn = k.account.isLogin || Boolean(accessToken);
+    const showLogin = !isLoggedIn;
+    const adminBaseUrl =
+        resolveAdminBaseFromToken(accessToken) || "/_Admin";
+    let loginUrl =
+        adminBaseUrl + "/login?returnurl=" + encodeURIComponent(loginReturnUrl);
+    let consoleUrl = adminBaseUrl + "/";
+    let logoutUrl =
+        "/_api/v2/user/logout?returnUrl=" + encodeURIComponent(loginReturnUrl);
+    if (k.request.culture) {
+        const langParam = "lang=" + encodeURIComponent(k.request.culture);
+        loginUrl += "&" + langParam;
+        consoleUrl += "?" + langParam;
+        logoutUrl += "&" + langParam;
+    }
+
+    let userDisplayName = "";
+    let userInitials = "";
+
+    if (isLoggedIn) {
+        const user = k.account.user.current;
+        if (user) {
+            const fullName = (
+                (user.firstName || "") +
+                " " +
+                (user.lastName || "")
+            ).trim();
+            userDisplayName = fullName || user.userName || user.email || "";
+            userInitials = (userDisplayName || "?").substring(0, 2).toUpperCase();
+        } else if (accessToken) {
+            const tokenUser = userDisplayFromToken(accessToken);
+            userDisplayName = tokenUser.displayName;
+            userInitials = tokenUser.initials;
+        }
+    }
+
+    export {
+        loginUrl,
+        consoleUrl,
+        logoutUrl,
+        isLoggedIn,
+        showLogin,
+        userDisplayName,
+        userInitials,
+    };
+</script>
+
+<header class="site-header" env="server">
     <div class="site-header__inner">
         <details class="site-header__mobile-menu">
             <summary class="site-header__menu-button" aria-label="Open navigation menu">
@@ -9,7 +64,15 @@
                 <a class="site-header__mobile-link" href="/innovation" k-label="menu.innovation">Innovation</a>
                 <a class="site-header__mobile-link" href="/price" k-label="menu.pricing">Price</a>
                 <a class="site-header__mobile-link" href="/docs" k-label="menu.docs">Doc</a>
-                <a class="site-header__mobile-link" href="/_start" k-label="SignIn">Login</a>
+                <a k-if="showLogin" class="site-header__mobile-link" :href="loginUrl" k-label="SignIn">Login</a>
+                <div k-if="isLoggedIn" class="site-header__mobile-user">
+                    <div class="site-header__mobile-user-meta">
+                        <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
+                        <span class="site-header__mobile-user-name" k-content="userDisplayName">User</span>
+                    </div>
+                    <a class="site-header__mobile-link" :href="consoleUrl" k-label="Console">Console</a>
+                    <a class="site-header__mobile-link site-header__mobile-link--muted" :href="logoutUrl" k-label="SignOut">Logout</a>
+                </div>
                 <a class="site-header__mobile-claim" href="/claim" k-label="Claim">Claim your <strong>$1</strong> website</a>
             </nav>
         </details>
@@ -26,7 +89,18 @@
         </nav>
 
         <div class="site-header__actions">
-            <a class="site-header__secondary-action" href="/_start" k-label="SignIn">Login</a>
+            <a k-if="showLogin" class="site-header__secondary-action" :href="loginUrl" k-label="SignIn">Login</a>
+            <details k-if="isLoggedIn" class="site-header__user-menu">
+                <summary class="site-header__user-trigger" aria-label="Account menu">
+                    <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
+                    <span class="site-header__user-name" k-content="userDisplayName">User</span>
+                    <span class="site-header__user-chevron" aria-hidden="true"></span>
+                </summary>
+                <div class="site-header__user-dropdown" role="menu">
+                    <a class="site-header__user-dropdown-link" :href="consoleUrl" role="menuitem" k-label="Console">Console</a>
+                    <a class="site-header__user-dropdown-link site-header__user-dropdown-link--muted" :href="logoutUrl" role="menuitem" k-label="SignOut">Logout</a>
+                </div>
+            </details>
             <a class="site-header__primary-action" href="/claim">
                 <span k-label="Claim">Claim your <strong>$1</strong> website</span>
                 <span class="site-header__primary-icon" aria-hidden="true"></span>

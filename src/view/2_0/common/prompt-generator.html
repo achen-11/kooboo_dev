@@ -3,24 +3,27 @@
         <label class="flex min-h-[95px] w-full flex-auto">
             <span class="sr-only">Website prompt</span>
             <textarea
-                class="min-h-[95px] w-full flex-auto resize-none border-0 text-[15px] leading-[1.45] text-[#606266] outline-none"
-                rows="4" k-label="Website prompt">What kind of website do you need? Try this: help me generate a coffee website...</textarea>
+                class="prompt-generator__input min-h-[95px] w-full flex-auto resize-none border-0 text-[15px] leading-[1.45] text-[#606266] outline-none"
+                rows="4"
+                k-label="Website prompt"
+                placeholder="What kind of website do you need? Try this: help me generate a coffee website..."></textarea>
         </label>
         <div class="prompt-generator__controls flex gap-4">
-            <div
-                class="prompt-generator__model gap-2 text-sm text-[#646c7d]">
-                <span k-label="Model setting:">模型设置:</span>
-                <button
-                    class="prompt-generator__model-select inline-flex h-[38px] cursor-pointer items-center gap-2 rounded-lg border border-[#dcdfe6] bg-[var(--color-white)] px-[11px] py-[9px] text-[#606266]"
-                    type="button">
-                    <span class="prompt-generator__model-value min-w-20 text-left text-sm">Low mode</span>
-                    <span class="h-0 w-0 border-x-4 border-t-[5px] border-x-transparent border-t-[#606266]"
-                        aria-hidden="true"></span>
-                </button>
+            <div class="prompt-generator__model gap-2 text-sm text-[#646c7d]">
+                <label class="prompt-generator__model-label" for="prompt-generator-model" k-label="Model setting:">模型设置:</label>
+                <select
+                    id="prompt-generator-model"
+                    class="prompt-generator__model-select"
+                    aria-label="Model"
+                    disabled>
+                    <option value="" k-label="Loading models...">模型加载中...</option>
+                </select>
             </div>
             <button
                 class="inline-flex h-10 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-[50px] prompt-generator__btn px-4 py-2.5 text-sm font-medium leading-none text-[var(--color-white)]"
-                type="button" k-label="Generate now">立即生成</button>
+                type="button"
+                k-label="Generate now"
+                disabled>立即生成</button>
         </div>
     </div>
 </div>
