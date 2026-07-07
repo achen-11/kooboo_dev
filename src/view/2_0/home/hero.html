@@ -1,11 +1,11 @@
 <script env="server">
     var hero = k.content.HomeHero;
-    var labels = k.content.HomeHero.Labels;
 </script>
 
-<section class="home-hero px-4 pb-20">
-    <div class="home-hero__stage relative mx-auto min-h-[722px] max-w-[1480px] overflow-hidden rounded-3xl">
-        <div class="home-hero__content relative z-[1] mx-auto text-center">
+<section class="home-hero">
+    <div class="home-hero__stage">
+        <div class="home-hero__aurora" aria-hidden="true"></div>
+        <div class="home-hero__content">
             <div class="text-center">
                 <h1 class="home-hero__title m-0 font-extrabold tracking-normal text-[var(--color-title)]">
                     <span class="home-hero__top-title-wrap">
@@ -18,14 +18,7 @@
 
             <p class="home-hero__subtitle mt-6 mb-0 text-lg leading-normal text-[var(--color-body)]" k-content="hero.Description">Production-ready , AI generated , Runs at extreme scale</p>
 
-            <div class="home-hero__types mt-12 flex justify-center gap-2" aria-label="Website types">
-                <button k-for="label in labels" repeat-self="true" class="home-hero__type-button inline-flex min-h-[30px] cursor-pointer items-center gap-2 rounded-[30px] bg-white/60 px-4 py-1.5 text-[var(--color-title)]" type="button">
-                    <img class="h-4 w-4" k-attribute="src label.Icon" alt="" aria-hidden="true" />
-                    <span class="whitespace-nowrap text-[13px] leading-none" k-content="label.Title">Landing page</span>
-                </button>
-            </div>
-
-            <div id="home-prompt-generator">
+            <div id="home-prompt-generator" class="home-hero__prompt">
                 <view id="2_0/common/prompt-generator"></view>
             </div>
         </div>

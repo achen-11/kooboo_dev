@@ -456,9 +456,153 @@ function initScrollToPromptLinks() {
     });
 }
 
+function initPromptGeneratorSpotlights() {
+    document
+        .querySelectorAll(".home-hero .prompt-generator, .home-start-building .prompt-generator")
+        .forEach((card) => {
+            const moveGlow = (event) => {
+                const rect = card.getBoundingClientRect();
+                card.style.setProperty("--hero-glow-x", `${event.clientX - rect.left}px`);
+                card.style.setProperty("--hero-glow-y", `${event.clientY - rect.top}px`);
+            };
+
+            card.addEventListener("pointerenter", (event) => {
+                card.classList.add("is-glow-active");
+                moveGlow(event);
+            });
+            card.addEventListener("pointermove", moveGlow);
+            card.addEventListener("pointerleave", () => {
+                card.classList.remove("is-glow-active");
+            });
+        });
+}
+
+function initPromptTypingPlaceholder(textarea) {
+    if (!textarea) return;
+
+    let userEdited = false;
+    textarea.setAttribute("autocomplete", "off");
+    textarea.addEventListener(
+        "input",
+        () => {
+            userEdited = true;
+        },
+        { once: true }
+    );
+
+    const clearPrefilledValue = () => {
+        if (userEdited) return;
+        textarea.value = "";
+    };
+
+    clearPrefilledValue();
+    window.requestAnimationFrame(clearPrefilledValue);
+    window.setTimeout(clearPrefilledValue, 120);
+
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if (reducedMotion) return;
+
+    const prompts = [
+        "help me generate a coffee website with online ordering...",
+        "build a SaaS dashboard for finance teams...",
+        "create a portfolio for a UI designer...",
+    ];
+    const originalPlaceholder = textarea.getAttribute("placeholder") || "";
+    const prefix = originalPlaceholder.includes("Try this:")
+        ? `${originalPlaceholder.split("Try this:")[0]}Try this: `
+        : "";
+
+    let promptIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let showCursor = true;
+
+    const setPlaceholder = () => {
+        const currentPrompt = prompts[promptIndex];
+        const visiblePrompt = currentPrompt.slice(0, charIndex);
+        textarea.setAttribute(
+            "placeholder",
+            `${prefix}${visiblePrompt}${showCursor ? "|" : ""}`
+        );
+    };
+
+    const tick = () => {
+        const currentPrompt = prompts[promptIndex];
+
+        if (!isDeleting && charIndex < currentPrompt.length) {
+            charIndex += 1;
+            showCursor = true;
+            setPlaceholder();
+            window.setTimeout(tick, 48);
+            return;
+        }
+
+        if (!isDeleting && charIndex === currentPrompt.length) {
+            showCursor = !showCursor;
+            setPlaceholder();
+            window.setTimeout(() => {
+                isDeleting = true;
+                showCursor = true;
+                tick();
+            }, 1400);
+            return;
+        }
+
+        if (isDeleting && charIndex > 0) {
+            charIndex -= 1;
+            showCursor = true;
+            setPlaceholder();
+            window.setTimeout(tick, 24);
+            return;
+        }
+
+        promptIndex = (promptIndex + 1) % prompts.length;
+        isDeleting = false;
+        window.setTimeout(tick, 260);
+    };
+
+    tick();
+}
+
+function initPromptTypingPlaceholders() {
+    document
+        .querySelectorAll(
+            ".home-hero .prompt-generator__input, .home-start-building .prompt-generator__input"
+        )
+        .forEach((textarea) => initPromptTypingPlaceholder(textarea));
+}
+
+function initHomeStartBuildingEntrance() {
+    const section = document.querySelector(".home-start-building");
+    if (!section) return;
+
+    if (!("IntersectionObserver" in window)) {
+        section.classList.add("is-in-view");
+        return;
+    }
+
+    const observer = new IntersectionObserver(
+        ([entry]) => {
+            if (!entry?.isIntersecting) return;
+            section.classList.add("is-in-view");
+            observer.disconnect();
+        },
+        { threshold: 0.28 }
+    );
+
+    observer.observe(section);
+}
+
+function initHomePromptEffects() {
+    initPromptGeneratorSpotlights();
+    initPromptTypingPlaceholders();
+    initHomeStartBuildingEntrance();
+}
+
 function initPromptGeneratorFeatures() {
     initPromptGenerators();
     initScrollToPromptLinks();
+    initHomePromptEffects();
 }
 
 if (document.readyState === "loading") {
