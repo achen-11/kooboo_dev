@@ -1194,7 +1194,7 @@ body:has(.home-hero) .site-header__user-trigger {
 }
 
 .home-start-building__prompt .prompt-generator {
-    margin: 0;
+    margin: 0 auto;
 }
 
 .home-start-building__cta {
