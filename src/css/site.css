@@ -3,11 +3,15 @@
     --color-body: #374151;
     --color-muted: #6b7280;
     --color-border: #d3d7db;
+    --color-border-hover: #a4b7ca;
     --color-dark: #111a4a;
+    --color-dark-hover: rgba(17, 26, 74, 0.85);
     --color-white: #ffffff;
+    --color-card: #f6f9fa;
     --container-width: 1352px;
     --page-gutter: 80px;
     --gradient-brand: linear-gradient(90deg, #1146ff 0%, #01a3ff 49.04%, #00e69b 100%);
+    --gradient-card-hover: linear-gradient(180deg, #f3f7f8 0%, #e0eef5 100%);
 }
 
 * {
@@ -194,6 +198,11 @@ body:has(.home-hero) .site-header__user-trigger {
     padding: 0 12px;
 }
 
+.site-header__mobile-link:hover,
+.site-header__mobile-link:focus-visible {
+    color: var(--color-muted);
+}
+
 .site-header__mobile-claim {
     justify-content: center;
     gap: 4px;
@@ -234,8 +243,9 @@ body:has(.home-hero) .site-header__user-trigger {
     font-size: 16px;
 }
 
-.site-header__link:hover {
-    background: rgba(217, 217, 217, 0.3);
+.site-header__link:hover,
+.site-header__link:focus-visible {
+    color: var(--color-muted);
 }
 
 .site-header__actions {
@@ -263,6 +273,14 @@ body:has(.home-hero) .site-header__user-trigger {
     border: 1px solid var(--color-border);
     background: var(--color-white);
     color: var(--color-title);
+}
+
+.site-header__secondary-action:hover,
+.site-header__secondary-action:active,
+.site-header__secondary-action:focus-visible,
+.site-header__user-trigger:hover,
+.site-header__user-trigger:focus-visible {
+    border-color: var(--color-border-hover);
 }
 
 .site-header__user-menu {
@@ -405,6 +423,13 @@ body:has(.home-hero) .site-header__user-trigger {
     color: var(--color-white);
 }
 
+.site-header__primary-action:hover,
+.site-header__primary-action:active,
+.site-header__mobile-claim:hover,
+.site-header__mobile-claim:active {
+    background: var(--color-dark-hover);
+}
+
 .site-header__primary-action strong {
     font-size: 16px;
     font-weight: 500;
@@ -421,6 +446,11 @@ body:has(.home-hero) .site-header__user-trigger {
 .site-footer__nav,
 .site-footer__meta {
     justify-content: flex-start;
+}
+
+.site-footer__nav a:hover,
+.site-footer__nav a:focus-visible {
+    color: var(--color-muted);
 }
 
 .home-hero {
@@ -613,6 +643,11 @@ body:has(.home-hero) .site-header__user-trigger {
     overflow: hidden;
     width: 180px;
     background-image: var(--gradient-brand) !important;
+}
+
+.prompt-generator__btn:hover:not(:disabled),
+.prompt-generator__btn:active:not(:disabled) {
+    opacity: 0.8;
 }
 
 .home-hero .prompt-generator__btn::after,
@@ -956,6 +991,11 @@ body:has(.home-hero) .site-header__user-trigger {
     letter-spacing: 0;
 }
 
+.home-business__action:hover,
+.home-business__action:active {
+    background: var(--color-dark-hover);
+}
+
 .home-business__action:focus-visible {
     outline: 3px solid rgba(17, 70, 255, 0.28);
     outline-offset: 3px;
@@ -1266,7 +1306,12 @@ body:has(.home-hero) .site-header__user-trigger {
     display: flex;
     flex-direction: column;
     border-radius: 24px;
-    background: #f5f8f9;
+    background: var(--color-card);
+}
+
+.innovation-card:hover,
+.innovation-card:focus-within {
+    background: var(--gradient-card-hover);
 }
 
 .innovation-card__icon {
@@ -1311,6 +1356,12 @@ body:has(.home-hero) .site-header__user-trigger {
     font-weight: 400;
     line-height: 1.4;
     letter-spacing: 0;
+}
+
+.innovation-card__link:hover,
+.innovation-card__link:active,
+.innovation-card__link:focus-visible {
+    border-color: var(--color-border-hover);
 }
 
 .innovation-card__link:focus-visible {
@@ -1515,6 +1566,11 @@ body:has(.home-hero) .site-header__user-trigger {
     font-weight: 500;
 }
 
+.price-plan-card__button--primary:hover,
+.price-plan-card__button--primary:active {
+    opacity: 0.8;
+}
+
 .price-plan-card__button:focus-visible {
     outline: 3px solid rgba(17, 70, 255, 0.28);
     outline-offset: 3px;
@@ -1660,6 +1716,11 @@ body:has(.home-hero) .site-header__user-trigger {
 
 .home-publish-banner__claim-btn {
     background: var(--gradient-brand);
+}
+
+.home-publish-banner__claim-btn:hover,
+.home-publish-banner__claim-btn:active {
+    opacity: 0.8;
 }
 
 .home-publish-banner {

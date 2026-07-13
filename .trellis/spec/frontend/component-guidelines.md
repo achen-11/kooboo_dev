@@ -98,6 +98,14 @@ Kooboo 模板绑定只用于服务端渲染的动态内容。
 - 若响应式只是简单的断点切换，优先使用 Tailwind responsive utilities；只有复杂布局或与原生 CSS mockup 强相关时才使用 media query。
 - Kooboo 当前 Tailwind 处理不支持 `max-[960px]:...`、`min-[720px]:...` 这类任意断点变体。需要非标准断点时，使用 `site.css` 中的 `@media`。
 
+### 官网 2.0 hover 状态约定
+
+- 纯视觉 hover 使用 CSS 表达，不为颜色、透明度或背景渐变变化添加 JavaScript 状态。
+- 复用的交互值定义在 `:root` token 中；当前描边 hover 使用 `--color-border-hover`，深色 CTA hover 使用 `--color-dark-hover`，Innovation 卡片 hover 使用 `--gradient-card-hover`。
+- 文本链接的 hover 应同步提供 `:focus-visible`；容器卡片内存在可聚焦控件时，卡片 hover 背景同步提供 `:focus-within`。
+- 渐变主按钮通过 `opacity: 0.8` 表达 hover/active，禁用按钮必须用 `:not(:disabled)` 排除。
+- Innovation 卡片只切换背景色或背景渐变，不通过尺寸、padding、位移或缩放制造 hover，避免网格发生布局抖动。
+
 禁止的模式：
 
 - 不要为了普通布局或视觉样式添加 inline `style` 属性。
