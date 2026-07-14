@@ -169,10 +169,22 @@ const PROMPT_GENERATOR_STRINGS = {
     zh: {
         noModelsAvailable: "暂无可用模型",
         loadModelsFailed: "模型加载失败",
+        placeholderPrefix: "您想创建什么网站？试试：",
+        placeholderPrompts: [
+            "帮我生成一个支持在线点单的咖啡网站...",
+            "为财务团队搭建一个 SaaS 仪表盘...",
+            "创建一个 UI 设计师作品集...",
+        ],
     },
     en: {
         noModelsAvailable: "No models available",
         loadModelsFailed: "Failed to load models",
+        placeholderPrefix: "What kind of website do you need? Try this: ",
+        placeholderPrompts: [
+            "help me generate a coffee website with online ordering...",
+            "build a SaaS dashboard for finance teams...",
+            "create a portfolio for a UI designer...",
+        ],
     },
 };
 
@@ -182,7 +194,8 @@ function detectPromptGeneratorLang(root) {
 }
 
 function promptGeneratorText(lang, key) {
-    return (PROMPT_GENERATOR_STRINGS[lang] || PROMPT_GENERATOR_STRINGS.en)[key];
+    const strings = PROMPT_GENERATOR_STRINGS[lang] || PROMPT_GENERATOR_STRINGS.en;
+    return strings[key] ?? PROMPT_GENERATOR_STRINGS.en[key];
 }
 
 function trimTrailingSlash(url) {
@@ -480,6 +493,8 @@ function initPromptGeneratorSpotlights() {
 function initPromptTypingPlaceholder(textarea) {
     if (!textarea) return;
 
+    const root = textarea.closest(".prompt-generator");
+    const lang = root ? detectPromptGeneratorLang(root) : "en";
     let userEdited = false;
     textarea.setAttribute("autocomplete", "off");
     textarea.addEventListener(
@@ -502,15 +517,20 @@ function initPromptTypingPlaceholder(textarea) {
     const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     if (reducedMotion) return;
 
-    const prompts = [
-        "help me generate a coffee website with online ordering...",
-        "build a SaaS dashboard for finance teams...",
-        "create a portfolio for a UI designer...",
-    ];
+    const promptDataset = root?.dataset || {};
+    const localizedPrompts = [
+        promptDataset.placeholderPrompt1,
+        promptDataset.placeholderPrompt2,
+        promptDataset.placeholderPrompt3,
+    ].filter(Boolean);
+    const prompts = localizedPrompts.length
+        ? localizedPrompts
+        : promptGeneratorText(lang, "placeholderPrompts");
     const originalPlaceholder = textarea.getAttribute("placeholder") || "";
-    const prefix = originalPlaceholder.includes("Try this:")
+    const localizedPrefix = promptDataset.placeholderPrefix || promptGeneratorText(lang, "placeholderPrefix");
+    const prefix = localizedPrefix || (originalPlaceholder.includes("Try this:")
         ? `${originalPlaceholder.split("Try this:")[0]}Try this: `
-        : "";
+        : "");
 
     let promptIndex = 0;
     let charIndex = 0;

@@ -61,6 +61,28 @@ Kooboo 模板绑定使用 `env="server"` 和 `k-*` 指令。这些绑定在 Koob
 
 表达式应保持简单。如果某个绑定变得难以阅读，先在附近的服务端脚本中计算该值，再绑定命名变量。
 
+### 属性类多语言文案
+
+`k-label` 只用于元素文本内容。`placeholder`、`aria-label`、`title`、`alt` 等属性需要多语言时，先在附近的 `env="server"` 脚本中用 `k.label()` 计算变量，再用 `k-attribute` 绑定属性。保留静态属性 fallback，方便非 Kooboo 预览或 label 缺失时仍有可读文本。
+
+```html
+<script env="server">
+    var promptPlaceholderKey = "Prompt generator placeholder";
+    var translatedPromptPlaceholder = k.label(promptPlaceholderKey);
+    var promptPlaceholder =
+        translatedPromptPlaceholder && translatedPromptPlaceholder !== promptPlaceholderKey
+            ? translatedPromptPlaceholder
+            : "What kind of website do you need?";
+</script>
+
+<label env="server">
+    <span class="sr-only" k-label="Website prompt">Website prompt</span>
+    <textarea
+        k-attribute="placeholder promptPlaceholder"
+        placeholder="What kind of website do you need?"></textarea>
+</label>
+```
+
 ---
 
 ## 服务端 Module

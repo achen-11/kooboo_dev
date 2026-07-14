@@ -1,12 +1,49 @@
-<div class="prompt-generator m-4 mb-8 rounded-2xl border border-white/40 p-4">
+<script env="server">
+    var promptGeneratorLabelKey = "Prompt generator placeholder";
+    var promptGeneratorCulture = (k.request.culture || k.site.multilingual.currentCulture || "en").toLowerCase();
+    var promptGeneratorIsChinese = promptGeneratorCulture.indexOf("zh") === 0;
+
+    function promptGeneratorLabel(name, fallback) {
+        var value = k.label(name);
+        return value && value !== name ? value : fallback;
+    }
+
+    var promptGeneratorPlaceholderPrefix = promptGeneratorLabel(
+        "Prompt generator placeholder prefix",
+        promptGeneratorIsChinese ? "您想创建什么网站？试试：" : "What kind of website do you need? Try this: "
+    );
+    var promptGeneratorPromptExampleCoffee = promptGeneratorLabel(
+        "Prompt example coffee website",
+        promptGeneratorIsChinese ? "帮我生成一个支持在线点单的咖啡网站..." : "help me generate a coffee website with online ordering..."
+    );
+    var promptGeneratorPromptExampleSaas = promptGeneratorLabel(
+        "Prompt example SaaS dashboard",
+        promptGeneratorIsChinese ? "为财务团队搭建一个 SaaS 仪表盘..." : "build a SaaS dashboard for finance teams..."
+    );
+    var promptGeneratorPromptExamplePortfolio = promptGeneratorLabel(
+        "Prompt example UI designer portfolio",
+        promptGeneratorIsChinese ? "创建一个 UI 设计师作品集..." : "create a portfolio for a UI designer..."
+    );
+    var promptGeneratorPlaceholderFallback = promptGeneratorPlaceholderPrefix + promptGeneratorPromptExampleCoffee;
+    var promptGeneratorPlaceholderLabel = k.label(promptGeneratorLabelKey);
+    var promptGeneratorPlaceholder =
+        promptGeneratorPlaceholderLabel && promptGeneratorPlaceholderLabel !== promptGeneratorLabelKey
+            ? promptGeneratorPlaceholderLabel
+            : promptGeneratorPlaceholderFallback;
+</script>
+
+<div
+    class="prompt-generator m-4 mb-8 rounded-2xl border border-white/40 p-4"
+    env="server"
+    k-attribute="data-placeholder-prefix promptGeneratorPlaceholderPrefix; data-placeholder-prompt-1 promptGeneratorPromptExampleCoffee; data-placeholder-prompt-2 promptGeneratorPromptExampleSaas; data-placeholder-prompt-3 promptGeneratorPromptExamplePortfolio">
     <div class="prompt-generator__panel flex min-h-[183px] flex-col gap-4 rounded-xl bg-[var(--color-white)] p-4">
         <label class="flex min-h-[95px] w-full flex-auto">
-            <span class="sr-only">Website prompt</span>
+            <span class="sr-only" k-label="Website prompt">Website prompt</span>
             <textarea
                 class="prompt-generator__input min-h-[95px] w-full flex-auto resize-none border-0 text-[15px] leading-[1.45] text-[#606266] outline-none"
                 rows="4"
                 autocomplete="off"
-                k-label="Website prompt"
+                k-attribute="placeholder promptGeneratorPlaceholder"
                 placeholder="What kind of website do you need? Try this: help me generate a coffee website..."></textarea>
         </label>
         <div class="prompt-generator__controls flex gap-4">
