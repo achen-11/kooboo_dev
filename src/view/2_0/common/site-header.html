@@ -8,8 +8,9 @@
     const accessToken = k.account.getAccessToken();
     const isLoggedIn = k.account.isLogin || Boolean(accessToken);
     const showLogin = !isLoggedIn;
-    const adminBaseUrl =
+    const resolvedAdminBaseUrl =
         resolveAdminBaseFromToken(accessToken) || "/_Admin";
+    const adminBaseUrl = resolvedAdminBaseUrl.replace(/\/+$/, "") || "/_Admin";
     let loginUrl =
         adminBaseUrl + "/login?returnurl=" + encodeURIComponent(loginReturnUrl);
     let consoleUrl = adminBaseUrl + "/";
@@ -64,14 +65,16 @@
                 <a class="site-header__mobile-link" href="/innovation" k-label="menu.innovation">Innovation</a>
                 <a class="site-header__mobile-link" href="/price" k-label="menu.pricing">Price</a>
                 <a class="site-header__mobile-link" href="/docs" k-label="menu.docs">Doc</a>
-                <a k-if="showLogin" class="site-header__mobile-link" :href="loginUrl" k-label="SignIn">Login</a>
+                <a k-if="showLogin" class="site-header__mobile-link" href="/_Admin/login?returnurl=%2F" k-attribute="href loginUrl" k-label="SignIn">Login</a>
                 <div k-if="isLoggedIn" class="site-header__mobile-user">
                     <div class="site-header__mobile-user-meta">
                         <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
                         <span class="site-header__mobile-user-name" k-content="userDisplayName">User</span>
                     </div>
-                    <a class="site-header__mobile-link" :href="consoleUrl" k-label="Console">Console</a>
-                    <a class="site-header__mobile-link site-header__mobile-link--muted" :href="logoutUrl" k-label="SignOut">Logout</a>
+                    <a class="site-header__mobile-link" href="/_Admin/" k-attribute="href consoleUrl" k-label="Console">Console</a>
+                    <form class="site-header__logout-form" action="/_api/v2/user/logout?returnUrl=%2F" k-attribute="action logoutUrl" method="post">
+                        <button class="site-header__mobile-link site-header__mobile-link--muted site-header__mobile-logout-button" type="submit" k-label="SignOut">Logout</button>
+                    </form>
                 </div>
                 <a class="site-header__mobile-claim" href="/claim" k-label="Claim">Claim your <strong>$1</strong> website</a>
             </nav>
@@ -89,7 +92,7 @@
         </nav>
 
         <div class="site-header__actions">
-            <a k-if="showLogin" class="site-header__secondary-action" :href="loginUrl" k-label="SignIn">Login</a>
+            <a k-if="showLogin" class="site-header__secondary-action" href="/_Admin/login?returnurl=%2F" k-attribute="href loginUrl" k-label="SignIn">Login</a>
             <details k-if="isLoggedIn" class="site-header__user-menu">
                 <summary class="site-header__user-trigger" aria-label="Account menu">
                     <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
@@ -97,8 +100,10 @@
                     <span class="site-header__user-chevron" aria-hidden="true"></span>
                 </summary>
                 <div class="site-header__user-dropdown" role="menu">
-                    <a class="site-header__user-dropdown-link" :href="consoleUrl" role="menuitem" k-label="Console">Console</a>
-                    <a class="site-header__user-dropdown-link site-header__user-dropdown-link--muted" :href="logoutUrl" role="menuitem" k-label="SignOut">Logout</a>
+                    <a class="site-header__user-dropdown-link" href="/_Admin/" k-attribute="href consoleUrl" role="menuitem" k-label="Console">Console</a>
+                    <form class="site-header__logout-form" action="/_api/v2/user/logout?returnUrl=%2F" k-attribute="action logoutUrl" method="post" role="none">
+                        <button class="site-header__user-dropdown-link site-header__user-dropdown-link--muted site-header__logout-button" type="submit" role="menuitem" k-label="SignOut">Logout</button>
+                    </form>
                 </div>
             </details>
             <a class="site-header__primary-action" href="/claim">

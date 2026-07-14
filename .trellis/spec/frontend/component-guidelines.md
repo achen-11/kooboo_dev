@@ -73,6 +73,13 @@ Kooboo 模板绑定只用于服务端渲染的动态内容。
 - 不要用 `k-content`、`k-if`、`k-for` 或 `k-attribute` 表达客户端交互状态。需要浏览器交互时，在 `src/js/site.js` 中使用渐进增强 JavaScript。
 - 不要把服务端渲染的动态属性和普通展示用的 inline visual styling 混在一起。优先使用 CSS class 和 token。
 
+### 共享 Header 认证动作
+
+- Login 和 Console 的目标地址在附近的服务端 module 中计算；先移除管理端基址末尾多余的 `/`，再拼接 `/login` 或 `/`，避免生成 `//login`、`//`。
+- 动态导航地址使用 `k-attribute="href variable"`，同时保留可用的静态 `href` fallback，保证 Kooboo 绑定失败或静态预览时控件仍有明确行为。
+- Logout 是会改变登录态的操作，必须通过 `POST /_api/v2/user/logout` 提交，并携带 `returnUrl`；不要把 Logout 实现为普通 GET 链接。
+- Logout 使用语义化 `<form method="post">` 和 `<button type="submit">`，桌面与移动菜单共用同一请求契约，样式只负责让 button 与菜单项视觉一致。
+
 ---
 
 ## 样式模式

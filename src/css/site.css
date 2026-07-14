@@ -382,6 +382,19 @@ body:has(.home-hero) .site-header__user-trigger {
     background: rgba(217, 217, 217, 0.3);
 }
 
+.site-header__logout-form {
+    margin: 0;
+}
+
+.site-header__logout-button,
+.site-header__mobile-logout-button {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
 .site-header__user-dropdown-link--muted {
     color: #646c7d;
 }
@@ -1549,6 +1562,7 @@ body:has(.home-hero) .site-header__user-trigger {
     align-items: center;
     justify-content: center;
     gap: 12px;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     background: var(--color-white);
     color: var(--color-title);
@@ -1557,6 +1571,12 @@ body:has(.home-hero) .site-header__user-trigger {
     font-weight: 400;
     line-height: 1.4;
     letter-spacing: 0;
+}
+
+.price-plan-card__button:not(.price-plan-card__button--primary):hover,
+.price-plan-card__button:not(.price-plan-card__button--primary):active,
+.price-plan-card__button:not(.price-plan-card__button--primary):focus-visible {
+    border-color: var(--color-border-hover);
 }
 
 .price-plan-card__button--primary {
@@ -2091,7 +2111,38 @@ body:has(.home-hero) .site-header__user-trigger {
     }
 
     .site-footer__inner {
-        width: min(var(--container-width), calc(100% - 32px));
+        width: 100%;
+        display: block;
+        padding: 0;
+    }
+
+    .site-footer__nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 14px 16px;
+        border-top: 1px solid #e5e7eb;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+    }
+
+    .site-footer__meta {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 16px;
+        font-size: 12px;
+    }
+
+    .site-footer__nav a,
+    .site-footer__meta > * {
+        padding: 10px 14px;
+        justify-self: start;
+    }
+
+    .site-footer__nav a:nth-child(even),
+    .site-footer__meta > :last-child {
+        justify-self: end;
     }
 
     .home-hero__stage {
