@@ -40,6 +40,7 @@
 - 对共享颜色、尺寸和渐变复用 `:root` token。
 - 固定格式 UI 元素需要通过稳定尺寸、`min()`/`max()` 约束、flex/grid 换行或 media query 实现响应式。
 - 非标准响应式断点写在 `site.css` 的 `@media` 中；HTML class 只使用 Kooboo Tailwind 支持的标准响应式前缀。
+- 当 `site.css` 的响应式规则需要覆盖 HTML 中已有的 Tailwind utility 时，使用组件作用域选择器（例如 `.site-footer .site-footer__inner`）确保优先级高于后加载的单类 utility；不要依赖相同优先级下的加载顺序。
 - 视觉变更后检查桌面和移动端行为。
 - 图片和图标保留在根目录 `images/`；有用时将分组导出放在 `images/icons/`。
 - 修改导航、按钮、图片、label 或表单控件时，保留或更新可访问性属性。
@@ -55,6 +56,7 @@
 - 当服务端模板绑定发生变化时，验证 `env="server"` 作用域以及 `k-content`/`k-if`/`k-for`/`k-attribute` 用法。
 - 只有当任务需要 live-site 验证时，才运行或依赖 Kooboo CLI sync 命令。当前 dev 命令是 `pnpm dev`。
 - 面向用户的视觉变更至少检查一个桌面宽度和一个移动端宽度。
+- 移动端布局或共享 footer/header 变更需要确认 `document.documentElement.scrollWidth === document.documentElement.clientWidth`；若不相等，定位实际越界元素后再调整 CSS，不能用缩小页面内容掩盖横向溢出。
 
 JavaScript 变更：
 

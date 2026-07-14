@@ -1851,11 +1851,11 @@ body:has(.home-hero) .site-header__user-trigger {
         display: none;
     }
 
-    .site-footer {
+    footer.site-footer {
         height: auto;
     }
 
-    .site-footer__inner {
+    .site-footer .site-footer__inner {
         height: auto;
         flex-wrap: wrap;
         justify-content: center;
@@ -1863,8 +1863,8 @@ body:has(.home-hero) .site-header__user-trigger {
         padding-bottom: 14px;
     }
 
-    .site-footer__nav,
-    .site-footer__meta {
+    .site-footer .site-footer__nav,
+    .site-footer .site-footer__meta {
         flex-wrap: wrap;
         justify-content: center;
     }
@@ -2110,38 +2110,50 @@ body:has(.home-hero) .site-header__user-trigger {
         width: min(100% - 32px, var(--container-width));
     }
 
-    .site-footer__inner {
+    .site-footer .site-footer__inner {
         width: 100%;
+        max-width: 100%;
+        min-width: 0;
         display: block;
+        height: auto;
         padding: 0;
+        box-sizing: border-box;
     }
 
-    .site-footer__nav {
+    .site-footer .site-footer__nav {
+        width: 100%;
+        min-width: 0;
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;
         padding: 14px 16px;
         border-top: 1px solid #e5e7eb;
         border-bottom: 1px solid #e5e7eb;
+        box-sizing: border-box;
         font-size: 14px;
     }
 
-    .site-footer__meta {
+    .site-footer .site-footer__meta {
+        width: 100%;
+        min-width: 0;
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;
         padding: 16px;
+        box-sizing: border-box;
         font-size: 12px;
     }
 
-    .site-footer__nav a,
-    .site-footer__meta > * {
+    .site-footer .site-footer__nav a,
+    .site-footer .site-footer__meta > * {
+        min-width: 0;
+        max-width: 100%;
         padding: 10px 14px;
         justify-self: start;
     }
 
-    .site-footer__nav a:nth-child(even),
-    .site-footer__meta > :last-child {
+    .site-footer .site-footer__nav a:nth-child(even),
+    .site-footer .site-footer__meta > :last-child {
         justify-self: end;
     }
 
@@ -2179,12 +2191,21 @@ body:has(.home-hero) .site-header__user-trigger {
     }
 
     .home-hero__top-title-wrap {
-        gap: 8px;
+        display: inline;
+        white-space: normal;
+    }
+
+    .home-hero__top-title {
+        display: inline-block;
+        white-space: nowrap;
     }
 
     .home-hero__title-icon {
+        display: inline-block;
         width: 37px;
         height: 36px;
+        margin-left: 8px;
+        vertical-align: -6px;
     }
 
     .home-hero__subtitle {
