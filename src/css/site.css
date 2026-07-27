@@ -89,11 +89,20 @@ a {
     top: 0;
     z-index: 50;
     height: 64px;
-    background: var(--color-white);
+    background: transparent;
+    transition: background-color 180ms ease, backdrop-filter 180ms ease, -webkit-backdrop-filter 180ms ease;
+}
+
+.site-header.is-scrolled {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 }
 
 body:has(.home-hero) .site-header {
-    background: transparent;
+    position: sticky;
+    top: 0;
+    z-index: 50;
 }
 
 body:has(.home-hero) .site-header__user-trigger {
@@ -253,6 +262,52 @@ body:has(.home-hero) .site-header__user-trigger {
     align-items: center;
     justify-self: end;
     gap: 16px;
+}
+
+.site-header__language-link {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-white);
+    cursor: pointer;
+    list-style: none;
+    transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.site-header__language-link img,
+.site-header__mobile-language-link img {
+    display: block;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+}
+
+.site-header__language-link:hover,
+.site-header__language-link:focus-visible {
+    border-color: var(--color-border-hover);
+    box-shadow: 0 0 0 4px rgba(17, 26, 74, 0.06);
+}
+
+.site-header__mobile-language-link {
+    display: inline-flex;
+    width: 36px;
+    height: 36px;
+    margin: 8px 12px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-white);
+}
+
+.site-header__mobile-language-link:hover,
+.site-header__mobile-language-link:focus-visible {
+    border-color: var(--color-border-hover);
+    box-shadow: 0 0 0 4px rgba(17, 26, 74, 0.06);
 }
 
 .site-header__secondary-action,
@@ -756,7 +811,7 @@ body:has(.home-hero) .site-header__user-trigger {
 .home-productivity__background {
     position: absolute;
     inset: 0;
-    background: url("/2_0/home-productivity-background.svg") center top / 1512px 730px no-repeat;
+    display: none;
     pointer-events: none;
 }
 
@@ -766,7 +821,8 @@ body:has(.home-hero) .site-header__user-trigger {
     border-radius: 24px;
     background: rgba(248, 250, 251, 0.5);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
-    backdrop-filter: blur(80px);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
 }
 
 .home-productivity-card__inner {
@@ -783,12 +839,15 @@ body:has(.home-hero) .site-header__user-trigger {
 
 .home-productivity-card__image {
     display: block;
+    width: min(120px, 100%);
     max-width: 100%;
+    max-height: 120px;
     height: auto;
+    object-fit: contain;
 }
 
 .home-productivity-card__image--operations {
-    width: min(177px, 100%);
+    width: min(120px, 100%);
 }
 
 .home-productivity-card__body {

@@ -1,5 +1,17 @@
 document.documentElement.classList.add("site-ready");
 
+function initSiteHeaderScrollState() {
+    const header = document.querySelector(".site-header");
+    if (!header) return;
+
+    const updateHeaderState = () => {
+        header.classList.toggle("is-scrolled", window.scrollY > 8);
+    };
+
+    updateHeaderState();
+    window.addEventListener("scroll", updateHeaderState, { passive: true });
+}
+
 function initHomeBusinessAccordion() {
     const roots = document.querySelectorAll("[data-business-accordion]");
 
@@ -151,8 +163,12 @@ function initHomeBusinessAccordion() {
 }
 
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initHomeBusinessAccordion);
+    document.addEventListener("DOMContentLoaded", () => {
+        initSiteHeaderScrollState();
+        initHomeBusinessAccordion();
+    });
 } else {
+    initSiteHeaderScrollState();
     initHomeBusinessAccordion();
 }
 
