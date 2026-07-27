@@ -180,7 +180,6 @@ const STARTER_PROMPT_QUERY = "prompt";
 const STARTER_PROVIDER_QUERY = "provider";
 const STARTER_MODEL_QUERY = "model";
 const STARTER_SITE_CREATED_QUERY = "starterSiteCreated";
-const STARTER_HANDOFF_SESSION_KEY = "kooboo_starter_handoff";
 const MODEL_PREFERENCE_KEY = "kooboo_ai_chat_model_preference";
 const MODEL_VALUE_SEP = "|";
 
@@ -489,16 +488,6 @@ function populateModelSelect(select, providers, preferred, lang) {
     return Boolean(selectedValue);
 }
 
-function buildAdminHandoffUrl(handoff) {
-    const params = new URLSearchParams();
-    if (handoff.prompt) params.set(STARTER_PROMPT_QUERY, handoff.prompt);
-    if (handoff.provider) params.set(STARTER_PROVIDER_QUERY, handoff.provider);
-    if (handoff.model) params.set(STARTER_MODEL_QUERY, handoff.model);
-    const query = params.toString();
-    const adminBase = trimTrailingSlash(getAdminBase());
-    return query ? `${adminBase}/?${query}` : `${adminBase}`;
-}
-
 function buildAiChatUrl(siteId, handoff, accessToken) {
     const url = new URL(
         `${trimTrailingSlash(getAdminBase())}/ai-chat/overview`,
@@ -515,22 +504,10 @@ function buildAiChatUrl(siteId, handoff, accessToken) {
     return url.href;
 }
 
-function buildLoginUrl(handoff) {
-    const returnUrl = buildAdminHandoffUrl(handoff);
+function buildLoginUrl() {
     const params = new URLSearchParams();
-    if (handoff.prompt) params.set(STARTER_PROMPT_QUERY, handoff.prompt);
-    if (handoff.provider) params.set(STARTER_PROVIDER_QUERY, handoff.provider);
-    if (handoff.model) params.set(STARTER_MODEL_QUERY, handoff.model);
-    params.set("returnurl", returnUrl);
+    params.set("returnurl", "/");
     return `${getAdminBase()}/login?${params.toString()}`;
-}
-
-function persistStarterHandoff(handoff) {
-    try {
-        sessionStorage.setItem(STARTER_HANDOFF_SESSION_KEY, JSON.stringify(handoff));
-    } catch {
-        // ignore storage failures
-    }
 }
 
 function setPromptGeneratorsBusy(busy) {
@@ -580,10 +557,9 @@ async function navigateToGenerate(root) {
     };
 
     saveModelPreference(handoff.provider, handoff.model);
-    persistStarterHandoff(handoff);
 
     if (!isKoobooLoggedIn()) {
-        window.location.href = buildLoginUrl(handoff);
+        window.location.href = buildLoginUrl();
         return;
     }
 
