@@ -174,9 +174,12 @@ if (document.readyState === "loading") {
 
 const ADMIN_BASE = "/_Admin/";
 const AI_PROVIDERS_API = "/_api/v2/ai/providers";
+const AVAILABLE_DOMAINS_API = "/_api/v2/Domain/Available";
+const CREATE_SITE_API = "/_api/v2/Site/Create";
 const STARTER_PROMPT_QUERY = "prompt";
 const STARTER_PROVIDER_QUERY = "provider";
 const STARTER_MODEL_QUERY = "model";
+const STARTER_SITE_CREATED_QUERY = "starterSiteCreated";
 const STARTER_HANDOFF_SESSION_KEY = "kooboo_starter_handoff";
 const MODEL_PREFERENCE_KEY = "kooboo_ai_chat_model_preference";
 const MODEL_VALUE_SEP = "|";
@@ -185,6 +188,8 @@ const PROMPT_GENERATOR_STRINGS = {
     zh: {
         noModelsAvailable: "暂无可用模型",
         loadModelsFailed: "模型加载失败",
+        creatingSite: "正在创建...",
+        createSiteFailed: "站点创建失败，请稍后重试",
         placeholderPrefix: "您想创建什么网站？试试：",
         placeholderPrompts: [
             "帮我生成一个支持在线点单的咖啡网站...",
@@ -195,6 +200,8 @@ const PROMPT_GENERATOR_STRINGS = {
     en: {
         noModelsAvailable: "No models available",
         loadModelsFailed: "Failed to load models",
+        creatingSite: "Creating...",
+        createSiteFailed: "Failed to create the site. Please try again.",
         placeholderPrefix: "What kind of website do you need? Try this: ",
         placeholderPrompts: [
             "help me generate a coffee website with online ordering...",
@@ -228,6 +235,22 @@ function getAdminBase() {
     return ADMIN_BASE;
 }
 
+function getKoobooBaseUrl() {
+    const adminBase = trimTrailingSlash(getAdminBase());
+    return adminBase.replace(/\/_Admin$/i, "") || "/";
+}
+
+function buildKoobooApiUrl(path, params) {
+    const baseUrl = new URL(`${trimTrailingSlash(getKoobooBaseUrl())}/`, window.location.origin);
+    const url = new URL(String(path).replace(/^\/+/, ""), baseUrl);
+    Object.entries(params || {}).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+            url.searchParams.set(key, String(value));
+        }
+    });
+    return url.href;
+}
+
 function getCookieValue(name) {
     const prefix = `${name}=`;
     return (
@@ -241,6 +264,110 @@ function getCookieValue(name) {
 
 function isKoobooLoggedIn() {
     return Boolean(getCookieValue("jwt_token"));
+}
+
+function requestKoobooApi(path, { method = "GET", params } = {}) {
+    const accessToken = getCookieValue("jwt_token");
+    if (!accessToken) throw new Error("Kooboo access token is missing");
+
+    const url = buildKoobooApiUrl(path, params);
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open(method, url, true);
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader("Authorization", `Bearer ${accessToken}`);
+
+        xhr.onload = () => {
+            const responseText = xhr.responseText;
+            let data = null;
+            if (responseText) {
+                try {
+                    data = JSON.parse(responseText);
+                } catch {
+                    data = responseText;
+                }
+            }
+
+            if (xhr.status >= 200 && xhr.status < 300) {
+                resolve(data);
+                return;
+            }
+
+            const message = Array.isArray(data)
+                ? data.filter(Boolean).join("; ")
+                : typeof data === "string"
+                  ? data
+                  : `Kooboo API request failed: ${xhr.status}`;
+            const error = new Error(
+                message || `Kooboo API request failed: ${xhr.status}`
+            );
+            error.status = xhr.status;
+            reject(error);
+        };
+
+        xhr.onerror = () => {
+            const error = new Error("Kooboo API network request failed");
+            error.status = xhr.status;
+            reject(error);
+        };
+
+        xhr.send(null);
+    });
+}
+
+function formatSiteTimestamp(date = new Date()) {
+    const pad = (value) => String(value).padStart(2, "0");
+    return [
+        pad(date.getFullYear() % 100),
+        pad(date.getMonth() + 1),
+        pad(date.getDate()),
+        pad(date.getHours()),
+        pad(date.getMinutes()),
+        pad(date.getSeconds()),
+    ].join("");
+}
+
+function buildRandomSiteName() {
+    const stamp = formatSiteTimestamp();
+    const suffix = Math.random().toString(36).slice(2, 6);
+    return `ai_site_${stamp}_${suffix}`;
+}
+
+function buildStarterSiteParams(root) {
+    const rootDomain = root?.domainName ?? root?.DomainName;
+    const sudDomainUseDash =
+        root?.sudDomainUseDash ?? root?.SudDomainUseDash ?? false;
+    if (!rootDomain) throw new Error("No available domain");
+
+    const siteName = buildRandomSiteName();
+    return {
+        subDomain: siteName,
+        rootDomain,
+        siteName,
+        sudDomainUseDash,
+        siteType: "p",
+    };
+}
+
+async function createStarterSite() {
+    const domains = await requestKoobooApi(AVAILABLE_DOMAINS_API);
+    const root = Array.isArray(domains) ? domains[0] : null;
+    const siteParams = buildStarterSiteParams(root);
+    const site = await requestKoobooApi(CREATE_SITE_API, {
+        method: "POST",
+        params: siteParams,
+    });
+    const siteId =
+        (typeof site === "string" ? site : null) ??
+        site?.id ??
+        site?.Id ??
+        site?.ID ??
+        site?.siteId ??
+        site?.SiteId ??
+        site?.model?.id ??
+        site?.Model?.Id;
+    if (!siteId) throw new Error("Site creation returned no site id");
+    return siteId;
 }
 
 function readPromptFromGenerator(root) {
@@ -372,6 +499,22 @@ function buildAdminHandoffUrl(handoff) {
     return query ? `${adminBase}/?${query}` : `${adminBase}`;
 }
 
+function buildAiChatUrl(siteId, handoff, accessToken) {
+    const url = new URL(
+        `${trimTrailingSlash(getAdminBase())}/ai-chat/overview`,
+        window.location.origin
+    );
+    url.searchParams.set("SiteId", siteId);
+    url.searchParams.set(STARTER_SITE_CREATED_QUERY, "1");
+    if (handoff.prompt) url.searchParams.set(STARTER_PROMPT_QUERY, handoff.prompt);
+    if (handoff.provider) {
+        url.searchParams.set(STARTER_PROVIDER_QUERY, handoff.provider);
+    }
+    if (handoff.model) url.searchParams.set(STARTER_MODEL_QUERY, handoff.model);
+    if (accessToken) url.searchParams.set("access_token", accessToken);
+    return url.href;
+}
+
 function buildLoginUrl(handoff) {
     const returnUrl = buildAdminHandoffUrl(handoff);
     const params = new URLSearchParams();
@@ -390,7 +533,33 @@ function persistStarterHandoff(handoff) {
     }
 }
 
-function navigateToGenerate(root) {
+function setPromptGeneratorsBusy(busy) {
+    document.querySelectorAll(".prompt-generator").forEach((root) => {
+        const button = root.querySelector(".prompt-generator__btn");
+        const select = root.querySelector(".prompt-generator__model-select");
+        if (!button) return;
+
+        if (!button.dataset.idleLabel) {
+            button.dataset.idleLabel = button.textContent?.trim() || "Generate now";
+        }
+        button.disabled = busy || !select?.value;
+        button.setAttribute("aria-busy", busy ? "true" : "false");
+        button.textContent = busy
+            ? promptGeneratorText(detectPromptGeneratorLang(root), "creatingSite")
+            : button.dataset.idleLabel;
+    });
+}
+
+function showPromptGeneratorError(root, message = "") {
+    const status = root.querySelector(".prompt-generator__status");
+    if (!status) return;
+    status.textContent = message;
+    status.hidden = !message;
+}
+
+let sharedStarterSitePromise = null;
+
+async function navigateToGenerate(root) {
     const prompt = readPromptFromGenerator(root);
     const modelSelection = readModelFromGenerator(root);
 
@@ -412,9 +581,32 @@ function navigateToGenerate(root) {
 
     saveModelPreference(handoff.provider, handoff.model);
     persistStarterHandoff(handoff);
-    window.location.href = isKoobooLoggedIn()
-        ? buildAdminHandoffUrl(handoff)
-        : buildLoginUrl(handoff);
+
+    if (!isKoobooLoggedIn()) {
+        window.location.href = buildLoginUrl(handoff);
+        return;
+    }
+
+    if (sharedStarterSitePromise) return sharedStarterSitePromise;
+
+    showPromptGeneratorError(root);
+    setPromptGeneratorsBusy(true);
+    sharedStarterSitePromise = createStarterSite();
+
+    try {
+        const siteId = await sharedStarterSitePromise;
+        const accessToken = getCookieValue("jwt_token");
+        window.location.href = buildAiChatUrl(siteId, handoff, accessToken);
+    } catch (error) {
+        console.error("[prompt-generator] create site failed:", error);
+        showPromptGeneratorError(
+            root,
+            promptGeneratorText(detectPromptGeneratorLang(root), "createSiteFailed")
+        );
+        setPromptGeneratorsBusy(false);
+    } finally {
+        sharedStarterSitePromise = null;
+    }
 }
 
 let sharedAiProvidersPromise = null;
@@ -462,7 +654,7 @@ async function initPromptGenerator(root) {
         button.disabled = true;
     }
 
-    button.addEventListener("click", () => navigateToGenerate(root));
+    button.addEventListener("click", () => void navigateToGenerate(root));
 }
 
 function initPromptGenerators() {
