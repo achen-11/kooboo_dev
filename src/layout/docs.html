@@ -10,12 +10,8 @@
 
 <body>
 	<main k-placeholder="Main" class="bg-white"></main>
-		<script env="server" type="module">
+	<script env="server" type="module">
 		k.utils.clientJS.setVariable('__customer_service__', k.userOptions.customer_service)
-		
-		const i18nStore = k.utils.clientJS.i18n()
-		const locale = i18nStore.locale
-		k.utils.clientJS.setVariable('lang', {locale})
 	</script>
 
 	<script>
@@ -25,7 +21,7 @@
 			script.onload = () => {
 				const chatWidget = createChatWidget({
 					site_id: __customer_service__.id,
-					language: window.lang?.locale || 'zh'
+					language: 'en'
 				})
 				window.toggleChat = chatWidget.toggleChat
 			}

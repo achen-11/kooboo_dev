@@ -184,40 +184,20 @@ const MODEL_PREFERENCE_KEY = "kooboo_ai_chat_model_preference";
 const MODEL_VALUE_SEP = "|";
 
 const PROMPT_GENERATOR_STRINGS = {
-    zh: {
-        noModelsAvailable: "暂无可用模型",
-        loadModelsFailed: "模型加载失败",
-        creatingSite: "正在创建...",
-        createSiteFailed: "站点创建失败，请稍后重试",
-        placeholderPrefix: "您想创建什么网站？试试：",
-        placeholderPrompts: [
-            "帮我生成一个支持在线点单的咖啡网站...",
-            "为财务团队搭建一个 SaaS 仪表盘...",
-            "创建一个 UI 设计师作品集...",
-        ],
-    },
-    en: {
-        noModelsAvailable: "No models available",
-        loadModelsFailed: "Failed to load models",
-        creatingSite: "Creating...",
-        createSiteFailed: "Failed to create the site. Please try again.",
-        placeholderPrefix: "What kind of website do you need? Try this: ",
-        placeholderPrompts: [
-            "help me generate a coffee website with online ordering...",
-            "build a SaaS dashboard for finance teams...",
-            "create a portfolio for a UI designer...",
-        ],
-    },
+    noModelsAvailable: "No models available",
+    loadModelsFailed: "Failed to load models",
+    creatingSite: "Creating...",
+    createSiteFailed: "Failed to create the site. Please try again.",
+    placeholderPrefix: "What kind of website do you need? Try this: ",
+    placeholderPrompts: [
+        "help me generate a coffee website with online ordering...",
+        "build a SaaS dashboard for finance teams...",
+        "create a portfolio for a UI designer...",
+    ],
 };
 
-function detectPromptGeneratorLang(root) {
-    const sample = root.querySelector(".prompt-generator__model-label")?.textContent || "";
-    return /[\u4e00-\u9fa5]/.test(sample) ? "zh" : "en";
-}
-
-function promptGeneratorText(lang, key) {
-    const strings = PROMPT_GENERATOR_STRINGS[lang] || PROMPT_GENERATOR_STRINGS.en;
-    return strings[key] ?? PROMPT_GENERATOR_STRINGS.en[key];
+function promptGeneratorText(key) {
+    return PROMPT_GENERATOR_STRINGS[key];
 }
 
 function trimTrailingSlash(url) {
@@ -439,13 +419,13 @@ async function fetchAiProviders() {
     return mapProviders(await response.json());
 }
 
-function populateModelSelect(select, providers, preferred, lang) {
+function populateModelSelect(select, providers, preferred) {
     select.replaceChildren();
 
     if (!providers.length) {
         const option = document.createElement("option");
         option.value = "";
-        option.textContent = promptGeneratorText(lang, "noModelsAvailable");
+        option.textContent = promptGeneratorText("noModelsAvailable");
         select.appendChild(option);
         select.disabled = true;
         return false;
@@ -501,12 +481,14 @@ function buildAiChatUrl(siteId, handoff, accessToken) {
     }
     if (handoff.model) url.searchParams.set(STARTER_MODEL_QUERY, handoff.model);
     if (accessToken) url.searchParams.set("access_token", accessToken);
+    url.searchParams.set("lang", "en");
     return url.href;
 }
 
 function buildLoginUrl() {
     const params = new URLSearchParams();
     params.set("returnurl", "/");
+    params.set("lang", "en");
     return `${getAdminBase()}/login?${params.toString()}`;
 }
 
@@ -522,7 +504,7 @@ function setPromptGeneratorsBusy(busy) {
         button.disabled = busy || !select?.value;
         button.setAttribute("aria-busy", busy ? "true" : "false");
         button.textContent = busy
-            ? promptGeneratorText(detectPromptGeneratorLang(root), "creatingSite")
+            ? promptGeneratorText("creatingSite")
             : button.dataset.idleLabel;
     });
 }
@@ -577,7 +559,7 @@ async function navigateToGenerate(root) {
         console.error("[prompt-generator] create site failed:", error);
         showPromptGeneratorError(
             root,
-            promptGeneratorText(detectPromptGeneratorLang(root), "createSiteFailed")
+            promptGeneratorText("createSiteFailed")
         );
         setPromptGeneratorsBusy(false);
     } finally {
@@ -602,15 +584,12 @@ async function initPromptGenerator(root) {
     const button = root.querySelector(".prompt-generator__btn");
     if (!select || !button) return;
 
-    const lang = detectPromptGeneratorLang(root);
-
     try {
         const providers = await getAiProviders();
         const hasModel = populateModelSelect(
             select,
             providers,
-            loadSavedModelPreference(),
-            lang
+            loadSavedModelPreference()
         );
         button.disabled = !hasModel;
 
@@ -624,7 +603,7 @@ async function initPromptGenerator(root) {
         select.replaceChildren();
         const option = document.createElement("option");
         option.value = "";
-        option.textContent = promptGeneratorText(lang, "loadModelsFailed");
+        option.textContent = promptGeneratorText("loadModelsFailed");
         select.appendChild(option);
         select.disabled = true;
         button.disabled = true;
@@ -678,7 +657,6 @@ function initPromptTypingPlaceholder(textarea) {
     if (!textarea) return;
 
     const root = textarea.closest(".prompt-generator");
-    const lang = root ? detectPromptGeneratorLang(root) : "en";
     let userEdited = false;
     textarea.setAttribute("autocomplete", "off");
     textarea.addEventListener(
@@ -709,9 +687,9 @@ function initPromptTypingPlaceholder(textarea) {
     ].filter(Boolean);
     const prompts = localizedPrompts.length
         ? localizedPrompts
-        : promptGeneratorText(lang, "placeholderPrompts");
+        : promptGeneratorText("placeholderPrompts");
     const originalPlaceholder = textarea.getAttribute("placeholder") || "";
-    const localizedPrefix = promptDataset.placeholderPrefix || promptGeneratorText(lang, "placeholderPrefix");
+    const localizedPrefix = promptDataset.placeholderPrefix || promptGeneratorText("placeholderPrefix");
     const prefix = localizedPrefix || (originalPlaceholder.includes("Try this:")
         ? `${originalPlaceholder.split("Try this:")[0]}Try this: `
         : "");

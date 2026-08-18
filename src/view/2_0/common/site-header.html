@@ -8,23 +8,6 @@
     const accessToken = k.account.getAccessToken();
     const isLoggedIn = k.account.isLogin || Boolean(accessToken);
     const showLogin = !isLoggedIn;
-    const rawLanguageUrls = k.site.multilingual.currentURLs();
-    const currentCulture = k.site.multilingual.currentCulture;
-    function normalizeLanguageFlagKey(key) {
-        if (key === "zh" || key === "ZH" || key === "Chinese") return "Chinese";
-        if (key === "en" || key === "EN" || key === "English") return "English";
-        return key;
-    }
-    const activeLanguage = rawLanguageUrls.find(function (language) {
-        return language.isActive;
-    });
-    const switchLanguage = rawLanguageUrls.find(function (language) {
-        return !language.isActive;
-    });
-    const currentCultureFlagKey = normalizeLanguageFlagKey(
-        (activeLanguage && activeLanguage.Key) || currentCulture
-    );
-    const switchLanguageUrl = (switchLanguage && switchLanguage.URL) || "/";
     const resolvedAdminBaseUrl =
         resolveAdminBaseFromToken(accessToken) || "/_Admin";
     const adminBaseUrl = resolvedAdminBaseUrl.replace(/\/+$/, "") || "/_Admin";
@@ -33,12 +16,10 @@
     let consoleUrl = adminBaseUrl + "/";
     let logoutUrl =
         "/_api/v2/user/logout?returnUrl=" + encodeURIComponent(loginReturnUrl);
-    if (k.request.culture) {
-        const langParam = "lang=" + encodeURIComponent(k.request.culture);
-        loginUrl += "&" + langParam;
-        consoleUrl += "?" + langParam;
-        logoutUrl += "&" + langParam;
-    }
+    const langParam = "lang=en";
+    loginUrl += "&" + langParam;
+    consoleUrl += "?" + langParam;
+    logoutUrl += "&" + langParam;
 
     let userDisplayName = "";
     let userInitials = "";
@@ -68,8 +49,6 @@
         showLogin,
         userDisplayName,
         userInitials,
-        currentCultureFlagKey,
-        switchLanguageUrl,
     };
 </script>
 
@@ -84,17 +63,14 @@
                 <a class="site-header__mobile-link" href="/innovation" k-label="menu.innovation">Innovation</a>
                 <a class="site-header__mobile-link" href="/price" k-label="menu.pricing">Price</a>
                 <a class="site-header__mobile-link" href="/docs" k-label="menu.docs">Doc</a>
-                <a class="site-header__mobile-language-link" href="/" k-attribute="href switchLanguageUrl" aria-label="Switch language" title="Switch language">
-                    <img src="/images/English.svg" k-attribute="src /images/{currentCultureFlagKey}.svg" alt="" width="32" height="32">
-                </a>
-                <a k-if="showLogin" class="site-header__mobile-link" href="/_Admin/login?returnurl=/" k-attribute="href loginUrl" k-label="SignIn">Login</a>
+                <a k-if="showLogin" class="site-header__mobile-link" href="/_Admin/login?returnurl=/&amp;lang=en" k-attribute="href loginUrl" k-label="SignIn">Login</a>
                 <div k-if="isLoggedIn" class="site-header__mobile-user">
                     <div class="site-header__mobile-user-meta">
                         <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
                         <span class="site-header__mobile-user-name" k-content="userDisplayName">User</span>
                     </div>
-                    <a class="site-header__mobile-link" href="/_Admin/" k-attribute="href consoleUrl" k-label="Console">Console</a>
-                    <form class="site-header__logout-form" action="/_api/v2/user/logout?returnUrl=%2F" k-attribute="action logoutUrl" method="post">
+                    <a class="site-header__mobile-link" href="/_Admin/?lang=en" k-attribute="href consoleUrl" k-label="Console">Console</a>
+                    <form class="site-header__logout-form" action="/_api/v2/user/logout?returnUrl=%2F&amp;lang=en" k-attribute="action logoutUrl" method="post">
                         <button class="site-header__mobile-link site-header__mobile-link--muted site-header__mobile-logout-button" type="submit" k-label="SignOut">Logout</button>
                     </form>
                 </div>
@@ -114,10 +90,7 @@
         </nav>
 
         <div class="site-header__actions">
-            <a class="site-header__language-link" href="/" k-attribute="href switchLanguageUrl" aria-label="Switch language" title="Switch language">
-                <img src="/images/English.svg" k-attribute="src /images/{currentCultureFlagKey}.svg" alt="" width="32" height="32">
-            </a>
-            <a k-if="showLogin" class="site-header__secondary-action" href="/_Admin/login?returnurl=/" k-attribute="href loginUrl" k-label="SignIn">Login</a>
+            <a k-if="showLogin" class="site-header__secondary-action" href="/_Admin/login?returnurl=/&amp;lang=en" k-attribute="href loginUrl" k-label="SignIn">Login</a>
             <details k-if="isLoggedIn" class="site-header__user-menu">
                 <summary class="site-header__user-trigger" aria-label="Account menu">
                     <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
@@ -125,8 +98,8 @@
                     <span class="site-header__user-chevron" aria-hidden="true"></span>
                 </summary>
                 <div class="site-header__user-dropdown" role="menu">
-                    <a class="site-header__user-dropdown-link" href="/_Admin/" k-attribute="href consoleUrl" role="menuitem" k-label="Console">Console</a>
-                    <form class="site-header__logout-form" action="/_api/v2/user/logout?returnUrl=%2F" k-attribute="action logoutUrl" method="post" role="none">
+                    <a class="site-header__user-dropdown-link" href="/_Admin/?lang=en" k-attribute="href consoleUrl" role="menuitem" k-label="Console">Console</a>
+                    <form class="site-header__logout-form" action="/_api/v2/user/logout?returnUrl=%2F&amp;lang=en" k-attribute="action logoutUrl" method="post" role="none">
                         <button class="site-header__user-dropdown-link site-header__user-dropdown-link--muted site-header__logout-button" type="submit" role="menuitem" k-label="SignOut">Logout</button>
                     </form>
                 </div>
