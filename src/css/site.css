@@ -512,6 +512,8 @@ body:not(:has(.home-hero)) .site-footer {
     --aurora-start-y: 116px;
     --aurora-final-y: 0px;
     top: calc(clamp(117px, 18vh, 216px) + 180px);
+    bottom: 0;
+    aspect-ratio: auto;
     transform: translateX(-50%) translateY(var(--aurora-start-y));
     animation: home-aurora-slide-up 1600ms cubic-bezier(0.16, 1, 0.3, 1) 0ms both;
 }
@@ -524,7 +526,7 @@ body:not(:has(.home-hero)) .site-footer {
 }
 
 .home-hero__aurora::before {
-    background: url("/2_0/home-hero-ring.webp") center / contain no-repeat;
+    background: url("/2_0/home-hero-ring.webp") center bottom / contain no-repeat;
 }
 
 .home-start-building__glow::before {
@@ -2197,6 +2199,8 @@ body:not(:has(.home-hero)) .site-footer {
         --aurora-final-y: 0px;
         width: max(1728px, 100vw);
         top: clamp(438px, 49vh, 606px);
+        bottom: auto;
+        aspect-ratio: 3456 / 1023;
     }
 
     .home-start-building__glow {
