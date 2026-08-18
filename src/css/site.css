@@ -29,6 +29,7 @@ html {
 body {
     margin: 0;
     min-width: 320px;
+    font-family: var(--font-sans);
 }
 
 body:has(.home-hero) {

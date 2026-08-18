@@ -8602,7 +8602,7 @@ k.response.write(msg.html);
 declare namespace Kooboo.Sites.Scripting.Global.Mail.Amazonses {
   interface Amazonses {
     /** ```ts
-var mail = k.mail.amazonses.createEmail({accessKeyId:'EXAMPLE_AWS_ACCESS_KEY_ID' ,secretAccessKey:'EXAMPLE_AWS_SECRET_ACCESS_KEY',region:'EUCentral1'});
+var mail = k.mail.amazonses.createEmail({accessKeyId: 'YOUR_AWS_ACCESS_KEY_ID' ,secretAccessKey: 'YOUR_AWS_SECRET_ACCESS_KEY',region:'EUCentral1'});
 var from = 'me@gmail.com';
 var to = ['to-someone@gmail.com','to-someone2@gmail.com'];
 var subject = 'my subject';
@@ -8624,7 +8624,7 @@ k.response.json(res);
 
   interface AwsEmail {
     /** ```ts
-var mail = k.mail.amazonses.createEmail({accessKeyId:'EXAMPLE_AWS_ACCESS_KEY_ID' ,secretAccessKey:'EXAMPLE_AWS_SECRET_ACCESS_KEY',region:'EUCentral1'});
+var mail = k.mail.amazonses.createEmail({accessKeyId: 'YOUR_AWS_ACCESS_KEY_ID' ,secretAccessKey: 'YOUR_AWS_SECRET_ACCESS_KEY',region:'EUCentral1'});
 var from = 'me@gmail.com';
 var to = ['to-someone@gmail.com','to-someone2@gmail.com'];
 var subject = 'my subject';
@@ -8652,7 +8652,7 @@ var pdfHtml = `<!DOCTYPE html>
 </html>`;
 var pdf = k.utils.converter.htmlToPdf('fileName.pdf', pdfHtml);
 msg.addAttachment('test.pdf', pdf.zipEntries[0].binary);
-var mail = k.mail.amazonses.createEmail({ accessKeyId: 'EXAMPLE_AWS_ACCESS_KEY_ID', secretAccessKey: 'EXAMPLE_AWS_SECRET_ACCESS_KEY', region: 'EUCentral1' });
+var mail = k.mail.amazonses.createEmail({ accessKeyId: 'YOUR_AWS_ACCESS_KEY_ID', secretAccessKey: 'YOUR_AWS_SECRET_ACCESS_KEY', region: 'EUCentral1' });
 mail.SendRaw(msg);
 ```
  */
@@ -16834,7 +16834,7 @@ declare namespace MimeKit {
     registerMimeType(mimeType: string, type: any): void;
   }
 
-  interface HeaderList extends Array<Header> {
+  interface HeaderList extends Header[] {
     item: string;
     count: number;
     isReadOnly: boolean;
@@ -16889,7 +16889,7 @@ declare namespace MimeKit {
 
   type XMessagePriority = 'Highest' | 'High' | 'Normal' | 'Low' | 'Lowest';
 
-  interface InternetAddressList extends Array<InternetAddress> {
+  interface InternetAddressList extends InternetAddress[] {
     mailboxes: MailboxAddress[];
     item: InternetAddress;
     count: number;
@@ -16922,7 +16922,7 @@ declare namespace MimeKit {
     parse(text: string): InternetAddressList;
   }
 
-  interface MessageIdList extends Array<string> {
+  interface MessageIdList extends string[] {
     item: string;
     count: number;
     isReadOnly: boolean;
@@ -17011,7 +17011,7 @@ declare namespace MimeKit {
   interface MailboxAddress {
   }
 
-  interface DomainList extends Array<string> {
+  interface DomainList extends string[] {
     item: string;
     count: number;
     isReadOnly: boolean;
@@ -17185,7 +17185,7 @@ declare namespace MimeKit {
   interface ContentType {
   }
 
-  interface ParameterList extends Array<Parameter> {
+  interface ParameterList extends Parameter[] {
     item: string;
     count: number;
     isReadOnly: boolean;
@@ -17321,7 +17321,7 @@ declare namespace MimeKit.Cryptography {
 
   type EncryptionAlgorithm = 'Aes128' | 'Aes192' | 'Aes256' | 'Camellia128' | 'Camellia192' | 'Camellia256' | 'Cast5' | 'Des' | 'TripleDes' | 'Idea' | 'Blowfish' | 'Twofish' | 'RC240' | 'RC264' | 'RC2128' | 'Seed';
 
-  interface DigitalSignatureCollection extends Array<IDigitalSignature> {
+  interface DigitalSignatureCollection extends IDigitalSignature[] {
     count: number;
     item?: IDigitalSignature;
     contains(value: IDigitalSignature): boolean;
@@ -17351,7 +17351,7 @@ declare namespace MimeKit.Cryptography {
 
 }
 declare namespace Kooboo.IndexedDB.BTree {
-  interface ItemCollection extends Array<number> {
+  interface ItemCollection extends number[] {
   }
 
   interface KeyBytesCollection {
@@ -19888,17 +19888,24 @@ declare namespace KScript {
 
 declare namespace Kooboo.KContent {
   interface KContentInstance {
+    CommonContent: Kooboo.KContent.Folders.CommonContent;
     Applications: Kooboo.KContent.Folders.Applications;
     EcommerceKooboo: Kooboo.KContent.Folders.EcommerceKooboo;
+    Faq: Kooboo.KContent.Folders.Faq;
     JobBaseQuestion: Kooboo.KContent.Folders.JobBaseQuestion;
+    ProductivityBanner: Kooboo.KContent.Folders.ProductivityBanner;
     Price: Kooboo.KContent.Folders.Price;
+    Pricing: Kooboo.KContent.Folders.Pricing;
     ClientInfoBanner: Kooboo.KContent.Folders.ClientInfoBanner;
     JobQuestion: Kooboo.KContent.Folders.JobQuestion;
     EcommerceFeature: Kooboo.KContent.Folders.EcommerceFeature;
     article: Kooboo.KContent.Folders.article;
     Service: Kooboo.KContent.Folders.Service;
     homeTabs: Kooboo.KContent.Folders.homeTabs;
+    BusinessBanner: Kooboo.KContent.Folders.BusinessBanner;
+    PublishBanner: Kooboo.KContent.Folders.PublishBanner;
     PageAdvantage: Kooboo.KContent.Folders.PageAdvantage;
+    DetailPage: Kooboo.KContent.Folders.DetailPage;
     EcommerceShoplazza: Kooboo.KContent.Folders.EcommerceShoplazza;
     category: Kooboo.KContent.Folders.category;
     EcommerceContent: Kooboo.KContent.Folders.EcommerceContent;
@@ -19909,18 +19916,24 @@ declare namespace Kooboo.KContent {
     News: Kooboo.KContent.Folders.News;
     HomeBanner: Kooboo.KContent.Folders.HomeBanner;
     Favorite: Kooboo.KContent.Folders.Favorite;
+    KoobooCore: Kooboo.KContent.Folders.KoobooCore;
+    PerformanceBanner: Kooboo.KContent.Folders.PerformanceBanner;
     EcommerceTitle: Kooboo.KContent.Folders.EcommerceTitle;
+    Label: Kooboo.KContent.Folders.Label;
     JobItem: Kooboo.KContent.Folders.JobItem;
     EcommerceShopify: Kooboo.KContent.Folders.EcommerceShopify;
     ListItem: Kooboo.KContent.Folders.ListItem;
     PriceItem: Kooboo.KContent.Folders.PriceItem;
     index_action: Kooboo.KContent.Folders.index_action;
+    ProductionBanner: Kooboo.KContent.Folders.ProductionBanner;
     ClientInfoUpdate: Kooboo.KContent.Folders.ClientInfoUpdate;
     products: Kooboo.KContent.Folders.products;
     Downloads: Kooboo.KContent.Folders.Downloads;
     email: Kooboo.KContent.Folders.email;
     Package: Kooboo.KContent.Folders.Package;
     homeContent: Kooboo.KContent.FolderTypes.homeContent;
+    HomeHero: Kooboo.KContent.FolderTypes.HomeHero;
+    StartBuildingBanner: Kooboo.KContent.FolderTypes.StartBuildingBanner;
     operators(): KScript.Operators;
   }
 
@@ -20107,6 +20120,19 @@ declare namespace Kooboo.KContent.Types {
     summary: string;
   }
 
+  interface DetailPage {
+    /** Title TextBox */
+    Title: string;
+    /** Name TextBox */
+    Name: string;
+    /** Description TextBox */
+    Description: string;
+    /** Icon MediaFile */
+    Icon: string;
+    /** Body RichEditor */
+    Body: string;
+  }
+
   interface Package {
     /** Version TextBox */
     Version: string;
@@ -20195,6 +20221,21 @@ declare namespace Kooboo.KContent.Types {
     title: string;
   }
 
+  interface BusinessBanner {
+    /** Title TextBox */
+    Title: string;
+    /** Description TextBox */
+    Description: string;
+    /** Image MediaFile */
+    Image: string;
+    /** Image2 MediaFile */
+    Image2: string;
+    /** UrlName TextBox */
+    UrlName: string;
+    /** Url TextBox */
+    Url: string;
+  }
+
   interface ClientInfoBanner {
     /** Title TextBox */
     Title: string;
@@ -20219,6 +20260,13 @@ declare namespace Kooboo.KContent.Types {
     mobile_img: string;
     /** sort Number */
     sort: string;
+  }
+
+  interface Label {
+    /** Title TextBox */
+    Title: string;
+    /** Icon MediaFile */
+    Icon: string;
   }
 
   interface category {
@@ -20286,6 +20334,30 @@ declare namespace Kooboo.KContent.Types {
     content: string;
     /** 样式类型 Selection */
     type: string;
+  }
+
+  interface CommonContent {
+    /** Title TextBox */
+    Title: string;
+    /** Description TextArea */
+    Description: string;
+    /** Path TextBox */
+    Path: string;
+    /** Image MediaFile */
+    Image: string;
+  }
+
+  interface Pricing {
+    /** Title TextBox */
+    Title: string;
+    /** Icon MediaFile */
+    Icon: string;
+    /** Description TextBox */
+    Description: string;
+    /** Price TextBox */
+    Price: string;
+    /** Items ValueList */
+    Items: string;
   }
 
   interface Price {
@@ -20578,6 +20650,33 @@ blog1.comment().remove(comment1.id);
     remove(nameOrId: any): void;
   }
 
+  interface Label {
+    /** 
+var blogs= k.content.blog.all();
+var blog1=blogs[0];
+var comments=k.content.comment.all();
+var comment1=comment[0];
+
+blog1.comment().add(comment1);
+
+//or
+blog1.comment().add(comment1.id);
+ */
+    add(nameOrId: any): void;
+    /** 
+var blogs= k.content.blog.all();
+var blog1=blogs[0];
+var comments=blog1.comment().all();
+var comment1=comment[0];
+
+blog1.comment().remove(comment1);
+
+//or
+blog1.comment().remove(comment1.id);
+ */
+    remove(nameOrId: any): void;
+  }
+
   interface EcommerceFeature {
     /** 
 var blogs= k.content.blog.all();
@@ -20661,19 +20760,31 @@ blog1.comment().remove(comment1.id);
 
 }
 declare namespace Kooboo.KContent.MutationTypes {
+  interface CommonContent extends Kooboo.KContent.Types.CommonContent, Kooboo.KContent.contentTypeBase {
+  }
+
   interface Applications extends Kooboo.KContent.Types.Applications, Kooboo.KContent.contentTypeBase {
   }
 
   interface EcommerceKooboo extends Kooboo.KContent.Types.EcommerceKooboo, Kooboo.KContent.contentTypeBase {
   }
 
+  interface Faq extends Kooboo.KContent.Types.CommonContent, Kooboo.KContent.contentTypeBase {
+  }
+
   interface JobBaseQuestion extends Kooboo.KContent.Types.JobQuestionItem, Kooboo.KContent.contentTypeBase {
+  }
+
+  interface ProductivityBanner extends Kooboo.KContent.Types.CommonContent, Kooboo.KContent.contentTypeBase {
   }
 
   interface Price extends Kooboo.KContent.Types.Price, Kooboo.KContent.contentTypeBase {
   }
 
   interface homeContent extends Kooboo.KContent.Types.homeContent, Kooboo.KContent.contentTypeBase {
+  }
+
+  interface Pricing extends Kooboo.KContent.Types.Pricing, Kooboo.KContent.contentTypeBase {
   }
 
   interface ClientInfoBanner extends Kooboo.KContent.Types.ClientInfoBanner, Kooboo.KContent.contentTypeBase {
@@ -20694,7 +20805,19 @@ declare namespace Kooboo.KContent.MutationTypes {
   interface homeTabs extends Kooboo.KContent.Types.homeTabs, Kooboo.KContent.contentTypeBase {
   }
 
+  interface BusinessBanner extends Kooboo.KContent.Types.BusinessBanner, Kooboo.KContent.contentTypeBase {
+  }
+
+  interface PublishBanner extends Kooboo.KContent.Types.CommonContent, Kooboo.KContent.contentTypeBase {
+  }
+
   interface PageAdvantage extends Kooboo.KContent.Types.PageAdvantage, Kooboo.KContent.contentTypeBase {
+  }
+
+  interface HomeHero extends Kooboo.KContent.Types.CommonContent, Kooboo.KContent.contentTypeBase {
+  }
+
+  interface DetailPage extends Kooboo.KContent.Types.DetailPage, Kooboo.KContent.contentTypeBase {
   }
 
   interface EcommerceShoplazza extends Kooboo.KContent.Types.EcommerceShoplazza, Kooboo.KContent.contentTypeBase {
@@ -20727,7 +20850,16 @@ declare namespace Kooboo.KContent.MutationTypes {
   interface Favorite extends Kooboo.KContent.Types.Favorite, Kooboo.KContent.contentTypeBase {
   }
 
+  interface KoobooCore extends Kooboo.KContent.Types.DetailPage, Kooboo.KContent.contentTypeBase {
+  }
+
+  interface PerformanceBanner extends Kooboo.KContent.Types.CommonContent, Kooboo.KContent.contentTypeBase {
+  }
+
   interface EcommerceTitle extends Kooboo.KContent.Types.EcommerceTitle, Kooboo.KContent.contentTypeBase {
+  }
+
+  interface Label extends Kooboo.KContent.Types.Label, Kooboo.KContent.contentTypeBase {
   }
 
   interface JobItem extends Kooboo.KContent.Types.JobItem, Kooboo.KContent.contentTypeBase {
@@ -20739,10 +20871,16 @@ declare namespace Kooboo.KContent.MutationTypes {
   interface ListItem extends Kooboo.KContent.Types.ListItem, Kooboo.KContent.contentTypeBase {
   }
 
+  interface StartBuildingBanner extends Kooboo.KContent.Types.CommonContent, Kooboo.KContent.contentTypeBase {
+  }
+
   interface PriceItem extends Kooboo.KContent.Types.PriceItem, Kooboo.KContent.contentTypeBase {
   }
 
   interface index_action extends Kooboo.KContent.Types.index_action, Kooboo.KContent.contentTypeBase {
+  }
+
+  interface ProductionBanner extends Kooboo.KContent.Types.CommonContent, Kooboo.KContent.contentTypeBase {
   }
 
   interface ClientInfoUpdate extends Kooboo.KContent.Types.ClientInfoUpdate, Kooboo.KContent.contentTypeBase {
@@ -20762,13 +20900,22 @@ declare namespace Kooboo.KContent.MutationTypes {
 
 }
 declare namespace Kooboo.KContent.FolderTypes {
+  interface CommonContent extends Kooboo.KContent.Types.CommonContent, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
   interface Applications extends Kooboo.KContent.Types.Applications, Required<Kooboo.KContent.contentTypeBase> {
   }
 
   interface EcommerceKooboo extends Kooboo.KContent.Types.EcommerceKooboo, Required<Kooboo.KContent.contentTypeBase> {
   }
 
+  interface Faq extends Kooboo.KContent.Types.CommonContent, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
   interface JobBaseQuestion extends Kooboo.KContent.Types.JobQuestionItem, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
+  interface ProductivityBanner extends Kooboo.KContent.Types.CommonContent, Required<Kooboo.KContent.contentTypeBase> {
   }
 
   interface Price extends Kooboo.KContent.Types.Price, Required<Kooboo.KContent.contentTypeBase> {
@@ -20779,6 +20926,9 @@ declare namespace Kooboo.KContent.FolderTypes {
   interface homeContent extends Kooboo.KContent.Types.homeContent, Required<Kooboo.KContent.contentTypeBase> {
     homeTabs: Kooboo.KContent.FolderTypes.homeTabs[];
     relatedContent: Kooboo.KContent.FolderTypes.homeContent.relatedContent;
+  }
+
+  interface Pricing extends Kooboo.KContent.Types.Pricing, Required<Kooboo.KContent.contentTypeBase> {
   }
 
   interface ClientInfoBanner extends Kooboo.KContent.Types.ClientInfoBanner, Required<Kooboo.KContent.contentTypeBase> {
@@ -20807,9 +20957,23 @@ declare namespace Kooboo.KContent.FolderTypes {
   interface homeTabs extends Kooboo.KContent.Types.homeTabs, Required<Kooboo.KContent.contentTypeBase> {
   }
 
+  interface BusinessBanner extends Kooboo.KContent.Types.BusinessBanner, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
+  interface PublishBanner extends Kooboo.KContent.Types.CommonContent, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
   interface PageAdvantage extends Kooboo.KContent.Types.PageAdvantage, Required<Kooboo.KContent.contentTypeBase> {
     Items: Kooboo.KContent.FolderTypes.ListItem[];
     relatedContent: Kooboo.KContent.FolderTypes.PageAdvantage.relatedContent;
+  }
+
+  interface HomeHero extends Kooboo.KContent.Types.CommonContent, Required<Kooboo.KContent.contentTypeBase> {
+    Labels: Kooboo.KContent.FolderTypes.Label[];
+    relatedContent: Kooboo.KContent.FolderTypes.HomeHero.relatedContent;
+  }
+
+  interface DetailPage extends Kooboo.KContent.Types.DetailPage, Required<Kooboo.KContent.contentTypeBase> {
   }
 
   interface EcommerceShoplazza extends Kooboo.KContent.Types.EcommerceShoplazza, Required<Kooboo.KContent.contentTypeBase> {
@@ -20846,7 +21010,16 @@ declare namespace Kooboo.KContent.FolderTypes {
   interface Favorite extends Kooboo.KContent.Types.Favorite, Required<Kooboo.KContent.contentTypeBase> {
   }
 
+  interface KoobooCore extends Kooboo.KContent.Types.DetailPage, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
+  interface PerformanceBanner extends Kooboo.KContent.Types.CommonContent, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
   interface EcommerceTitle extends Kooboo.KContent.Types.EcommerceTitle, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
+  interface Label extends Kooboo.KContent.Types.Label, Required<Kooboo.KContent.contentTypeBase> {
   }
 
   interface JobItem extends Kooboo.KContent.Types.JobItem, Required<Kooboo.KContent.contentTypeBase> {
@@ -20858,10 +21031,16 @@ declare namespace Kooboo.KContent.FolderTypes {
   interface ListItem extends Kooboo.KContent.Types.ListItem, Required<Kooboo.KContent.contentTypeBase> {
   }
 
+  interface StartBuildingBanner extends Kooboo.KContent.Types.CommonContent, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
   interface PriceItem extends Kooboo.KContent.Types.PriceItem, Required<Kooboo.KContent.contentTypeBase> {
   }
 
   interface index_action extends Kooboo.KContent.Types.index_action, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
+  interface ProductionBanner extends Kooboo.KContent.Types.CommonContent, Required<Kooboo.KContent.contentTypeBase> {
   }
 
   interface ClientInfoUpdate extends Kooboo.KContent.Types.ClientInfoUpdate, Required<Kooboo.KContent.contentTypeBase> {
@@ -20918,6 +21097,12 @@ declare namespace Kooboo.KContent.FolderTypes.PageAdvantage {
   }
 
 }
+declare namespace Kooboo.KContent.FolderTypes.HomeHero {
+  interface relatedContent {
+    Labels: Kooboo.KContent.RelationFolders.Label;
+  }
+
+}
 declare namespace Kooboo.KContent.FolderTypes.category {
   interface relatedContent {
     article: Kooboo.KContent.RelationFolders.article;
@@ -20931,16 +21116,28 @@ declare namespace Kooboo.KContent.FolderTypes.EcommerceContent {
 
 }
 declare namespace Kooboo.KContent.Folders {
+  interface CommonContent extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.CommonContent,Kooboo.KContent.MutationTypes.CommonContent> {
+  }
+
   interface Applications extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.Applications,Kooboo.KContent.MutationTypes.Applications> {
   }
 
   interface EcommerceKooboo extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.EcommerceKooboo,Kooboo.KContent.MutationTypes.EcommerceKooboo> {
   }
 
+  interface Faq extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.Faq,Kooboo.KContent.MutationTypes.Faq> {
+  }
+
   interface JobBaseQuestion extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.JobBaseQuestion,Kooboo.KContent.MutationTypes.JobBaseQuestion> {
   }
 
+  interface ProductivityBanner extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.ProductivityBanner,Kooboo.KContent.MutationTypes.ProductivityBanner> {
+  }
+
   interface Price extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.Price,Kooboo.KContent.MutationTypes.Price> {
+  }
+
+  interface Pricing extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.Pricing,Kooboo.KContent.MutationTypes.Pricing> {
   }
 
   interface ClientInfoBanner extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.ClientInfoBanner,Kooboo.KContent.MutationTypes.ClientInfoBanner> {
@@ -20961,7 +21158,16 @@ declare namespace Kooboo.KContent.Folders {
   interface homeTabs extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.homeTabs,Kooboo.KContent.MutationTypes.homeTabs> {
   }
 
+  interface BusinessBanner extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.BusinessBanner,Kooboo.KContent.MutationTypes.BusinessBanner> {
+  }
+
+  interface PublishBanner extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.PublishBanner,Kooboo.KContent.MutationTypes.PublishBanner> {
+  }
+
   interface PageAdvantage extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.PageAdvantage,Kooboo.KContent.MutationTypes.PageAdvantage> {
+  }
+
+  interface DetailPage extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.DetailPage,Kooboo.KContent.MutationTypes.DetailPage> {
   }
 
   interface EcommerceShoplazza extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.EcommerceShoplazza,Kooboo.KContent.MutationTypes.EcommerceShoplazza> {
@@ -20994,7 +21200,16 @@ declare namespace Kooboo.KContent.Folders {
   interface Favorite extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.Favorite,Kooboo.KContent.MutationTypes.Favorite> {
   }
 
+  interface KoobooCore extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.KoobooCore,Kooboo.KContent.MutationTypes.KoobooCore> {
+  }
+
+  interface PerformanceBanner extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.PerformanceBanner,Kooboo.KContent.MutationTypes.PerformanceBanner> {
+  }
+
   interface EcommerceTitle extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.EcommerceTitle,Kooboo.KContent.MutationTypes.EcommerceTitle> {
+  }
+
+  interface Label extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.Label,Kooboo.KContent.MutationTypes.Label> {
   }
 
   interface JobItem extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.JobItem,Kooboo.KContent.MutationTypes.JobItem> {
@@ -21010,6 +21225,9 @@ declare namespace Kooboo.KContent.Folders {
   }
 
   interface index_action extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.index_action,Kooboo.KContent.MutationTypes.index_action> {
+  }
+
+  interface ProductionBanner extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.ProductionBanner,Kooboo.KContent.MutationTypes.ProductionBanner> {
   }
 
   interface ClientInfoUpdate extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.ClientInfoUpdate,Kooboo.KContent.MutationTypes.ClientInfoUpdate> {

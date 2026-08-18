@@ -85,9 +85,9 @@
                 <a class="site-header__mobile-link" href="/price" k-label="menu.pricing">Price</a>
                 <a class="site-header__mobile-link" href="/docs" k-label="menu.docs">Doc</a>
                 <a class="site-header__mobile-language-link" href="/" k-attribute="href switchLanguageUrl" aria-label="Switch language" title="Switch language">
-                    <img src="/images/English.svg" k-attribute="src /images/{currentCultureFlagKey}.svg" alt="" width="32" height="32" />
+                    <img src="/images/English.svg" k-attribute="src /images/{currentCultureFlagKey}.svg" alt="" width="32" height="32">
                 </a>
-                <a k-if="showLogin" class="site-header__mobile-link" href="/_Admin/login?returnurl=%2F" k-attribute="href loginUrl" k-label="SignIn">Login</a>
+                <a k-if="showLogin" class="site-header__mobile-link" href="/_Admin/login?returnurl=/" k-attribute="href loginUrl" k-label="SignIn">Login</a>
                 <div k-if="isLoggedIn" class="site-header__mobile-user">
                     <div class="site-header__mobile-user-meta">
                         <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
@@ -103,7 +103,7 @@
         </details>
 
         <a class="site-header__logo" href="/" aria-label="Kooboo home">
-            <img src="/kooboo-logo.svg" alt="Kooboo" width="97" height="20" />
+            <img src="/kooboo-logo.svg" alt="Kooboo" width="97" height="20">
         </a>
 
         <nav class="site-header__nav" aria-label="Primary navigation">
@@ -115,9 +115,9 @@
 
         <div class="site-header__actions">
             <a class="site-header__language-link" href="/" k-attribute="href switchLanguageUrl" aria-label="Switch language" title="Switch language">
-                <img src="/images/English.svg" k-attribute="src /images/{currentCultureFlagKey}.svg" alt="" width="32" height="32" />
+                <img src="/images/English.svg" k-attribute="src /images/{currentCultureFlagKey}.svg" alt="" width="32" height="32">
             </a>
-            <a k-if="showLogin" class="site-header__secondary-action" href="/_Admin/login?returnurl=%2F" k-attribute="href loginUrl" k-label="SignIn">Login</a>
+            <a k-if="showLogin" class="site-header__secondary-action" href="/_Admin/login?returnurl=/" k-attribute="href loginUrl" k-label="SignIn">Login</a>
             <details k-if="isLoggedIn" class="site-header__user-menu">
                 <summary class="site-header__user-trigger" aria-label="Account menu">
                     <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
