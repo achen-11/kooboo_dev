@@ -173,7 +173,7 @@ if (document.readyState === "loading") {
 }
 
 const ADMIN_BASE = "/_Admin/";
-const AI_PROVIDERS_API = "/_api/v2/ai/providers";
+const AI_PROVIDERS_API = "/api/ai-models";
 const AVAILABLE_DOMAINS_API = "/_api/v2/Domain/Available";
 const CREATE_SITE_API = "/_api/v2/Site/Create";
 const STARTER_PROMPT_QUERY = "prompt";
@@ -791,8 +791,6 @@ function initTemplateGallery() {
     document.querySelectorAll("[data-template-gallery]").forEach((gallery) => {
         const filters = Array.from(gallery.querySelectorAll("[data-template-filter]"));
         const cards = Array.from(gallery.querySelectorAll("[data-template-card]"));
-        const viewAll = gallery.querySelector("[data-template-view-all]");
-
         const setFilter = (filter) => {
             filters.forEach((button) => {
                 const isActive = button.dataset.templateFilter === filter;
@@ -809,8 +807,6 @@ function initTemplateGallery() {
         filters.forEach((button) => {
             button.addEventListener("click", () => setFilter(button.dataset.templateFilter));
         });
-
-        viewAll?.addEventListener("click", () => setFilter("all"));
 
         const defaultFilter = gallery.dataset.templateDefaultFilter || filters[0]?.dataset.templateFilter;
         if (defaultFilter) setFilter(defaultFilter);

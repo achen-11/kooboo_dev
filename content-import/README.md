@@ -11,6 +11,6 @@ The category-to-template relation is not included in Kooboo's CSV export. After 
 - Application: Aviza Fashion, Objects of Quiet Beauty
 - Tool: Journey Journal, Editorial Lifestyle
 
-Until those relations are configured, the View uses the same category mapping as the original static gallery. Once any category relation exists, the View reads category membership from Content.
+The gallery reads category membership directly from the `Templates` relations, so configure all relations before publishing the page.
 
 Four previews have an exact match in the current public Template Center and include a real `TemplateId`. The other four intentionally leave `TemplateId` empty, so their action opens the Template Center list instead of an unrelated template detail.

@@ -107,6 +107,7 @@
     background: var(--color-white);
     color: var(--color-title);
     font-size: 14px;
+    text-decoration: none;
     cursor: pointer;
 }
 
