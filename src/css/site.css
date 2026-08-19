@@ -2041,6 +2041,206 @@ body:not(:has(.home-hero)) .site-footer {
     margin-top: 32px;
 }
 
+.innovation-detail-page .innovation-detail-article {
+    width: min(880px, 100%);
+    margin: 0 auto;
+    color: var(--color-body);
+    font-size: 17px;
+    line-height: 1.75;
+}
+
+.innovation-detail-page .innovation-detail-article article,
+.innovation-detail-page .innovation-detail-article header,
+.innovation-detail-page .innovation-detail-article footer,
+.innovation-detail-page .innovation-detail-article figure,
+.innovation-detail-page .innovation-detail-article blockquote,
+.innovation-detail-page .innovation-detail-article h1,
+.innovation-detail-page .innovation-detail-article h2,
+.innovation-detail-page .innovation-detail-article h3,
+.innovation-detail-page .innovation-detail-article p,
+.innovation-detail-page .innovation-detail-article ol,
+.innovation-detail-page .innovation-detail-article ul,
+.innovation-detail-page .innovation-detail-article pre,
+.innovation-detail-page .innovation-detail-article table {
+    margin: 0;
+}
+
+.innovation-detail-page .innovation-detail-article article > * + * {
+    margin-top: 24px;
+}
+
+.innovation-detail-page .innovation-detail-article article > header {
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.innovation-detail-page .innovation-detail-article article > header > * + * {
+    margin-top: 12px;
+}
+
+.innovation-detail-page .innovation-detail-article h1,
+.innovation-detail-page .innovation-detail-article h2,
+.innovation-detail-page .innovation-detail-article h3 {
+    color: var(--color-title);
+    font-family: var(--font-sans);
+    letter-spacing: 0;
+}
+
+.innovation-detail-page .innovation-detail-article h1 {
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.innovation-detail-page .innovation-detail-article h2 {
+    margin-top: 48px;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.innovation-detail-page .innovation-detail-article h3 {
+    margin-top: 36px;
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.innovation-detail-page .innovation-detail-article p {
+    color: var(--color-body);
+    font-size: inherit;
+    font-weight: 400;
+    line-height: inherit;
+}
+
+.innovation-detail-page .innovation-detail-article strong {
+    color: var(--color-title);
+    font-weight: 600;
+}
+
+.innovation-detail-page .innovation-detail-article ol,
+.innovation-detail-page .innovation-detail-article ul {
+    padding-left: 28px;
+    color: var(--color-body);
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.innovation-detail-page .innovation-detail-article ol {
+    list-style: decimal;
+}
+
+.innovation-detail-page .innovation-detail-article ul {
+    list-style: disc;
+}
+
+.innovation-detail-page .innovation-detail-article li + li {
+    margin-top: 8px;
+}
+
+.innovation-detail-page .innovation-detail-article blockquote {
+    padding: 20px 24px;
+    border-left: 4px solid #2296f3;
+    border-radius: 0 12px 12px 0;
+    background: #f3f7fa;
+    color: var(--color-title);
+}
+
+.innovation-detail-page .innovation-detail-article blockquote p {
+    color: inherit;
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+.innovation-detail-page .innovation-detail-article figure {
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #f6f9fa;
+}
+
+.innovation-detail-page .innovation-detail-article figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.innovation-detail-page .innovation-detail-article figcaption {
+    padding: 12px 16px;
+    color: var(--color-muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.innovation-detail-page .innovation-detail-article a {
+    color: #1479c9;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+}
+
+.innovation-detail-page .innovation-detail-article a:hover,
+.innovation-detail-page .innovation-detail-article a:focus-visible {
+    color: #0d5f9f;
+}
+
+.innovation-detail-page .innovation-detail-article code {
+    padding: 0.15em 0.38em;
+    border-radius: 4px;
+    background: #eef2f6;
+    color: #25324a;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 0.88em;
+}
+
+.innovation-detail-page .innovation-detail-article pre {
+    max-width: 100%;
+    padding: 20px;
+    overflow-x: auto;
+    border-radius: 12px;
+    background: #172033;
+    color: #e7edf7;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.innovation-detail-page .innovation-detail-article pre code {
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font-size: inherit;
+}
+
+.innovation-detail-page .innovation-detail-article table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.innovation-detail-page .innovation-detail-article th,
+.innovation-detail-page .innovation-detail-article td {
+    min-width: 160px;
+    padding: 12px 16px;
+    border: 1px solid #dce1e7;
+    text-align: left;
+    vertical-align: top;
+}
+
+.innovation-detail-page .innovation-detail-article th {
+    background: #f3f7fa;
+    color: var(--color-title);
+    font-weight: 600;
+}
+
+.innovation-detail-page .innovation-detail-article article > footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+}
+
 .price-page {
     padding-bottom: 120px;
 }
@@ -3144,6 +3344,53 @@ body:not(:has(.home-hero)) .site-footer {
 
     .innovation-detail-page__content-slot {
         margin-top: 24px;
+    }
+
+    .innovation-detail-page .innovation-detail-article {
+        font-size: 16px;
+        line-height: 1.7;
+    }
+
+    .innovation-detail-page .innovation-detail-article article > header {
+        padding-bottom: 24px;
+    }
+
+    .innovation-detail-page .innovation-detail-article h1 {
+        font-size: 34px;
+        line-height: 1.22;
+    }
+
+    .innovation-detail-page .innovation-detail-article h2 {
+        margin-top: 40px;
+        font-size: 24px;
+    }
+
+    .innovation-detail-page .innovation-detail-article h3 {
+        margin-top: 32px;
+        font-size: 19px;
+    }
+
+    .innovation-detail-page .innovation-detail-article ol,
+    .innovation-detail-page .innovation-detail-article ul {
+        padding-left: 24px;
+    }
+
+    .innovation-detail-page .innovation-detail-article blockquote {
+        padding: 18px 20px;
+    }
+
+    .innovation-detail-page .innovation-detail-article blockquote p {
+        font-size: 17px;
+    }
+
+    .innovation-detail-page .innovation-detail-article pre {
+        padding: 16px;
+        font-size: 13px;
+    }
+
+    .innovation-detail-page .innovation-detail-article th,
+    .innovation-detail-page .innovation-detail-article td {
+        padding: 10px 12px;
     }
 
     .price-page {

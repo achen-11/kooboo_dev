@@ -1,0 +1,14 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="6" y="8" width="36" height="29" rx="6" fill="url(#inline-editor-panel)"/>
+  <rect x="10" y="12" width="28" height="5" rx="2.5" fill="#DFF5FF" fill-opacity="0.8"/>
+  <rect x="10" y="21" width="14" height="3" rx="1.5" fill="#DFF5FF" fill-opacity="0.72"/>
+  <rect x="10" y="27" width="11" height="3" rx="1.5" fill="#DFF5FF" fill-opacity="0.5"/>
+  <path d="M24 19L38 26L31.5 28.2L28.5 35L24 19Z" fill="#F8FBFF" stroke="#173654" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M31.5 28.2L36.5 34" stroke="#FFB84D" stroke-width="3" stroke-linecap="round"/>
+  <defs>
+    <linearGradient id="inline-editor-panel" x1="24" y1="8" x2="24" y2="37" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8ED8F2"/>
+      <stop offset="1" stop-color="#3168A7"/>
+    </linearGradient>
+  </defs>
+</svg>

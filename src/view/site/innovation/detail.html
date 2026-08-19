@@ -1,5 +1,6 @@
 <script env="server">
-    var coreDetail = k.content.KoobooCore.find(`Name == '${decodeURIComponent(k.request.queryString.p)}'`);
+    const slug = k.request.queryString.slug
+    var coreDetail = k.content.KoobooCore.get(slug)
 </script>
 
 <section class="innovation-detail-page" aria-labelledby="innovation-detail-title">
@@ -18,7 +19,7 @@
         </header>
 
         <div class="innovation-detail-page__content-slot" aria-label="Innovation detail content">
-            <p k-content="coreDetail.Body"></p>
+            <div class="innovation-detail-article" k-content="coreDetail.Body"></div>
         </div>
     </div>
 </section>

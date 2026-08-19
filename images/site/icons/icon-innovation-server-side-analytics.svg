@@ -1,0 +1,22 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="6" y="8" width="19" height="32" rx="6" fill="url(#analytics-server)"/>
+  <rect x="10" y="13" width="11" height="5" rx="2.5" fill="#DFF6FF"/>
+  <rect x="10" y="22" width="11" height="5" rx="2.5" fill="#B6EAF3"/>
+  <rect x="10" y="31" width="11" height="5" rx="2.5" fill="#83D8D6"/>
+  <circle cx="18.5" cy="15.5" r="1" fill="#2E73B9"/>
+  <circle cx="18.5" cy="24.5" r="1" fill="#2E73B9"/>
+  <circle cx="18.5" cy="33.5" r="1" fill="#2E73B9"/>
+  <path d="M27 36V26M33 36V20M39 36V13" stroke="url(#analytics-bars)" stroke-width="5" stroke-linecap="round"/>
+  <path d="M27 20L32.5 15L37 17L42 10" stroke="#FFB84D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="42" cy="10" r="2.5" fill="#FF8A54"/>
+  <defs>
+    <linearGradient id="analytics-server" x1="15.5" y1="8" x2="15.5" y2="40" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#537FA4"/>
+      <stop offset="1" stop-color="#142A45"/>
+    </linearGradient>
+    <linearGradient id="analytics-bars" x1="27" y1="13" x2="42" y2="36" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#86E2EB"/>
+      <stop offset="1" stop-color="#3A73B2"/>
+    </linearGradient>
+  </defs>
+</svg>

@@ -1,0 +1,23 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M8 18H40L36.5 9H11.5L8 18Z" fill="url(#marketplace-awning)"/>
+  <path d="M10 18H38V40H10V18Z" fill="url(#marketplace-shop)"/>
+  <path d="M8 18C8 21.3 10.2 23 13 23C15.8 23 18 21.3 18 18C18 21.3 20.2 23 23 23C25.8 23 28 21.3 28 18C28 21.3 30.2 23 33 23C35.8 23 38 21.3 38 18" fill="#EAF8FF"/>
+  <rect x="16" y="27" width="16" height="13" rx="3" fill="#F8FBFF"/>
+  <path d="M20 31H28M20 35H25" stroke="#3B82C4" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="34.5" cy="12.5" r="4.5" fill="url(#marketplace-badge)"/>
+  <path d="M32.5 12.5L34 14L36.8 10.8" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <defs>
+    <linearGradient id="marketplace-awning" x1="24" y1="9" x2="24" y2="18" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFDB4D"/>
+      <stop offset="1" stop-color="#FF8A54"/>
+    </linearGradient>
+    <linearGradient id="marketplace-shop" x1="24" y1="18" x2="24" y2="40" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5D8DB3"/>
+      <stop offset="1" stop-color="#173654"/>
+    </linearGradient>
+    <linearGradient id="marketplace-badge" x1="30" y1="8" x2="39" y2="17" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6BE4CF"/>
+      <stop offset="1" stop-color="#23B9A4"/>
+    </linearGradient>
+  </defs>
+</svg>

@@ -1,0 +1,18 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="21" cy="23" r="15" fill="url(#domain-email-globe)"/>
+  <path d="M7 23H35M21 8C25 12.2 27 17.2 27 23C27 28.8 25 33.8 21 38M21 8C17 12.2 15 17.2 15 23C15 28.8 17 33.8 21 38" stroke="#EAF8FF" stroke-width="2" stroke-linecap="round"/>
+  <rect x="23" y="25" width="20" height="15" rx="4" fill="url(#domain-email-envelope)"/>
+  <path d="M25.5 28L33 33.5L40.5 28" stroke="#F7FBFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="39" cy="24" r="5" fill="#FFB84D"/>
+  <path d="M37 24H41M39 22V26" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+  <defs>
+    <linearGradient id="domain-email-globe" x1="21" y1="8" x2="21" y2="38" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#71D9ED"/>
+      <stop offset="1" stop-color="#2F639A"/>
+    </linearGradient>
+    <linearGradient id="domain-email-envelope" x1="33" y1="25" x2="33" y2="40" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#496F94"/>
+      <stop offset="1" stop-color="#142D4A"/>
+    </linearGradient>
+  </defs>
+</svg>

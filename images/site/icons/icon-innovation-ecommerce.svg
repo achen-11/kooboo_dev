@@ -1,0 +1,18 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M11 16H37L34.5 41H13.5L11 16Z" fill="url(#ecommerce-bag)"/>
+  <path d="M18 17V13C18 9.7 20.7 7 24 7C27.3 7 30 9.7 30 13V17" stroke="#173654" stroke-width="3" stroke-linecap="round"/>
+  <path d="M18 25H30" stroke="#EAF8FF" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M18 30H26" stroke="#EAF8FF" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="34" cy="33" r="8" fill="url(#ecommerce-coin)"/>
+  <path d="M31 33L33 35L37 30.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <defs>
+    <linearGradient id="ecommerce-bag" x1="24" y1="16" x2="24" y2="41" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7FD8EE"/>
+      <stop offset="1" stop-color="#376A9F"/>
+    </linearGradient>
+    <linearGradient id="ecommerce-coin" x1="28" y1="27" x2="40" y2="39" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFDB4D"/>
+      <stop offset="1" stop-color="#FF8A54"/>
+    </linearGradient>
+  </defs>
+</svg>
