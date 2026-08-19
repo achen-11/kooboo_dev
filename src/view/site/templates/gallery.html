@@ -1,0 +1,110 @@
+<script env="server">
+    var fallbackTemplateCategories = [
+        { id: "7c2fe4c8-0e34-4a71-94fc-1b854b40f901", Name: "E-commerce", Sort: "1" },
+        { id: "166e4c32-b2b3-494f-9d96-5e34ae0b9842", Name: "Website", Sort: "2" },
+        { id: "dc29d2b0-3d2a-47d1-8559-e6d65ec4ff03", Name: "H5", Sort: "3" },
+        { id: "78acdaf4-5e9f-4fd4-8c40-c08d3d9e4204", Name: "Example", Sort: "4" },
+        { id: "fe293f2c-0547-47d4-a4fd-8d93c21c7605", Name: "Application", Sort: "5" },
+        { id: "b402cc97-135e-4e95-b112-23adcfed0606", Name: "Tool", Sort: "6" }
+    ];
+    var fallbackTemplateItems = [
+        { id: "05e03cc8-b463-4248-bf74-e0123ffdb101", Name: "Fresh Market", PreviewImage: "/site/templates/template-fruit.png", AltText: "Fruit market ecommerce template preview", TemplateId: "5638bf8e-079f-4457-8415-b0769606bfe0", Sort: "1" },
+        { id: "ea4041fa-9d5d-4ee7-872d-25071fdfb102", Name: "Aviza Fashion", PreviewImage: "/site/templates/template-fashion.png", AltText: "Fashion ecommerce template preview", TemplateId: "a1737312-269c-4470-999b-41ca3c9043af", Sort: "2" },
+        { id: "355504c3-6c55-4703-b7f4-aed56791b103", Name: "Quiet Interiors", PreviewImage: "/site/templates/template-furniture.png", AltText: "Furniture store template preview", TemplateId: "d14286ff-5285-43f2-92d4-93b40fc3533e", Sort: "3" },
+        { id: "54cbeb72-cd0e-4fb2-babb-e0a5471eb104", Name: "Ground Shifted", PreviewImage: "/site/templates/template-editorial.png", AltText: "Editorial ecommerce template preview", TemplateId: "1c05ddb7-d57f-4143-9ebf-173a39b3c0af", Sort: "4" },
+        { id: "e930ef37-24d1-4abe-90c0-ca2d5e28b105", Name: "Vesper Studio", PreviewImage: "/site/templates/template-vesper.png", AltText: "Vesper studio template preview", TemplateId: "", Sort: "5" },
+        { id: "edc42963-04da-47ce-958d-6e574797b106", Name: "Journey Journal", PreviewImage: "/site/templates/template-journey.png", AltText: "Journal template preview", TemplateId: "", Sort: "6" },
+        { id: "1939d2f4-3a10-47f7-8696-b979c85bb107", Name: "Objects of Quiet Beauty", PreviewImage: "/site/templates/template-interior.png", AltText: "Interior design template preview", TemplateId: "", Sort: "7" },
+        { id: "00623e6b-aadb-4842-bc88-9839d0e8b108", Name: "Editorial Lifestyle", PreviewImage: "/site/templates/template-lifestyle.png", AltText: "Lifestyle template preview", TemplateId: "", Sort: "8" }
+    ];
+
+    var templateCategories = k.content.TemplateCategory.all({ orderBy: "Sort" }) || [];
+    var templateItems = k.content.TemplateItem.all({ orderBy: "Sort" }) || [];
+
+    if (!templateCategories.length) templateCategories = fallbackTemplateCategories;
+    if (!templateItems.length) templateItems = fallbackTemplateItems;
+
+    templateCategories.sort(function (a, b) {
+        return Number(a.Sort || a.sequence || 0) - Number(b.Sort || b.sequence || 0);
+    });
+    templateItems.sort(function (a, b) {
+        return Number(a.Sort || a.sequence || 0) - Number(b.Sort || b.sequence || 0);
+    });
+
+    var categoryKeysByItemId = {};
+    var hasTemplateRelations = templateCategories.some(function (category) {
+        return category.Templates && category.Templates.length;
+    });
+    var legacyCategoryItemIndexes = [
+        [0, 1, 2, 3, 4, 5, 6, 7],
+        [0, 1, 2, 4, 5, 6, 7],
+        [3, 7],
+        [4, 5],
+        [1, 6],
+        [5, 7]
+    ];
+
+    function addTemplateCategory(itemId, categoryKey) {
+        if (!itemId || !categoryKey) return;
+        if (!categoryKeysByItemId[itemId]) categoryKeysByItemId[itemId] = [];
+        if (categoryKeysByItemId[itemId].indexOf(categoryKey) === -1) {
+            categoryKeysByItemId[itemId].push(categoryKey);
+        }
+    }
+
+    templateCategories.forEach(function (category, categoryIndex) {
+        category.FilterKey = category.id || "template-category-" + categoryIndex;
+
+        if (hasTemplateRelations) {
+            (category.Templates || []).forEach(function (item) {
+                addTemplateCategory(item.id, category.FilterKey);
+            });
+            return;
+        }
+
+        (legacyCategoryItemIndexes[categoryIndex] || []).forEach(function (itemIndex) {
+            var item = templateItems[itemIndex];
+            if (item) addTemplateCategory(item.id, category.FilterKey);
+        });
+    });
+
+    var templateDefaultFilter = templateCategories.length ? templateCategories[0].FilterKey : "all";
+
+    templateItems.forEach(function (item) {
+        var templateId = String(item.TemplateId || "").trim();
+        item.FilterKeys = (categoryKeysByItemId[item.id] || [templateDefaultFilter]).join(" ");
+        item.AdminPath = templateId
+            ? "/template/detail?templateId=" + encodeURIComponent(templateId) + "&lang=en"
+            : "/templates?lang=en";
+        item.AdminHref = "/_Admin" + item.AdminPath;
+    });
+</script>
+
+<section class="template-gallery" aria-labelledby="template-gallery-title" data-template-gallery k-attribute="data-template-default-filter templateDefaultFilter">
+    <div class="template-gallery__inner">
+        <div class="template-gallery__filters" role="group" aria-label="Template categories">
+            <button class="template-gallery__filter" type="button" aria-pressed="false" k-for="category in templateCategories" repeat-self="true" k-attribute="data-template-filter category.FilterKey" k-content="category.Name">E-commerce</button>
+        </div>
+
+        <div class="template-gallery__heading">
+            <div>
+                <h2 id="template-gallery-title">Choose a starting point and quickly create a website</h2>
+                <p>From corporate websites, e-commerce platforms, choose a template to create your website with one click</p>
+            </div>
+            <button class="template-gallery__view-all" type="button" data-template-view-all>
+                <span>View all</span>
+                <span aria-hidden="true">›</span>
+            </button>
+        </div>
+
+        <div class="template-gallery__grid">
+            <article class="template-card" data-template-card k-for="item in templateItems" repeat-self="true" k-attribute="data-template-categories item.FilterKeys">
+                <div class="template-card__media">
+                    <img src="/site/templates/template-fruit.png" alt="Fruit market ecommerce template preview" width="750" height="421" loading="lazy" k-attribute="src item.PreviewImage; alt item.AltText">
+                    <a class="template-card__action" href="/_Admin/templates?lang=en" data-template-admin-path="/templates?lang=en" k-attribute="href item.AdminHref; data-template-admin-path item.AdminPath" k-label="Use this template">Use this template</a>
+                </div>
+                <h3 k-content="item.Name">Fresh Market</h3>
+            </article>
+        </div>
+    </div>
+</section>

@@ -787,8 +787,108 @@ function initPromptGeneratorFeatures() {
     initHomePromptEffects();
 }
 
+function initTemplateGallery() {
+    document.querySelectorAll("[data-template-gallery]").forEach((gallery) => {
+        const filters = Array.from(gallery.querySelectorAll("[data-template-filter]"));
+        const cards = Array.from(gallery.querySelectorAll("[data-template-card]"));
+        const viewAll = gallery.querySelector("[data-template-view-all]");
+
+        const setFilter = (filter) => {
+            filters.forEach((button) => {
+                const isActive = button.dataset.templateFilter === filter;
+                button.classList.toggle("is-active", isActive);
+                button.setAttribute("aria-pressed", String(isActive));
+            });
+
+            cards.forEach((card) => {
+                const categories = (card.dataset.templateCategories || "").split(/\s+/);
+                card.hidden = filter !== "all" && !categories.includes(filter);
+            });
+        };
+
+        filters.forEach((button) => {
+            button.addEventListener("click", () => setFilter(button.dataset.templateFilter));
+        });
+
+        viewAll?.addEventListener("click", () => setFilter("all"));
+
+        const defaultFilter = gallery.dataset.templateDefaultFilter || filters[0]?.dataset.templateFilter;
+        if (defaultFilter) setFilter(defaultFilter);
+    });
+
+    document.querySelectorAll("[data-template-admin-path]").forEach((link) => {
+        const path = link.dataset.templateAdminPath;
+        if (!path) return;
+        link.href = `${trimTrailingSlash(getAdminBase())}${path}`;
+    });
+}
+
+function initDownloadPage() {
+    document.querySelectorAll("[data-download-page]").forEach((page) => {
+        const tabs = Array.from(page.querySelectorAll("[data-download-tab]"));
+        const panels = Array.from(page.querySelectorAll("[data-download-panel]"));
+
+        const setActiveTab = (key) => {
+            tabs.forEach((tab) => {
+                const isActive = tab.dataset.downloadTab === key;
+                tab.classList.toggle("is-active", isActive);
+                tab.setAttribute("aria-selected", String(isActive));
+                tab.tabIndex = isActive ? 0 : -1;
+            });
+
+            panels.forEach((panel) => {
+                const isActive = panel.dataset.downloadPanel === key;
+                panel.classList.toggle("is-active", isActive);
+                panel.hidden = !isActive;
+            });
+        };
+
+        tabs.forEach((tab, index) => {
+            tab.addEventListener("click", () => setActiveTab(tab.dataset.downloadTab));
+            tab.addEventListener("keydown", (event) => {
+                if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+                event.preventDefault();
+                let nextIndex = index;
+                if (event.key === "ArrowLeft") nextIndex = (index - 1 + tabs.length) % tabs.length;
+                if (event.key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
+                if (event.key === "Home") nextIndex = 0;
+                if (event.key === "End") nextIndex = tabs.length - 1;
+                tabs[nextIndex]?.focus();
+                setActiveTab(tabs[nextIndex]?.dataset.downloadTab);
+            });
+        });
+
+        page.querySelectorAll("[data-copy-command]").forEach((button) => {
+            button.addEventListener("click", async () => {
+                const code = button.closest(".download-command")?.querySelector("code");
+                const value = code?.innerText.trim();
+                if (!value) return;
+
+                try {
+                    await navigator.clipboard.writeText(value);
+                    button.classList.add("is-copied");
+                    button.setAttribute("aria-label", "Copied");
+                    window.setTimeout(() => {
+                        button.classList.remove("is-copied");
+                        button.setAttribute("aria-label", "Copy command");
+                    }, 1600);
+                } catch (error) {
+                    console.error("[download] copy command failed:", error);
+                }
+            });
+        });
+    });
+}
+
+function initSitePageFeatures() {
+    initTemplateGallery();
+    initDownloadPage();
+}
+
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initPromptGeneratorFeatures);
+    document.addEventListener("DOMContentLoaded", initSitePageFeatures);
 } else {
     initPromptGeneratorFeatures();
+    initSitePageFeatures();
 }

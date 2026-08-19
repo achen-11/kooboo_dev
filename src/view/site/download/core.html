@@ -1,0 +1,103 @@
+<section class="download-page" aria-labelledby="download-page-title" data-download-page>
+    <div class="download-page__inner">
+        <h1 id="download-page-title">Download Local Version of Kooboo</h1>
+
+        <div class="download-tabs" role="tablist" aria-label="Download platform">
+            <button class="download-tabs__tab is-active" id="download-tab-desktop" type="button" role="tab" aria-selected="true" aria-controls="download-panel-desktop" data-download-tab="desktop">Windows / Mac</button>
+            <button class="download-tabs__tab" id="download-tab-server" type="button" role="tab" aria-selected="false" aria-controls="download-panel-server" data-download-tab="server">Linux / Docker</button>
+        </div>
+
+        <div class="download-panel is-active" id="download-panel-desktop" role="tabpanel" aria-labelledby="download-tab-desktop" data-download-panel="desktop">
+            <article class="download-card download-card--windows">
+                <div class="download-windows-option">
+                    <div class="download-card__heading download-card__heading--inline">
+                        <img src="/site/download/windows.svg" alt="" width="48" height="48" aria-hidden="true">
+                        <span>(Installer)</span>
+                    </div>
+                    <h2>Windows x64 Installer</h2>
+                    <p>Install Kooboo into Windows OS, easier to use, suitable for long term user</p>
+                    <span class="download-card__version">V2.1.9358.23980</span>
+                    <a class="download-card__button" href="https://www.kooboo.com/__kb/kfile/Kooboo2.1.9358.23980.msi">Download</a>
+                </div>
+                <div class="download-windows-option">
+                    <div class="download-card__heading download-card__heading--inline">
+                        <img src="/site/download/windows.svg" alt="" width="48" height="48" aria-hidden="true">
+                        <span>(Portable)</span>
+                    </div>
+                    <h2>Windows x64 Portable</h2>
+                    <p>Portable application, download, unzip and double click on Kooboo.exe to run</p>
+                    <span class="download-card__version">V2.1.9358.23980</span>
+                    <a class="download-card__button" href="https://www.kooboo.com/__kb/kfile/Kooboo-portable-2.1.9358.23980.zip">Download</a>
+                </div>
+            </article>
+
+            <article class="download-card">
+                <div class="download-card__heading">
+                    <img src="/site/download/macos.svg" alt="" width="48" height="48" aria-hidden="true">
+                    <h2>MacOS</h2>
+                </div>
+                <p>Download and Click to run, support both Arm and X64</p>
+                <span class="download-card__version">V2.1</span>
+                <a class="download-card__button" href="https://www.kooboo.com/__kb/kfile/Kooboo-2.1-osx.zip">Download</a>
+            </article>
+
+            <article class="download-card">
+                <div class="download-card__heading">
+                    <img src="/site/download/microsoft-store.svg" alt="" width="48" height="48" aria-hidden="true">
+                    <h2>Microsoft Store</h2>
+                </div>
+                <p>Windows user may search Kooboo on Microsoft Store and install from there</p>
+                <span class="download-card__version">Microsoft Store</span>
+                <a class="download-card__button" href="https://apps.microsoft.com/store/detail/XP898V0JVK3CTB?ocid=pdpshare" target="_blank" rel="noopener">Go to install</a>
+            </article>
+        </div>
+
+        <div class="download-panel download-panel--server" id="download-panel-server" role="tabpanel" aria-labelledby="download-tab-server" data-download-panel="server" hidden>
+            <article class="download-command-card">
+                <div class="download-command-card__heading">
+                    <img src="/site/download/linux.svg" alt="" width="48" height="48" aria-hidden="true">
+                    <h2>Linux x64</h2>
+                </div>
+
+                <div class="download-command-group">
+                    <p>Use wget to install or update:</p>
+                    <div class="download-command">
+                        <code>sudo wget -O - https://www.kooboo.com/install.sh | /bin/bash</code>
+                        <button type="button" data-copy-command aria-label="Copy wget install command"></button>
+                    </div>
+                </div>
+
+                <div class="download-command-group">
+                    <p>Or use curl to install or update:</p>
+                    <div class="download-command">
+                        <code>sudo /bin/bash -c "$(curl -fsSL https://www.kooboo.com/install.sh)"</code>
+                        <button type="button" data-copy-command aria-label="Copy curl install command"></button>
+                    </div>
+                </div>
+
+                <div class="download-command-group">
+                    <p>After installation successfully, use below commands to start or stop service:</p>
+                    <div class="download-command">
+                        <code>sudo systemctl status kooboo<br>sudo systemctl stop kooboo<br>sudo systemctl start kooboo</code>
+                        <button type="button" data-copy-command aria-label="Copy service commands"></button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="download-command-card">
+                <div class="download-command-card__heading">
+                    <img src="/site/download/docker.svg" alt="" width="48" height="48" aria-hidden="true">
+                    <h2>Docker</h2>
+                </div>
+                <p>Assume that docker container is running on port 80, and the user data will stored in /var/lib/kooboo</p>
+                <div class="download-command-group">
+                    <p>Run:</p>
+                    <div class="download-command">
+                        <code>docker run -d -p 80:80 -v /var/lib/kooboo:/data --name kooboo kooboo/kooboo:latest</code>
+                        <button type="button" data-copy-command aria-label="Copy Docker command"></button>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
