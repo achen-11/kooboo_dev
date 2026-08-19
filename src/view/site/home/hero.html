@@ -1,0 +1,25 @@
+<script env="server">
+    var hero = k.content.HomeHero;
+</script>
+
+<section class="home-hero">
+    <div class="home-hero__stage">
+        <div class="home-hero__aurora" aria-hidden="true"></div>
+        <div class="home-hero__content">
+            <div class="text-center">
+                <h1 class="home-hero__title m-0 tracking-normal text-[var(--color-title)]">
+                    <span class="home-hero__top-title-wrap">
+                        <span k-html="hero.Title">Build a Real Website <span class="home-hero__top-title">in Seconds</span></span>
+                        <img class="home-hero__title-icon" src="/site/icons/icon-hero-arrow.svg" alt="" aria-hidden="true" width="41" height="40">
+                    </span>
+                </h1>
+            </div>
+
+            <p class="home-hero__subtitle mt-6 mb-0 text-lg leading-normal text-[var(--color-body)]" k-content="hero.Description">Production-ready , AI generated , Runs at extreme scale</p>
+
+            <div id="home-prompt-generator" class="home-hero__prompt">
+                <view id="site/common/prompt-generator"></view>
+            </div>
+        </div>
+    </div>
+</section>

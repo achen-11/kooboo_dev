@@ -46,7 +46,7 @@ body:has(.home-hero)::before {
     height: calc(100svh + 64px);
     pointer-events: none;
     background:
-        url("/2_0/home-hero-background-split.svg") center top / cover no-repeat,
+        url("/site/home-hero-background-split.svg") center top / cover no-repeat,
         var(--color-white);
 }
 
@@ -526,11 +526,11 @@ body:not(:has(.home-hero)) .site-footer {
 }
 
 .home-hero__aurora::before {
-    background: url("/2_0/home-hero-ring.webp") center bottom / contain no-repeat;
+    background: url("/site/home-hero-ring.webp") center bottom / contain no-repeat;
 }
 
 .home-start-building__glow::before {
-    background: url("/2_0/home-hero-ring.webp") center / contain no-repeat;
+    background: url("/site/home-hero-ring.webp") center / contain no-repeat;
 }
 
 .home-hero__content {
@@ -749,7 +749,7 @@ body:not(:has(.home-hero)) .site-footer {
     list-style: none;
     overflow: hidden;
     border-radius: 24px;
-    background: url("/2_0/home-publish-banner-bg.svg") center / cover no-repeat;
+    background: url("/site/home-publish-banner-bg.svg") center / cover no-repeat;
 }
 
 .publish-step {
@@ -1075,7 +1075,7 @@ body:not(:has(.home-hero)) .site-footer {
     align-items: center;
     overflow: hidden;
     border-radius: 14px;
-    background: url("/2_0/home-production-card-background.svg") center / 100% 100% no-repeat;
+    background: url("/site/home-production-card-background.svg") center / 100% 100% no-repeat;
 }
 
 .home-production-card__icon-wrap {
@@ -1293,7 +1293,7 @@ body:not(:has(.home-hero)) .site-footer {
 .innovation-hero__panel {
     min-height: 236px;
     border-radius: 24px;
-    background: url("/2_0/home-innovation-hero-background.png") center / 100% 100% no-repeat;
+    background: url("/site/home-innovation-hero-background.png") center / 100% 100% no-repeat;
 }
 
 .innovation-hero__decor {
@@ -1422,7 +1422,7 @@ body:not(:has(.home-hero)) .site-footer {
     align-items: center;
     gap: 24px;
     border-radius: 24px;
-    background: #eaf8fb url("/2_0/innovation-detail-header-background.png") center / 100% 100% no-repeat;
+    background: #eaf8fb url("/site/innovation-detail-header-background.png") center / 100% 100% no-repeat;
 }
 
 .innovation-detail-header__back {
@@ -2132,7 +2132,7 @@ body:not(:has(.home-hero)) .site-footer {
 @media (max-width: 640px) {
     body:has(.home-hero)::before {
         background:
-            url("/2_0/home-hero-background-split.svg") center top / cover no-repeat,
+            url("/site/home-hero-background-split.svg") center top / cover no-repeat,
             var(--color-white);
     }
 
@@ -2313,7 +2313,7 @@ body:not(:has(.home-hero)) .site-footer {
     .home-publish-banner__flow {
         border-radius: 18px;
         padding: 24px 16px;
-        background: url("/2_0/home-publish-banner-mobile-bg.png") center / cover no-repeat;
+        background: url("/site/home-publish-banner-mobile-bg.png") center / cover no-repeat;
     }
 
     .publish-step__image {
@@ -2331,7 +2331,7 @@ body:not(:has(.home-hero)) .site-footer {
     .home-productivity__background {
         inset: 0 16px;
         border-radius: 24px;
-        background: url("/2_0/home-productivity-background.svg") center center no-repeat;
+        background: url("/site/home-productivity-background.svg") center center no-repeat;
 
     }
 

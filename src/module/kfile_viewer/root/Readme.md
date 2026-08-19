@@ -1,1 +1,0 @@
-<p>Your module information in **MarkDown** syntax</p> <p>Module config value can be access from k.Module.Config</p>
