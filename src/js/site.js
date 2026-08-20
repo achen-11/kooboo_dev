@@ -24,6 +24,8 @@ function initHomeBusinessAccordion() {
             .filter(Boolean);
         const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
         const carouselState = new Map();
+        let isRootVisible = !("IntersectionObserver" in window);
+        let isPageVisible = !document.hidden;
 
         const createCarouselState = (carousel) => {
             const slides = Array.from(carousel.querySelectorAll("[data-business-slide]"));
@@ -31,22 +33,62 @@ function initHomeBusinessAccordion() {
             const interval = Number(carousel.dataset.businessCarouselInterval) || 4500;
             let activeIndex = Math.max(0, slides.findIndex((slide) => slide.classList.contains("is-active")));
             let timer = null;
+            let transitionTimer = null;
 
-            const setSlide = (index) => {
-                if (!slides.length) return;
-
-                activeIndex = (index + slides.length) % slides.length;
-
-                slides.forEach((slide, slideIndex) => {
-                    slide.classList.toggle("is-active", slideIndex === activeIndex);
-                });
-
+            const updateControls = () => {
                 controls.forEach((control, controlIndex) => {
                     const isActive = controlIndex === activeIndex;
 
                     control.classList.toggle("is-active", isActive);
                     control.setAttribute("aria-current", String(isActive));
                 });
+            };
+
+            const setSlide = (index, direction = 1, immediate = false) => {
+                if (!slides.length) return;
+
+                const nextIndex = (index + slides.length) % slides.length;
+
+                if (!immediate && nextIndex === activeIndex) return;
+
+                window.clearTimeout(transitionTimer);
+                slides.forEach((slide) => slide.classList.remove("is-leaving"));
+
+                if (immediate || reducedMotion) {
+                    activeIndex = nextIndex;
+
+                    slides.forEach((slide, slideIndex) => {
+                        slide.classList.toggle("is-active", slideIndex === activeIndex);
+                        slide.style.removeProperty("--home-business-slide-enter-x");
+                        slide.style.removeProperty("--home-business-slide-exit-x");
+                    });
+
+                    updateControls();
+                    return;
+                }
+
+                const previousSlide = slides[activeIndex];
+                const nextSlide = slides[nextIndex];
+                const travelDirection = direction >= 0 ? 1 : -1;
+
+                nextSlide.classList.remove("is-active");
+                nextSlide.style.setProperty("--home-business-slide-enter-x", `${travelDirection * 5}%`);
+                previousSlide.style.setProperty("--home-business-slide-exit-x", `${travelDirection * -4}%`);
+
+                // Commit the incoming slide's starting position before transitioning it into view.
+                void nextSlide.offsetWidth;
+
+                previousSlide.classList.add("is-leaving");
+                previousSlide.classList.remove("is-active");
+                nextSlide.classList.add("is-active");
+                activeIndex = nextIndex;
+                updateControls();
+
+                transitionTimer = window.setTimeout(() => {
+                    previousSlide.classList.remove("is-leaving");
+                    previousSlide.style.removeProperty("--home-business-slide-exit-x");
+                    nextSlide.style.removeProperty("--home-business-slide-enter-x");
+                }, 950);
             };
 
             const stop = () => {
@@ -59,16 +101,22 @@ function initHomeBusinessAccordion() {
             const start = () => {
                 stop();
 
-                if (reducedMotion || slides.length < 2 || !carousel.classList.contains("is-active")) return;
+                if (
+                    reducedMotion ||
+                    slides.length < 2 ||
+                    !carousel.classList.contains("is-active") ||
+                    !isRootVisible ||
+                    !isPageVisible
+                ) return;
 
                 timer = window.setInterval(() => {
-                    setSlide(activeIndex + 1);
+                    setSlide(activeIndex + 1, 1);
                 }, interval);
             };
 
             controls.forEach((control, controlIndex) => {
                 control.addEventListener("click", () => {
-                    setSlide(controlIndex);
+                    setSlide(controlIndex, controlIndex > activeIndex ? 1 : -1);
                     start();
                 });
             });
@@ -82,13 +130,42 @@ function initHomeBusinessAccordion() {
                 }
             });
 
-            setSlide(activeIndex);
+            setSlide(activeIndex, 1, true);
 
             return { start, stop };
         };
 
         carousels.forEach((carousel) => {
             carouselState.set(carousel, createCarouselState(carousel));
+        });
+
+        const updateCarouselPlayback = () => {
+            carousels.forEach((carousel) => {
+                const state = carouselState.get(carousel);
+
+                if (isRootVisible && isPageVisible && carousel.classList.contains("is-active")) {
+                    state?.start();
+                } else {
+                    state?.stop();
+                }
+            });
+        };
+
+        if ("IntersectionObserver" in window) {
+            const observer = new IntersectionObserver(
+                ([entry]) => {
+                    isRootVisible = entry.isIntersecting;
+                    updateCarouselPlayback();
+                },
+                { threshold: 0.2 }
+            );
+
+            observer.observe(root);
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            isPageVisible = !document.hidden;
+            updateCarouselPlayback();
         });
 
         const setActive = (key) => {
@@ -162,14 +239,127 @@ function initHomeBusinessAccordion() {
     });
 }
 
+function initSiteScrollReveal() {
+    if (!document.querySelector("main")) return;
+
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const revealSpecs = [
+        { selector: ".home-publish-banner__container > div", delay: 0 },
+        { selector: ".home-publish-banner__flow", delay: 90 },
+        { selector: ".home-productivity__title", delay: 0 },
+        { selector: ".home-productivity-card", delay: 80, stagger: 80, staggerCycle: 3 },
+        { selector: ".home-business__title", delay: 0 },
+        { selector: ".home-business__stage", delay: 80 },
+        { selector: ".home-production__title", delay: 0 },
+        { selector: ".home-production-card", delay: 70, stagger: 70, staggerCycle: 3 },
+        { selector: ".home-performance__stage", delay: 0 },
+        { selector: ".home-start-building__header", delay: 0 },
+        { selector: ".home-start-building__prompt", delay: 100 },
+        { selector: ".download-page__inner > h1", delay: 0 },
+        { selector: ".download-card", delay: 70, stagger: 70, staggerCycle: 3 },
+        { selector: ".download-linux", delay: 80 },
+        { selector: ".innovation-hero__content", delay: 0 },
+        { selector: ".innovation-card", delay: 60, stagger: 65, staggerCycle: 3 },
+        { selector: ".innovation-detail-header", delay: 0 },
+        { selector: ".innovation-detail-article > *", delay: 30, stagger: 55, staggerCycle: 4 },
+        { selector: ".template-gallery__filters", delay: 0 },
+        { selector: ".template-gallery__heading", delay: 60 },
+        { selector: ".template-card", delay: 70, stagger: 65, staggerCycle: 4 },
+        { selector: ".price-plans > .price-page__title", delay: 0 },
+        { selector: ".price-plan-card", delay: 70, stagger: 75, staggerCycle: 3 },
+        { selector: ".price-faq > .price-page__title", delay: 0 },
+        { selector: ".price-faq__item", delay: 50, stagger: 55, staggerCycle: 4 },
+        { selector: ".component-summary > div > :first-child", delay: 0 },
+        { selector: ".component-summary > div > :nth-child(2) > *", delay: 50, stagger: 70, staggerCycle: 3 },
+        { selector: "main > div > div.mx-auto.max-w-screen-xl > *", delay: 30, stagger: 70, staggerCycle: 3 },
+    ];
+    const revealItems = [];
+    const seenItems = new Set();
+
+    revealSpecs.forEach(({ selector, delay, stagger = 0, staggerCycle = 0 }) => {
+        document.querySelectorAll(selector).forEach((element, index) => {
+            if (seenItems.has(element)) return;
+
+            const staggerIndex = staggerCycle ? index % staggerCycle : index;
+
+            seenItems.add(element);
+            element.classList.add("site-scroll-reveal");
+            element.style.setProperty("--site-reveal-delay", `${delay + staggerIndex * stagger}ms`);
+            revealItems.push(element);
+        });
+    });
+
+    if (!revealItems.length) return;
+
+    document.documentElement.classList.add("site-reveal-ready");
+
+    if (reducedMotion || !("IntersectionObserver" in window)) {
+        revealItems.forEach((element) => element.classList.add("is-visible"));
+        return;
+    }
+
+    const viewportRevealLine = window.innerHeight * 0.92;
+    const addInitialRevealMask = (element) => {
+        const rect = element.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+
+        const mask = document.createElement("span");
+        const delay = element.style.getPropertyValue("--site-reveal-delay") || "0ms";
+
+        mask.className = "site-initial-reveal-mask";
+        mask.setAttribute("aria-hidden", "true");
+        mask.style.left = `${rect.left + window.scrollX}px`;
+        mask.style.top = `${rect.top + window.scrollY}px`;
+        mask.style.width = `${rect.width}px`;
+        mask.style.height = `${rect.height}px`;
+        mask.style.borderRadius = getComputedStyle(element).borderRadius;
+        mask.style.setProperty("--site-reveal-delay", delay);
+        document.body.appendChild(mask);
+
+        mask.addEventListener("animationend", () => mask.remove(), { once: true });
+        window.setTimeout(() => mask.remove(), 1200);
+    };
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+
+                entry.target.classList.add("is-visible");
+                observer.unobserve(entry.target);
+            });
+        },
+        {
+            rootMargin: "0px 0px -10% 0px",
+            threshold: 0.08,
+        }
+    );
+
+    revealItems.forEach((element) => {
+        if (element.getBoundingClientRect().top <= viewportRevealLine) {
+            element.classList.add("is-initial-reveal", "is-visible");
+            addInitialRevealMask(element);
+        } else {
+            observer.observe(element);
+        }
+    });
+}
+
+function scheduleSiteScrollReveal() {
+    window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(initSiteScrollReveal);
+    });
+}
+
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
         initSiteHeaderScrollState();
         initHomeBusinessAccordion();
+        scheduleSiteScrollReveal();
     });
 } else {
     initSiteHeaderScrollState();
     initHomeBusinessAccordion();
+    scheduleSiteScrollReveal();
 }
 
 const ADMIN_BASE = "/_Admin/";
@@ -728,6 +918,13 @@ function initPromptTypingPlaceholder(textarea) {
     };
 
     const tick = () => {
+        if (userEdited || textarea.value) return;
+
+        if (document.hidden || document.activeElement === textarea) {
+            window.setTimeout(tick, 500);
+            return;
+        }
+
         const currentPrompt = prompts[promptIndex];
 
         if (!isDeleting && charIndex < currentPrompt.length) {
@@ -766,11 +963,19 @@ function initPromptTypingPlaceholder(textarea) {
 }
 
 function initPromptTypingPlaceholders() {
-    document
-        .querySelectorAll(
-            ".home-hero .prompt-generator__input, .home-start-building .prompt-generator__input"
-        )
-        .forEach((textarea) => initPromptTypingPlaceholder(textarea));
+    const startTyping = () => {
+        document
+            .querySelectorAll(".home-hero .prompt-generator__input")
+            .forEach((textarea) => initPromptTypingPlaceholder(textarea));
+    };
+
+    const scheduleTyping = () => window.setTimeout(startTyping, 700);
+
+    if (document.readyState === "complete") {
+        scheduleTyping();
+    } else {
+        window.addEventListener("load", scheduleTyping, { once: true });
+    }
 }
 
 function initHomeStartBuildingEntrance() {
@@ -796,6 +1001,7 @@ function initHomeStartBuildingEntrance() {
 
 function initHomePromptEffects() {
     initPromptGeneratorSpotlights();
+    initPromptTypingPlaceholders();
     initHomeStartBuildingEntrance();
 }
 

@@ -1,6 +1,7 @@
 <script env="server" type="module">
     import {
         resolveAdminBaseFromToken,
+        resolveStartNowUrl,
         userDisplayFromToken,
     } from "./utils.admin-url-from-token";
 
@@ -20,6 +21,7 @@
     loginUrl += "&" + langParam;
     consoleUrl += "?" + langParam;
     logoutUrl += "&" + langParam;
+    const startNowUrl = resolveStartNowUrl(accessToken, isLoggedIn);
 
     let userDisplayName = "";
     let userInitials = "";
@@ -45,6 +47,7 @@
         loginUrl,
         consoleUrl,
         logoutUrl,
+        startNowUrl,
         isLoggedIn,
         showLogin,
         userDisplayName,
@@ -76,7 +79,7 @@
                         <button class="site-header__mobile-link site-header__mobile-link--muted site-header__mobile-logout-button" type="submit" k-label="SignOut">Logout</button>
                     </form>
                 </div>
-                <a class="site-header__mobile-claim" href="https://www.kooboo.com/en/_start/login?lang=en" k-label="Start now">Start now</a>
+                <a class="site-header__mobile-claim" href="https://www.kooboo.com/en/_start/login?lang=en" k-attribute="href startNowUrl" k-label="Start now">Start now</a>
             </nav>
         </details>
 
@@ -108,7 +111,7 @@
                     </form>
                 </div>
             </details>
-            <a class="site-header__primary-action" href="https://www.kooboo.com/en/_start/login?lang=en">
+            <a class="site-header__primary-action" href="https://www.kooboo.com/en/_start/login?lang=en" k-attribute="href startNowUrl">
                 <span k-label="Start now">Start now</span>
                 <span class="site-header__primary-icon" aria-hidden="true"></span>
             </a>

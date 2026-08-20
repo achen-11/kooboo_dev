@@ -25,6 +25,16 @@
     var protectionBanner = getBusinessBanner(["protection", "protect", "保护", "防护"], 3);
 </script>
 
+<script env="server" type="module">
+    import { resolveStartNowUrl } from "./utils.admin-url-from-token";
+
+    const accessToken = k.account.getAccessToken();
+    const isLoggedIn = k.account.isLogin || Boolean(accessToken);
+    const startNowUrl = resolveStartNowUrl(accessToken, isLoggedIn);
+
+    export { startNowUrl };
+</script>
+
 <section class="home-business" aria-labelledby="home-business-title">
     <div class="site-container">
         <h2 id="home-business-title" class="home-business__title" k-label="It doesn't just build your site&mdash;it runs your business">It doesn't just build your site&mdash;it runs your business</h2>
@@ -80,7 +90,7 @@
                     </h3>
                     <div class="home-business__panel" id="home-business-panel-growth" role="region" aria-labelledby="home-business-trigger-growth">
                         <p k-content="growthBanner.Description">It features a built-in end-to-end growth suite, encompassing high-precision access log analysis and A/B testing experiments. Through simulator logic, it predicts conversion rates in real time, revealing visitor hesitation and preferences at every step, ensuring that each product iteration is based on real data feedback rather than blind guesswork</p>
-                        <a class="home-business__action" k-attribute="href growthBanner.Url" k-content="growthBanner.UrlName">Start Growing <span aria-hidden="true">&rsaquo;</span></a>
+                        <a class="home-business__action" href="https://www.kooboo.com/en/_start/login?lang=en" k-attribute="href startNowUrl" k-content="growthBanner.UrlName">Start Growing <span aria-hidden="true">&rsaquo;</span></a>
                     </div>
                 </article>
 
@@ -90,7 +100,7 @@
                     </h3>
                     <div class="home-business__panel" id="home-business-panel-protection" role="region" aria-labelledby="home-business-trigger-protection">
                         <p k-content="protectionBanner.Description">System-level "resource guardians" and error monitoring mechanisms provide 24/7 stability protection for your digital assets. With extremely low memory usage and optimized GC (garbage collection) environment, AI intercepts operational risks in real time, ensuring enterprise-level operational reliability even at a very low cost of $1/year</p>
-                        <a class="home-business__action" k-attribute="href protectionBanner.Url" k-content="protectionBanner.UrlName">Claim My $1 Protection <span aria-hidden="true">&rsaquo;</span></a>
+                        <a class="home-business__action" href="https://www.kooboo.com/en/_start/login?lang=en" k-attribute="href startNowUrl" k-content="protectionBanner.UrlName">Claim My $1 Protection <span aria-hidden="true">&rsaquo;</span></a>
                     </div>
                 </article>
             </div>
