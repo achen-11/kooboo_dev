@@ -1,5 +1,25 @@
 <script env="server">
     var businessBanner = k.content.BusinessBanner.all();
+
+    function getBusinessBanner(keywords, fallbackIndex) {
+        var matched = businessBanner.find(function (item) {
+            var identity = [item.userKey, item.Title, item.Image, item.Image2]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+            return keywords.some(function (keyword) {
+                return identity.includes(keyword);
+            });
+        });
+
+        return matched || businessBanner[fallbackIndex] || {};
+    }
+
+    var aiGeneratedBanner = getBusinessBanner(["ai-generated", "ai generated", "clone", "cloned", "克隆"], 0);
+    var aiControlsBanner = getBusinessBanner(["ai-controls", "ai controls", "掌控"], 1);
+    var growthBanner = getBusinessBanner(["growth", "增长"], 2);
+    var protectionBanner = getBusinessBanner(["protection", "protect", "保护", "防护"], 3);
 </script>
 
 <section class="home-business" aria-labelledby="home-business-title">
@@ -12,8 +32,8 @@
                 <img class="home-business__visual" data-business-visual="ai-controls" src="/site/home-business-ai-controls.png" width="664" height="748" alt="" aria-hidden="true">
 
                 <div class="home-business__visual home-business__carousel is-active" data-business-visual="growth" data-business-carousel="" data-business-carousel-interval="4500">
-                    <img class="home-business__carousel-slide is-active" data-business-slide="" src="/site/home-business-growth.png" width="664" height="748" alt="" aria-hidden="true">
-                    <img class="home-business__carousel-slide" data-business-slide="" src="/site/home-business-growth-alt.png" width="664" height="748" alt="" aria-hidden="true">
+                    <img class="home-business__carousel-slide is-active" data-business-slide="" src="/site/home-business-growth.webp" width="664" height="748" alt="" aria-hidden="true">
+                    <img class="home-business__carousel-slide" data-business-slide="" src="/site/home-business-growth-alt.webp" width="664" height="748" alt="" aria-hidden="true">
                     <div class="home-business__carousel-dots" aria-label="Growth visual slides">
                         <div class="home-business__carousel-dot is-active" data-business-slide-control="0" aria-label="Show growth visual 1" aria-current="true"></div>
                         <div class="home-business__carousel-dot" data-business-slide-control="1" aria-label="Show growth visual 2" aria-current="false"></div>
@@ -21,8 +41,8 @@
                 </div>
 
                 <div class="home-business__visual home-business__carousel" data-business-visual="protection" data-business-carousel="" data-business-carousel-interval="4500" aria-hidden="true">
-                    <img class="home-business__carousel-slide is-active" data-business-slide="" src="/site/home-business-protection.png" width="664" height="748" alt="" aria-hidden="true">
-                    <img class="home-business__carousel-slide" data-business-slide="" src="/site/home-business-protection-alt.png" width="664" height="766" alt="" aria-hidden="true">
+                    <img class="home-business__carousel-slide is-active" data-business-slide="" src="/site/home-business-protection.webp" width="664" height="748" alt="" aria-hidden="true">
+                    <img class="home-business__carousel-slide" data-business-slide="" src="/site/home-business-protection-alt.webp" width="664" height="748" alt="" aria-hidden="true">
                     <div class="home-business__carousel-dots" aria-label="Protection visual slides">
                         <div class="home-business__carousel-dot is-active" data-business-slide-control="0" aria-label="Show protection visual 1" aria-current="true" tabindex="-1"></div>
                         <div class="home-business__carousel-dot" data-business-slide-control="1" aria-label="Show protection visual 2" aria-current="false" tabindex="-1"></div>
@@ -33,41 +53,41 @@
             <div class="home-business__accordion" aria-label="Business capabilities">
                 <article class="home-business__item" data-business-item="ai-generated">
                     <h3 class="home-business__item-title">
-                        <button class="home-business__trigger" id="home-business-trigger-ai-generated" type="button" aria-expanded="true" aria-controls="home-business-panel-ai-generated" k-content="businessBanner[0].Title">AI-generated or directly cloned websites</button>
+                        <button class="home-business__trigger" id="home-business-trigger-ai-generated" type="button" aria-expanded="true" aria-controls="home-business-panel-ai-generated" k-content="aiGeneratedBanner.Title">AI-generated or directly cloned websites</button>
                     </h3>
                     <div class="home-business__panel" id="home-business-panel-ai-generated" role="region" aria-labelledby="home-business-trigger-ai-generated">
-                        <p k-content="businessBanner[0].Description">You can choose to generate a website directly using AI or use our cloning feature: simply enter the URL of the website you want to create an identical, editable copy.</p>
-                        <a class="home-business__action" k-attribute="href businessBanner[0].Url" k-content="businessBanner[0].UrlName">Build a website now <span aria-hidden="true">&rsaquo;</span></a>
+                        <p k-content="aiGeneratedBanner.Description">You can choose to generate a website directly using AI or use our cloning feature: simply enter the URL of the website you want to create an identical, editable copy.</p>
+                        <a class="home-business__action" k-attribute="href aiGeneratedBanner.Url" k-content="aiGeneratedBanner.UrlName">Build a website now <span aria-hidden="true">&rsaquo;</span></a>
                     </div>
                 </article>
 
                 <article class="home-business__item" data-business-item="ai-controls">
                     <h3 class="home-business__item-title">
-                        <button class="home-business__trigger" id="home-business-trigger-ai-controls" type="button" aria-expanded="true" aria-controls="home-business-panel-ai-controls" k-content="businessBanner[1].Title">AI controls everything</button>
+                        <button class="home-business__trigger" id="home-business-trigger-ai-controls" type="button" aria-expanded="true" aria-controls="home-business-panel-ai-controls" k-content="aiControlsBanner.Title">AI controls everything</button>
                     </h3>
                     <div class="home-business__panel" id="home-business-panel-ai-controls" role="region" aria-labelledby="home-business-trigger-ai-controls">
-                        <p k-content="businessBanner[1].Description">Our AI is more than just a chatbot. Through MCP (Model Context Protocol), AI can deeply understand your design architecture and business code. Whether adjusting global design tokens or integrating complex third-party APIs, production deployment can be completed with just natural language commands</p>
-                        <a class="home-business__action" k-attribute="href businessBanner[1].Url" k-content="businessBanner[1].UrlName">Experience AI deployment <span aria-hidden="true">&rsaquo;</span></a>
+                        <p k-content="aiControlsBanner.Description">Our AI is more than just a chatbot. Through MCP (Model Context Protocol), AI can deeply understand your design architecture and business code. Whether adjusting global design tokens or integrating complex third-party APIs, production deployment can be completed with just natural language commands</p>
+                        <a class="home-business__action" k-attribute="href aiControlsBanner.Url" k-content="aiControlsBanner.UrlName">Experience AI deployment <span aria-hidden="true">&rsaquo;</span></a>
                     </div>
                 </article>
 
                 <article class="home-business__item is-active" data-business-item="growth">
                     <h3 class="home-business__item-title">
-                        <button class="home-business__trigger" id="home-business-trigger-growth" type="button" aria-expanded="true" aria-controls="home-business-panel-growth" k-content="businessBanner[2].Title">Deep insights into growth</button>
+                        <button class="home-business__trigger" id="home-business-trigger-growth" type="button" aria-expanded="true" aria-controls="home-business-panel-growth" k-content="growthBanner.Title">Deep insights into growth</button>
                     </h3>
                     <div class="home-business__panel" id="home-business-panel-growth" role="region" aria-labelledby="home-business-trigger-growth">
-                        <p k-content="businessBanner[2].Description">It features a built-in end-to-end growth suite, encompassing high-precision access log analysis and A/B testing experiments. Through simulator logic, it predicts conversion rates in real time, revealing visitor hesitation and preferences at every step, ensuring that each product iteration is based on real data feedback rather than blind guesswork</p>
-                        <a class="home-business__action" k-attribute="href businessBanner[2].Url" k-content="businessBanner[2].UrlName">Start Growing <span aria-hidden="true">&rsaquo;</span></a>
+                        <p k-content="growthBanner.Description">It features a built-in end-to-end growth suite, encompassing high-precision access log analysis and A/B testing experiments. Through simulator logic, it predicts conversion rates in real time, revealing visitor hesitation and preferences at every step, ensuring that each product iteration is based on real data feedback rather than blind guesswork</p>
+                        <a class="home-business__action" k-attribute="href growthBanner.Url" k-content="growthBanner.UrlName">Start Growing <span aria-hidden="true">&rsaquo;</span></a>
                     </div>
                 </article>
 
                 <article class="home-business__item" data-business-item="protection">
                     <h3 class="home-business__item-title">
-                        <button class="home-business__trigger" id="home-business-trigger-protection" type="button" aria-expanded="true" aria-controls="home-business-panel-protection" k-content="businessBanner[3].Title">Website operation protection</button>
+                        <button class="home-business__trigger" id="home-business-trigger-protection" type="button" aria-expanded="true" aria-controls="home-business-panel-protection" k-content="protectionBanner.Title">Website operation protection</button>
                     </h3>
                     <div class="home-business__panel" id="home-business-panel-protection" role="region" aria-labelledby="home-business-trigger-protection">
-                        <p k-content="businessBanner[3].Description">System-level "resource guardians" and error monitoring mechanisms provide 24/7 stability protection for your digital assets. With extremely low memory usage and optimized GC (garbage collection) environment, AI intercepts operational risks in real time, ensuring enterprise-level operational reliability even at a very low cost of $1/year</p>
-                        <a class="home-business__action" k-attribute="href businessBanner[3].Url" k-content="businessBanner[3].UrlName">Claim My $1 Protection <span aria-hidden="true">&rsaquo;</span></a>
+                        <p k-content="protectionBanner.Description">System-level "resource guardians" and error monitoring mechanisms provide 24/7 stability protection for your digital assets. With extremely low memory usage and optimized GC (garbage collection) environment, AI intercepts operational risks in real time, ensuring enterprise-level operational reliability even at a very low cost of $1/year</p>
+                        <a class="home-business__action" k-attribute="href protectionBanner.Url" k-content="protectionBanner.UrlName">Claim My $1 Protection <span aria-hidden="true">&rsaquo;</span></a>
                     </div>
                 </article>
             </div>

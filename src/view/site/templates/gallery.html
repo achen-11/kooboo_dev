@@ -36,20 +36,16 @@
 
         <div class="template-gallery__heading">
             <div>
-                <h2 id="template-gallery-title">Choose a starting point and quickly create a website</h2>
+                <h1 id="template-gallery-title">Choose a starting point and quickly create a website</h1>
                 <p>From corporate websites, e-commerce platforms, choose a template to create your website with one click</p>
             </div>
-            <a class="template-gallery__view-all" href="https://www.redev.cn/_Admin/templates">
-                <span>View all</span>
-                <span aria-hidden="true">›</span>
-            </a>
         </div>
 
         <div class="template-gallery__grid">
             <article class="template-card" data-template-card k-for="item in templateItems" repeat-self="true" k-attribute="data-template-categories item.FilterKeys">
                 <div class="template-card__media">
                     <img src="/site/templates/template-fruit.png" alt="Fruit market ecommerce template preview" width="750" height="421" loading="lazy" k-attribute="src item.PreviewImage; alt item.AltText">
-                    <a class="template-card__action" href="/_Admin/templates?lang=en" data-template-admin-path="/templates?lang=en" k-attribute="href item.AdminHref; data-template-admin-path item.AdminPath" k-label="Use this template">Use this template</a>
+                    <a class="template-card__action" href="/_Admin/templates?lang=en" target="_blank" data-template-admin-path="/templates?lang=en" k-attribute="href item.AdminHref; data-template-admin-path item.AdminPath" k-label="Use this template">Use this template</a>
                 </div>
                 <h3 k-content="item.Name">Fresh Market</h3>
             </article>

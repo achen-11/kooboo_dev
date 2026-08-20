@@ -60,10 +60,11 @@
             </summary>
             <nav class="site-header__mobile-panel" aria-label="Mobile navigation">
                 <a class="site-header__mobile-link" href="/" k-label="menu.home">Home</a>
+                <a class="site-header__mobile-link" href="/templates">Market</a>
                 <a class="site-header__mobile-link" href="/innovation" k-label="menu.innovation">Innovation</a>
                 <a class="site-header__mobile-link" href="/price" k-label="menu.pricing">Price</a>
                 <a class="site-header__mobile-link" href="/download">Download</a>
-                <a class="site-header__mobile-link" href="/docs" k-label="menu.docs">Doc</a>
+                <a class="site-header__mobile-link" href="https://docs.redev.cn/" target="_blank" k-label="menu.docs">Doc</a>
                 <a k-if="showLogin" class="site-header__mobile-link" href="/_Admin/login?returnurl=/&amp;lang=en" k-attribute="href loginUrl" k-label="SignIn">Login</a>
                 <div k-if="isLoggedIn" class="site-header__mobile-user">
                     <div class="site-header__mobile-user-meta">
@@ -75,7 +76,7 @@
                         <button class="site-header__mobile-link site-header__mobile-link--muted site-header__mobile-logout-button" type="submit" k-label="SignOut">Logout</button>
                     </form>
                 </div>
-                <a class="site-header__mobile-claim" href="/claim" k-label="Claim">Claim your <strong>$1</strong> website</a>
+                <a class="site-header__mobile-claim" href="https://www.kooboo.com/en/_start/login?lang=en" k-label="Start now">Start now</a>
             </nav>
         </details>
 
@@ -85,6 +86,7 @@
 
         <nav class="site-header__nav" aria-label="Primary navigation">
             <a class="site-header__link" href="/" k-label="menu.home">Home</a>
+            <a class="site-header__link" href="/templates">Market</a>
             <a class="site-header__link" href="/innovation" k-label="menu.innovation">Innovation</a>
             <a class="site-header__link" href="/price" k-label="menu.pricing">Price</a>
             <a class="site-header__link" href="/download">Download</a>
@@ -106,8 +108,8 @@
                     </form>
                 </div>
             </details>
-            <a class="site-header__primary-action" href="/claim">
-                <span k-label="Claim">Claim your <strong>$1</strong> website</span>
+            <a class="site-header__primary-action" href="https://www.kooboo.com/en/_start/login?lang=en">
+                <span k-label="Start now">Start now</span>
                 <span class="site-header__primary-icon" aria-hidden="true"></span>
             </a>
         </div>

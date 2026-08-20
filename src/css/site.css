@@ -17,8 +17,12 @@
 
 /* Templates page */
 .template-gallery {
-    padding: 120px 0 128px;
-    background: var(--color-white);
+    padding: 64px 0 96px;
+    background:
+        radial-gradient(circle at 8% 0%, rgba(197, 241, 255, 0.38), transparent 32%),
+        radial-gradient(circle at 42% 0%, rgba(248, 255, 197, 0.24), transparent 28%),
+        radial-gradient(circle at 78% 0%, rgba(195, 182, 255, 0.28), transparent 34%),
+        var(--color-white);
 }
 
 .template-gallery__inner {
@@ -29,7 +33,7 @@
 .template-gallery__filters {
     width: fit-content;
     max-width: 100%;
-    margin: 0 auto 40px;
+    margin: 0 0 40px;
     padding: 8px;
     display: flex;
     gap: 2px;
@@ -64,7 +68,6 @@
 }
 
 .template-gallery__filter:focus-visible,
-.template-gallery__view-all:focus-visible,
 .template-card__action:focus-visible {
     outline: 3px solid rgba(34, 150, 243, 0.24);
     outline-offset: 3px;
@@ -72,13 +75,9 @@
 
 .template-gallery__heading {
     margin-bottom: 40px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 32px;
 }
 
-.template-gallery__heading h2 {
+.template-gallery__heading h1 {
     margin: 0;
     color: var(--color-title);
     font-size: 32px;
@@ -91,28 +90,6 @@
     color: var(--color-muted);
     font-size: 14px;
     line-height: 1.4;
-}
-
-.template-gallery__view-all {
-    min-width: 106px;
-    height: 40px;
-    padding: 0 16px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    flex: none;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    background: var(--color-white);
-    color: var(--color-title);
-    font-size: 14px;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.template-gallery__view-all:hover {
-    border-color: var(--color-border-hover);
 }
 
 .template-gallery__grid {
@@ -479,7 +456,7 @@
 
 @media (max-width: 1023px) {
     .template-gallery {
-        padding: 88px 0 96px;
+        padding: 48px 0 80px;
     }
 
     .template-gallery__grid {
@@ -497,7 +474,7 @@
 
 @media (max-width: 767px) {
     .template-gallery {
-        padding: 64px 0 80px;
+        padding: 40px 0 64px;
     }
 
     .template-gallery__inner,
@@ -514,12 +491,7 @@
         padding-inline: 18px;
     }
 
-    .template-gallery__heading {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .template-gallery__heading h2,
+    .template-gallery__heading h1,
     .download-page h1 {
         font-size: 26px;
     }
@@ -659,11 +631,13 @@ a {
     top: 0;
     z-index: 50;
     height: 64px;
+    border-bottom: 1px solid transparent;
     background: transparent;
-    transition: background-color 180ms ease, backdrop-filter 180ms ease, -webkit-backdrop-filter 180ms ease;
+    transition: background-color 180ms ease, border-color 180ms ease, backdrop-filter 180ms ease, -webkit-backdrop-filter 180ms ease;
 }
 
 .site-header.is-scrolled {
+    border-bottom-color: rgba(217, 217, 217, 0.5);
     background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -882,6 +856,7 @@ body:has(.home-hero) .site-header__user-trigger {
     background: var(--color-white);
     color: var(--color-title);
     cursor: pointer;
+    line-height: 1;
     list-style: none;
 }
 
@@ -916,7 +891,7 @@ body:has(.home-hero) .site-header__user-trigger {
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 14px;
-    line-height: 1;
+    line-height: 20px;
 }
 
 .site-header__user-chevron {
@@ -1009,7 +984,7 @@ body:has(.home-hero) .site-header__user-trigger {
 }
 
 .site-header__primary-action {
-    min-width: 204px;
+    min-width: 120px;
     border: 1px solid transparent;
     background: var(--color-dark);
     color: var(--color-white);
@@ -1432,7 +1407,7 @@ body:not(:has(.home-hero)) .site-footer {
 
 .home-business__stage {
     display: grid;
-    grid-template-columns: minmax(0, 664px) minmax(0, 688px);
+    grid-template-columns: minmax(0, 688px) minmax(0, 664px);
     min-height: 748px;
     overflow: hidden;
     border-radius: 24px;
@@ -1511,7 +1486,8 @@ body:not(:has(.home-hero)) .site-footer {
 }
 
 .home-business__accordion {
-    padding: 48px 56px;
+    order: -1;
+    padding: 32px 56px 48px;
     background: #f3f7fa;
 }
 
@@ -2263,7 +2239,8 @@ body:not(:has(.home-hero)) .site-footer {
 .price-plan-grid {
     margin-top: 48px;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 360px));
+    justify-content: center;
     gap: 20px;
 }
 
@@ -2880,7 +2857,7 @@ body:not(:has(.home-hero)) .site-footer {
     }
 
     .price-plan-grid {
-        width: min(560px, 100%);
+        width: min(360px, 100%);
         margin-right: auto;
         margin-left: auto;
         grid-template-columns: 1fr;
