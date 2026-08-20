@@ -1,6 +1,6 @@
-<script env="server">
-    var koobooCore = k.content.KoobooCore.all();
-</script>
+<k-data>
+    <query as="koobooCore" source="content" resource="KoobooCore" action="list" export></query>
+</k-data>
 
 <section class="innovation-page bg-[var(--color-white)]" aria-labelledby="innovation-title">
     <div class="innovation-hero px-4">
@@ -20,7 +20,7 @@
             <h2 k-content="item.Title">Native experiments</h2>
             <p k-content="item.Description">A/B testing is integrated into the OS kernel.No external scripts or performance hits</p>
             <a class="innovation-card__link" href="/articles/{item.slug}">
-                <span k-label="Case study">Case study</span>
+                <span k-label="View Detail">View Detail</span>
                 <span aria-hidden="true">&rarr;</span>
             </a>
         </article>

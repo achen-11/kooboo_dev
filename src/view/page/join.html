@@ -1,5 +1,11 @@
+<k-data>
+	<query as="item" source="content" resource="HomeBanner" action="item" where="{PageName:{$eq:'hire'}}" export></query>
+	<query as="jobQuestions" source="content" resource="JobQuestion" action="list" order="key" export></query>
+	<query as="baseQuestions" source="content" resource="JobBaseQuestion" action="list" export></query>
+	<let as="requestedKey" source="queryString" from="key" export></let>
+</k-data>
+
 <script env="server">
-	var item = k.content.HomeBanner.all().find(o => o.PageName == "hire");
 	
 	if (item) {
 		k.response.meta.title = "Kooboo " + item.Title;
@@ -7,10 +13,7 @@
 		k.response.meta.setMeta("description", item.SubTitle);
 	}
 	
-	var jobQuestions = k.content.JobQuestion.all().sort((a, b) => a.key - b.key)
-	var baseQuestions = k.content.JobBaseQuestion.all()
-
-	let key = k.request.queryString.key
+		let key = requestedKey
 	if (!jobQuestions.find(i => i.key === key)) {
 		key = jobQuestions?.[0]?.key
 	}
@@ -91,7 +94,7 @@
 	</div>
 </section>
 
-<div env="server" class="relative z-[1] max-w-screen-xl mx-auto lg:px-24 px-6">
+<div class="relative z-[1] max-w-screen-xl mx-auto lg:px-24 px-6">
 
 	<div class="p-8 shadow-[0_0_5px_2px_rgba(0,0,0,0.1)] bg-white mb-[20px]">
 		<div class="p-1 inline-block bg-[#EDF1F5] rounded-5 mb-6 md:w-auto w-full">

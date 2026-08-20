@@ -618,6 +618,25 @@ function initPromptGenerators() {
     });
 }
 
+function schedulePromptGenerators() {
+    const roots = Array.from(document.querySelectorAll(".prompt-generator"));
+    if (!roots.length) return;
+
+    let initialized = false;
+    const initialize = () => {
+        if (initialized) return;
+        initialized = true;
+        roots.forEach((root) => void initPromptGenerator(root));
+    };
+
+    roots.forEach((root) => {
+        root.addEventListener("pointerdown", initialize, { once: true, passive: true });
+        root.addEventListener("focusin", initialize, { once: true });
+    });
+
+    window.setTimeout(initialize, 2500);
+}
+
 function initScrollToPromptLinks() {
     document.querySelectorAll("[data-scroll-to-prompt]").forEach((link) => {
         link.addEventListener("click", (event) => {
@@ -777,12 +796,11 @@ function initHomeStartBuildingEntrance() {
 
 function initHomePromptEffects() {
     initPromptGeneratorSpotlights();
-    initPromptTypingPlaceholders();
     initHomeStartBuildingEntrance();
 }
 
 function initPromptGeneratorFeatures() {
-    initPromptGenerators();
+    schedulePromptGenerators();
     initScrollToPromptLinks();
     initHomePromptEffects();
 }
@@ -821,39 +839,6 @@ function initTemplateGallery() {
 
 function initDownloadPage() {
     document.querySelectorAll("[data-download-page]").forEach((page) => {
-        const tabs = Array.from(page.querySelectorAll("[data-download-tab]"));
-        const panels = Array.from(page.querySelectorAll("[data-download-panel]"));
-
-        const setActiveTab = (key) => {
-            tabs.forEach((tab) => {
-                const isActive = tab.dataset.downloadTab === key;
-                tab.classList.toggle("is-active", isActive);
-                tab.setAttribute("aria-selected", String(isActive));
-                tab.tabIndex = isActive ? 0 : -1;
-            });
-
-            panels.forEach((panel) => {
-                const isActive = panel.dataset.downloadPanel === key;
-                panel.classList.toggle("is-active", isActive);
-                panel.hidden = !isActive;
-            });
-        };
-
-        tabs.forEach((tab, index) => {
-            tab.addEventListener("click", () => setActiveTab(tab.dataset.downloadTab));
-            tab.addEventListener("keydown", (event) => {
-                if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-                event.preventDefault();
-                let nextIndex = index;
-                if (event.key === "ArrowLeft") nextIndex = (index - 1 + tabs.length) % tabs.length;
-                if (event.key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
-                if (event.key === "Home") nextIndex = 0;
-                if (event.key === "End") nextIndex = tabs.length - 1;
-                tabs[nextIndex]?.focus();
-                setActiveTab(tabs[nextIndex]?.dataset.downloadTab);
-            });
-        });
-
         page.querySelectorAll("[data-copy-command]").forEach((button) => {
             button.addEventListener("click", async () => {
                 const code = button.closest(".download-command")?.querySelector("code");

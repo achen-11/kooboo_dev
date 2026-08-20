@@ -1,7 +1,7 @@
-<script env="server">
-    const slug = k.request.slug
-    var coreDetail = k.content.KoobooCore.get(slug)
-</script>
+<k-data>
+    <let as="slug" from="slug"></let>
+    <query as="coreDetail" source="content" resource="KoobooCore" action="item" id="slug" export></query>
+</k-data>
 
 <section class="innovation-detail-page" aria-labelledby="innovation-detail-title">
     <div class="innovation-detail-page__inner">

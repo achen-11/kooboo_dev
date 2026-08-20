@@ -1,6 +1,6 @@
-<script env="server">
-    var productivityBanner = k.content.ProductivityBanner.all();
-</script>
+<k-data>
+    <query as="productivityBanner" source="content" resource="ProductivityBanner" action="list" export></query>
+</k-data>
 
 <section class="home-productivity relative overflow-hidden bg-[var(--color-white)]" aria-labelledby="home-productivity-title">
     <div class="home-productivity__background" aria-hidden="true"></div>

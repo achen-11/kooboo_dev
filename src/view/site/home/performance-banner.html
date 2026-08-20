@@ -1,11 +1,11 @@
-<script env="server">
-    var performanceBanner = k.content.PerformanceBanner.all();
-</script>
+<k-data>
+    <query as="performanceBanner" source="content" resource="PerformanceBanner" action="list" export></query>
+</k-data>
 
 <section class="home-performance bg-[var(--color-white)]" aria-labelledby="home-performance-title">
     <div class="site-container">
         <div class="home-performance__stage">
-            <img class="home-performance__visual" src="/site/home-performance-visual.png" width="1352" height="598" alt="" aria-hidden="true">
+            <img class="home-performance__visual" src="/site/home-performance-visual.webp" width="1352" height="598" alt="" aria-hidden="true" loading="lazy" decoding="async">
 
             <h2 id="home-performance-title" class="home-performance__title" k-label="Extreme Performance Architecture">Extreme Performance Architecture</h2>
 

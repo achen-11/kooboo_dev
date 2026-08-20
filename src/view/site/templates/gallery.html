@@ -1,6 +1,9 @@
+<k-data>
+    <query as="templateCategories" source="content" resource="TemplateCategory" action="list" order="Sort" export></query>
+    <query as="templateItems" source="content" resource="TemplateItem" action="list" order="Sort" export></query>
+</k-data>
+
 <script env="server">
-    var templateCategories = k.content.TemplateCategory.all({ orderBy: "Sort" }) || [];
-    var templateItems = k.content.TemplateItem.all({ orderBy: "Sort" }) || [];
 
     var categoryKeysByItemId = {};
 

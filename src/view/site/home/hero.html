@@ -1,10 +1,12 @@
-<script env="server">
-    var hero = k.content.HomeHero;
-</script>
+<k-data>
+    <query as="hero" source="content" resource="HomeHero" action="item" export></query>
+</k-data>
 
 <section class="home-hero">
     <div class="home-hero__stage">
-        <div class="home-hero__aurora" aria-hidden="true"></div>
+        <div class="home-hero__aurora" aria-hidden="true">
+            <img class="home-hero__aurora-image" src="/site/home-hero-ring.webp" width="1350" height="400" alt="" fetchpriority="high">
+        </div>
         <div class="home-hero__content">
             <div class="text-center">
                 <h1 class="home-hero__title m-0 tracking-normal text-[var(--color-title)]">

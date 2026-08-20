@@ -1,7 +1,7 @@
-<script env="server">
-	var pricingPlans = k.content.Pricing.all()
-	var faqItems = k.content.Faq.all()
-</script>
+<k-data>
+	<query as="pricingPlans" source="content" resource="Pricing" action="list" export></query>
+	<query as="faqItems" source="content" resource="Faq" action="list" export></query>
+</k-data>
 
 <script env="client">
 	document.addEventListener('DOMContentLoaded', function () {

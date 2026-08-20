@@ -1,16 +1,8 @@
-<script env="server">
-    var promptGeneratorPlaceholderPrefix = "What kind of website do you need? Try this: ";
-    var promptGeneratorPromptExampleCoffee = "help me generate a coffee website with online ordering...";
-    var promptGeneratorPromptExampleSaas = "build a SaaS dashboard for finance teams...";
-    var promptGeneratorPromptExamplePortfolio = "create a portfolio for a UI designer...";
-    var promptGeneratorPlaceholder = promptGeneratorPlaceholderPrefix + promptGeneratorPromptExampleCoffee;
-</script>
-
-<div class="prompt-generator m-4 mb-8 rounded-2xl border border-white/40 p-4" env="server" k-attribute="data-placeholder-prefix promptGeneratorPlaceholderPrefix; data-placeholder-prompt-1 promptGeneratorPromptExampleCoffee; data-placeholder-prompt-2 promptGeneratorPromptExampleSaas; data-placeholder-prompt-3 promptGeneratorPromptExamplePortfolio">
+<div class="prompt-generator m-4 mb-8 rounded-2xl border border-white/40 p-4" data-placeholder-prefix="What kind of website do you need? Try this: " data-placeholder-prompt-1="help me generate a coffee website with online ordering..." data-placeholder-prompt-2="build a SaaS dashboard for finance teams..." data-placeholder-prompt-3="create a portfolio for a UI designer...">
     <div class="prompt-generator__panel flex min-h-[183px] flex-col gap-4 rounded-xl bg-[var(--color-white)] p-4">
         <label class="flex min-h-[95px] w-full flex-auto">
             <span class="sr-only">Website prompt</span>
-            <textarea class="prompt-generator__input min-h-[95px] w-full flex-auto resize-none border-0 text-[15px] leading-[1.45] text-[#606266] outline-none" rows="4" autocomplete="off" k-attribute="placeholder promptGeneratorPlaceholder" placeholder="What kind of website do you need? Try this: help me generate a coffee website..."></textarea>
+            <textarea class="prompt-generator__input min-h-[95px] w-full flex-auto resize-none border-0 text-[15px] leading-[1.45] text-[#606266] outline-none" rows="4" autocomplete="off" placeholder="What kind of website do you need? Try this: help me generate a coffee website with online ordering..."></textarea>
         </label>
         <div class="prompt-generator__controls flex gap-4">
             <div class="prompt-generator__model gap-2 text-sm text-[#646c7d]">

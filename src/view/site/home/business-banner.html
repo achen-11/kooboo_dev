@@ -1,5 +1,8 @@
+<k-data>
+    <query as="businessBanner" source="content" resource="BusinessBanner" action="list" export></query>
+</k-data>
+
 <script env="server">
-    var businessBanner = k.content.BusinessBanner.all();
 
     function getBusinessBanner(keywords, fallbackIndex) {
         var matched = businessBanner.find(function (item) {
@@ -28,24 +31,24 @@
 
         <div class="home-business__stage" data-business-accordion="">
             <div class="home-business__visuals">
-                <img class="home-business__visual" data-business-visual="ai-generated" src="/site/home-business-ai-generated.png" width="664" height="748" alt="" aria-hidden="true">
-                <img class="home-business__visual" data-business-visual="ai-controls" src="/site/home-business-ai-controls.png" width="664" height="748" alt="" aria-hidden="true">
+                <img class="home-business__visual" data-business-visual="ai-generated" src="/site/home-business-ai-generated.webp" width="664" height="748" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                <img class="home-business__visual" data-business-visual="ai-controls" src="/site/home-business-ai-controls.webp" width="664" height="748" alt="" aria-hidden="true" loading="lazy" decoding="async">
 
                 <div class="home-business__visual home-business__carousel is-active" data-business-visual="growth" data-business-carousel="" data-business-carousel-interval="4500">
-                    <img class="home-business__carousel-slide is-active" data-business-slide="" src="/site/home-business-growth.webp" width="664" height="748" alt="" aria-hidden="true">
-                    <img class="home-business__carousel-slide" data-business-slide="" src="/site/home-business-growth-alt.webp" width="664" height="748" alt="" aria-hidden="true">
-                    <div class="home-business__carousel-dots" aria-label="Growth visual slides">
-                        <div class="home-business__carousel-dot is-active" data-business-slide-control="0" aria-label="Show growth visual 1" aria-current="true"></div>
-                        <div class="home-business__carousel-dot" data-business-slide-control="1" aria-label="Show growth visual 2" aria-current="false"></div>
+                    <img class="home-business__carousel-slide is-active" data-business-slide="" src="/site/home-business-growth.webp" width="664" height="748" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                    <img class="home-business__carousel-slide" data-business-slide="" src="/site/home-business-growth-alt.webp" width="664" height="748" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                    <div class="home-business__carousel-dots" role="group" aria-label="Growth visual slides">
+                        <button type="button" class="home-business__carousel-dot is-active" data-business-slide-control="0" aria-label="Show growth visual 1" aria-current="true"></button>
+                        <button type="button" class="home-business__carousel-dot" data-business-slide-control="1" aria-label="Show growth visual 2" aria-current="false"></button>
                     </div>
                 </div>
 
                 <div class="home-business__visual home-business__carousel" data-business-visual="protection" data-business-carousel="" data-business-carousel-interval="4500" aria-hidden="true">
-                    <img class="home-business__carousel-slide is-active" data-business-slide="" src="/site/home-business-protection.webp" width="664" height="748" alt="" aria-hidden="true">
-                    <img class="home-business__carousel-slide" data-business-slide="" src="/site/home-business-protection-alt.webp" width="664" height="748" alt="" aria-hidden="true">
-                    <div class="home-business__carousel-dots" aria-label="Protection visual slides">
-                        <div class="home-business__carousel-dot is-active" data-business-slide-control="0" aria-label="Show protection visual 1" aria-current="true" tabindex="-1"></div>
-                        <div class="home-business__carousel-dot" data-business-slide-control="1" aria-label="Show protection visual 2" aria-current="false" tabindex="-1"></div>
+                    <img class="home-business__carousel-slide is-active" data-business-slide="" src="/site/home-business-protection.webp" width="664" height="748" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                    <img class="home-business__carousel-slide" data-business-slide="" src="/site/home-business-protection-alt.webp" width="664" height="748" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                    <div class="home-business__carousel-dots" role="group" aria-label="Protection visual slides">
+                        <button type="button" class="home-business__carousel-dot is-active" data-business-slide-control="0" aria-label="Show protection visual 1" aria-current="true" tabindex="-1"></button>
+                        <button type="button" class="home-business__carousel-dot" data-business-slide-control="1" aria-label="Show protection visual 2" aria-current="false" tabindex="-1"></button>
                     </div>
                 </div>
             </div>
