@@ -23,7 +23,11 @@
 
     templateItems.forEach(function (item) {
         var templateId = String(item.TemplateId || "").trim();
-        item.FilterKeys = categoryKeysByItemId[item.id].join(" ");
+        var previewImage = String(item.PreviewImage || "");
+        item.FilterKeys = (categoryKeysByItemId[item.id] || []).join(" ");
+        item.OptimizedPreviewImage = previewImage.toLowerCase().lastIndexOf(".png") === previewImage.length - 4
+            ? previewImage.slice(0, -4) + ".webp"
+            : previewImage;
         item.AdminPath = templateId
             ? "/template/detail?templateId=" + encodeURIComponent(templateId) + "&lang=en"
             : "/templates?lang=en";
@@ -47,10 +51,10 @@
         <div class="template-gallery__grid">
             <article class="template-card" data-template-card k-for="item in templateItems" repeat-self="true" k-attribute="data-template-categories item.FilterKeys">
                 <div class="template-card__media">
-                    <img src="/site/templates/template-fruit.png" alt="Fruit market ecommerce template preview" width="750" height="421" loading="lazy" k-attribute="src item.PreviewImage; alt item.AltText">
+                    <img src="/site/templates/template-fruit.webp" alt="Fruit market ecommerce template preview" width="640" height="400" loading="eager" fetchpriority="high" decoding="async" k-attribute="src item.OptimizedPreviewImage; alt item.AltText">
                     <a class="template-card__action" href="/_Admin/templates?lang=en" target="_blank" data-template-admin-path="/templates?lang=en" k-attribute="href item.AdminHref; data-template-admin-path item.AdminPath" k-label="Use this template">Use this template</a>
                 </div>
-                <h3 k-content="item.Name">Fresh Market</h3>
+                <h2 k-content="item.Name">Fresh Market</h2>
             </article>
         </div>
     </div>

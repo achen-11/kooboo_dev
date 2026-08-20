@@ -53,7 +53,7 @@
     border: 0;
     border-radius: 50px;
     background: transparent;
-    color: #2296f3;
+    color: #0875c1;
     font-size: 14px;
     line-height: 20px;
     white-space: nowrap;
@@ -168,7 +168,7 @@
     transform: scale(1.025);
 }
 
-.template-card h3 {
+.template-card h2 {
     margin: 16px 0 0;
     overflow: hidden;
     color: var(--color-title);
@@ -1767,7 +1767,7 @@ body:not(:has(.home-hero)) .site-footer {
 .innovation-hero__panel {
     min-height: 236px;
     border-radius: 24px;
-    background: url("/site/home-innovation-hero-background.png") center / 100% 100% no-repeat;
+    background: url("/site/home-innovation-hero-background.webp") center / 100% 100% no-repeat;
 }
 
 .innovation-hero__decor {
