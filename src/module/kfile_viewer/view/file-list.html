@@ -1,0 +1,131 @@
+<template id="kfile-viewer-file-list">
+  <div class="flex-1 flex flex-col min-w-0">
+    <!-- 统一高度的工具栏 -->
+    <div class="flex-shrink-0 bg-white dark:bg-[#2d2d2d] border-b border-slate-200 dark:border-neutral-700 px-3 py-1.5 flex items-center justify-between gap-2 text-sm">
+      <div class="flex items-center gap-1 min-w-0 flex-1 overflow-hidden">
+        <span class="text-slate-500 dark:text-neutral-400 shrink-0">路径：</span>
+        <button type="button" @click="navigateTo('')" class="text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer shrink-0">根目录</button>
+        <template v-for="(item, i) in breadcrumbPartsDisplay" :key="i">
+          <template v-if="item.name === '...'">
+            <span class="text-slate-400 dark:text-neutral-500 shrink-0">...</span>
+          </template>
+          <template v-else="">
+            <span class="text-slate-400 dark:text-neutral-500 shrink-0">/</span>
+            <button type="button" @click="navigateTo(item.path)" class="text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer truncate shrink-0" :title="item.name">{{ item.name }}</button>
+          </template>
+        </template>
+      </div>
+      <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+        <div class="flex items-center gap-1">
+          <label class="sr-only" for="kfile-search">搜索当前目录</label>
+          <input id="kfile-search" v-model="searchQuery" type="search" placeholder="搜索" class="w-36 px-2 py-1 text-xs rounded border border-slate-200 dark:border-neutral-600 bg-white dark:bg-[#1e1e1e] dark:text-neutral-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+          <label class="sr-only" for="kfile-type-filter">类型</label>
+          <select id="kfile-type-filter" v-model="typeFilter" class="px-2 py-1 text-xs rounded border border-slate-200 dark:border-neutral-600 bg-white dark:bg-[#1e1e1e] dark:text-neutral-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+            <option value="all">全部</option>
+            <option value="folder">文件夹</option>
+            <option value="image">图片</option>
+            <option value="document">文档</option>
+            <option value="code">代码</option>
+            <option value="archive">压缩包</option>
+            <option value="media">媒体</option>
+            <option value="other">其他</option>
+          </select>
+        </div>
+        <button type="button" @click="listViewMode = 'list'" :class="listViewMode === 'list' ? 'bg-white dark:bg-neutral-800 border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-slate-200 dark:border-neutral-600 text-slate-500 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800'" class="p-1.5 rounded border transition-colors cursor-pointer" title="列表" aria-label="列表视图">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+        </button>
+        <button type="button" @click="listViewMode = 'grid'" :class="listViewMode === 'grid' ? 'bg-white dark:bg-neutral-800 border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-slate-200 dark:border-neutral-600 text-slate-500 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800'" class="p-1.5 rounded border transition-colors cursor-pointer" title="网格" aria-label="网格视图">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+        </button>
+        <span class="text-slate-400 dark:text-neutral-500 text-xs">排序：</span>
+        <button type="button" @click="setSortBy('name')" :class="sortBy === 'name' ? 'bg-indigo-50 border-indigo-300 text-indigo-700 dark:bg-indigo-950/50 dark:border-indigo-700 dark:text-indigo-300' : 'border-slate-200 dark:border-neutral-600 hover:bg-white dark:hover:bg-neutral-800 dark:text-neutral-300'" class="px-2 py-1 text-xs rounded border transition-colors cursor-pointer">名称</button>
+        <button type="button" @click="setSortBy('size')" :class="sortBy === 'size' ? 'bg-indigo-50 border-indigo-300 text-indigo-700 dark:bg-indigo-950/50 dark:border-indigo-700 dark:text-indigo-300' : 'border-slate-200 dark:border-neutral-600 hover:bg-white dark:hover:bg-neutral-800 dark:text-neutral-300'" class="px-2 py-1 text-xs rounded border transition-colors cursor-pointer">大小</button>
+        <button type="button" @click="setSortBy('time')" :class="sortBy === 'time' ? 'bg-indigo-50 border-indigo-300 text-indigo-700 dark:bg-indigo-950/50 dark:border-indigo-700 dark:text-indigo-300' : 'border-slate-200 dark:border-neutral-600 hover:bg-white dark:hover:bg-neutral-800 dark:text-neutral-300'" class="px-2 py-1 text-xs rounded border transition-colors cursor-pointer">时间</button>
+      </div>
+    </div>
+    <div class="flex-1 overflow-auto bg-white dark:bg-[#252526] p-4 min-h-0">
+      <div v-if="listLoading" class="text-slate-400 dark:text-neutral-500 text-sm py-8 text-center">加载中…</div>
+      <div v-else-if="listError" class="text-red-600 dark:text-red-400 text-sm py-4">{{ listError }}</div>
+      <div v-else-if="!sortedSubFoldersInList.length && !sortedFilesInList.length" class="text-slate-400 dark:text-neutral-500 text-sm py-8 text-center">
+        <p>{{ isFiltering ? '没有匹配项' : '暂无文件' }}</p>
+        <p v-if="!isFiltering" class="text-xs mt-1">可点击顶栏「新建文件夹」「新建文件」或「上传文件」</p>
+      </div>
+      <div v-else-if="listViewMode === 'list'" class="border border-slate-200 dark:border-neutral-700 rounded-lg overflow-hidden">
+        <table class="w-full text-sm text-left">
+          <thead class="bg-slate-50 dark:bg-[#2d2d2d] text-slate-500 dark:text-neutral-400 text-xs uppercase">
+            <tr><th class="px-3 py-2 font-medium">名称</th><th class="px-3 py-2 font-medium w-24">大小</th><th class="px-3 py-2 font-medium w-32"></th></tr>
+          </thead>
+          <tbody>
+            <tr v-for="f in sortedSubFoldersInList" :key="'folder-' + f.FullName" @click="navigateTo(f.FullName)" @dblclick.stop="openRenameModal(f.FullName, true)" class="border-t border-slate-100 dark:border-neutral-800 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 cursor-pointer group">
+              <td class="px-3 py-2 flex items-center gap-2 text-neutral-800 dark:text-neutral-200">
+                <svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                <span class="truncate">{{ f.Name }}</span>
+              </td>
+              <td class="px-3 py-2 text-slate-400 dark:text-neutral-500">—</td>
+              <td class="px-3 py-2">
+                <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button type="button" @click.stop="openCopyMoveModal(f.FullName, true, 'copy')" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-neutral-700 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer" title="复制文件夹" aria-label="复制文件夹"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 8h10a2 2 0 012 2v10a2 2 0 01-2 2H8a2 2 0 01-2-2V10a2 2 0 012-2zM4 16H3a2 2 0 01-2-2V4a2 2 0 012-2h10a2 2 0 012 2v1"></path></svg></button>
+                  <button type="button" @click.stop="openCopyMoveModal(f.FullName, true, 'move')" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-neutral-700 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer" title="移动文件夹" aria-label="移动文件夹"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H8m9 0v9"></path></svg></button>
+                  <button type="button" @click.stop="confirmDelete(f.FullName, true)" class="p-1 rounded hover:bg-red-100 dark:hover:bg-red-950/50 text-slate-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer" title="删除" aria-label="删除"> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                </div>
+              </td>
+            </tr>
+            <tr v-for="file in sortedFilesInList" :key="'file-' + (file.FullName || file.Name)" @click="selectFile(file)" @dblclick.stop="openRenameModal(file.FullName || file.Name, false)" :class="selectedFile && (selectedFile.FullName || selectedFile.Name) === (file.FullName || file.Name) ? 'bg-indigo-50 dark:bg-indigo-950/40' : ''" class="border-t border-slate-100 dark:border-neutral-800 hover:bg-slate-50 dark:hover:bg-neutral-800/80 cursor-pointer group">
+              <td class="px-3 py-2 flex items-center gap-2 text-neutral-800 dark:text-neutral-200">
+                <svg class="w-5 h-5 flex-shrink-0" :class="getFileIconClass(file)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <span class="truncate">{{ file.Name }}</span>
+              </td>
+              <td class="px-3 py-2 text-slate-400 dark:text-neutral-500">{{ file.StringSize || '' }}</td>
+              <td class="px-3 py-2">
+                <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button type="button" @click.stop="downloadFile(file)" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-neutral-700 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer" title="下载文件" aria-label="下载文件"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v12m0 0l4-4m-4 4l-4-4M5 21h14"></path></svg></button>
+                  <button type="button" @click.stop="openCopyMoveModal(file.FullName || file.Name, false, 'copy')" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-neutral-700 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer" title="复制文件" aria-label="复制文件"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 8h10a2 2 0 012 2v10a2 2 0 01-2 2H8a2 2 0 01-2-2V10a2 2 0 012-2zM4 16H3a2 2 0 01-2-2V4a2 2 0 012-2h10a2 2 0 012 2v1"></path></svg></button>
+                  <button type="button" @click.stop="openCopyMoveModal(file.FullName || file.Name, false, 'move')" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-neutral-700 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer" title="移动文件" aria-label="移动文件"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H8m9 0v9"></path></svg></button>
+                  <button type="button" @click.stop="confirmDelete(file.FullName || file.Name, false)" class="p-1 rounded hover:bg-red-100 dark:hover:bg-red-950/50 text-slate-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer" title="删除" aria-label="删除"> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-else="" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2">
+        <template v-for="f in sortedSubFoldersInList" :key="'folder-' + f.FullName">
+          <div class="relative p-3 rounded-lg border border-slate-200 dark:border-neutral-700 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 flex flex-col items-center gap-1 cursor-pointer transition-colors text-left w-full group">
+            <button type="button" @click="navigateTo(f.FullName)" @dblclick.stop="openRenameModal(f.FullName, true)" class="flex flex-col items-center gap-1 w-full cursor-pointer text-left">
+              <svg class="w-8 h-8 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+              <span class="text-sm font-medium text-slate-700 dark:text-neutral-200 truncate w-full text-center">{{ f.Name }}</span>
+            </button>
+            <div class="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button type="button" @click.stop="openCopyMoveModal(f.FullName, true, 'copy')" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-neutral-700 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer" title="复制文件夹" aria-label="复制文件夹"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 8h10a2 2 0 012 2v10a2 2 0 01-2 2H8a2 2 0 01-2-2V10a2 2 0 012-2zM4 16H3a2 2 0 01-2-2V4a2 2 0 012-2h10a2 2 0 012 2v1"></path></svg></button>
+              <button type="button" @click.stop="openCopyMoveModal(f.FullName, true, 'move')" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-neutral-700 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer" title="移动文件夹" aria-label="移动文件夹"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H8m9 0v9"></path></svg></button>
+              <button type="button" @click.stop="confirmDelete(f.FullName, true)" class="p-1 rounded hover:bg-red-100 dark:hover:bg-red-950/50 text-slate-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer" title="删除文件夹" aria-label="删除文件夹"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+            </div>
+          </div>
+        </template>
+        <template v-for="file in sortedFilesInList" :key="'file-' + (file.FullName || file.Name)">
+          <div :class="selectedFile && (selectedFile.FullName || selectedFile.Name) === (file.FullName || file.Name) ? 'border-indigo-500 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40' : 'border-slate-200 dark:border-neutral-700 hover:border-slate-300 dark:hover:border-neutral-600'" class="relative p-3 rounded-lg border flex flex-col items-center gap-1 cursor-pointer transition-colors text-left w-full group">
+            <button type="button" @click="selectFile(file)" @dblclick.stop="openRenameModal(file.FullName || file.Name, false)" class="flex flex-col items-center gap-1 w-full cursor-pointer text-left">
+              <svg class="w-8 h-8 flex-shrink-0" :class="getFileIconClass(file)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              <span class="text-sm font-medium text-slate-700 dark:text-neutral-200 truncate w-full text-center">{{ file.Name }}</span>
+              <span class="text-xs text-slate-400 dark:text-neutral-500">{{ file.StringSize || '' }}</span>
+            </button>
+            <div class="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button type="button" @click.stop="downloadFile(file)" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-neutral-700 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer" title="下载文件" aria-label="下载文件"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v12m0 0l4-4m-4 4l-4-4M5 21h14"></path></svg></button>
+              <button type="button" @click.stop="openCopyMoveModal(file.FullName || file.Name, false, 'copy')" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-neutral-700 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer" title="复制文件" aria-label="复制文件"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 8h10a2 2 0 012 2v10a2 2 0 01-2 2H8a2 2 0 01-2-2V10a2 2 0 012-2zM4 16H3a2 2 0 01-2-2V4a2 2 0 012-2h10a2 2 0 012 2v1"></path></svg></button>
+              <button type="button" @click.stop="openCopyMoveModal(file.FullName || file.Name, false, 'move')" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-neutral-700 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer" title="移动文件" aria-label="移动文件"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H8m9 0v9"></path></svg></button>
+              <button type="button" @click.stop="confirmDelete(file.FullName || file.Name, false)" class="p-1 rounded hover:bg-red-100 dark:hover:bg-red-950/50 text-slate-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer" title="删除文件" aria-label="删除文件"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+  defineComponent('kfile-viewer-file-list', {
+    template: '#kfile-viewer-file-list',
+    setup() {
+      return inject('store')
+    }
+  })
+</script>

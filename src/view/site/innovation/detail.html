@@ -1,5 +1,5 @@
 <script env="server">
-    const slug = k.request.queryString.slug
+    const slug = k.request.slug
     var coreDetail = k.content.KoobooCore.get(slug)
 </script>
 
@@ -14,7 +14,7 @@
 
             <div class="innovation-detail-header__copy">
                 <h1 id="innovation-detail-title" k-content="coreDetail.Title">Marketing</h1>
-                <p k-content="coreDetail.Description">A/B testing is integrated into the OS kernel.No external scripts or performance hits</p>
+                <div k-content="coreDetail.Description">A/B testing is integrated into the OS kernel.No external scripts or performance hits</div>
             </div>
         </header>
 

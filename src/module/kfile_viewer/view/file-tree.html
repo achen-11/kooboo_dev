@@ -1,0 +1,77 @@
+<template id="kfile-viewer-folder-node">
+  <li role="none">
+    <div class="group flex items-center gap-1 pr-2 py-0.5" :style="{ paddingLeft: (8 + level * 14) + 'px' }">
+      <span v-if="isFolderChecking(folder.FullName)" class="w-[18px] flex-shrink-0 inline-flex items-center justify-center" title="检测子目录中">
+        <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-neutral-600 animate-pulse"></span>
+      </span>
+      <button v-else-if="folderCanToggle(folder.FullName)" type="button" @click.stop="toggleFolder(folder.FullName)" class="p-0.5 rounded hover:bg-slate-100 dark:hover:bg-neutral-700 cursor-pointer transition-colors" :aria-label="isFolderExpanded(folder.FullName) ? '收起文件夹' : '展开文件夹'" :aria-expanded="isFolderExpanded(folder.FullName) ? 'true' : 'false'">
+        <svg class="w-3.5 h-3.5 text-slate-400 dark:text-neutral-500 transition-transform" :class="isFolderExpanded(folder.FullName) ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+      <span v-else="" class="w-[18px] flex-shrink-0"></span>
+      <button type="button" @click="navigateTo(folder.FullName)" :class="currentFolder === folder.FullName ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300' : 'hover:bg-slate-50 dark:hover:bg-neutral-800'" class="min-w-0 flex-1 text-left px-2 py-1.5 rounded-md text-sm flex items-center gap-2 cursor-pointer transition-colors" :aria-current="currentFolder === folder.FullName ? 'true' : null" role="treeitem" :title="folder.FullName">
+        <svg class="w-4 h-4 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+        <span class="truncate">{{ folder.Name }}</span>
+      </button>
+    </div>
+    <div v-if="isFolderExpanded(folder.FullName)" role="group">
+      <div v-if="isFolderLoading(folder.FullName)" class="px-3 py-1 text-xs text-slate-400 dark:text-neutral-500" :style="{ paddingLeft: (30 + level * 14) + 'px' }">加载中…</div>
+      <ul v-else="" class="space-y-0.5">
+        <kfile-viewer-folder-node v-for="child in folderChildren(folder.FullName)" :key="child.FullName || child.Name" :folder="child" :level="level + 1"></kfile-viewer-folder-node>
+      </ul>
+    </div>
+  </li>
+</template>
+
+<template id="kfile-viewer-file-tree">
+  <aside class="flex-shrink-0 bg-white dark:bg-[#2d2d2d] border-r border-slate-200 dark:border-neutral-700 overflow-hidden flex flex-col" :class="isTreeResizing ? 'transition-none' : 'transition-[width] duration-200'" :style="{ width: treeCollapsed ? '0px' : treeWidth + 'px' }" role="navigation" aria-label="文件夹树">
+    <div class="flex items-center justify-between px-2 py-1.5 border-b border-slate-100 dark:border-neutral-700">
+      <span class="text-xs font-medium text-slate-500 dark:text-neutral-400 uppercase tracking-wider">文件夹</span>
+      <button type="button" @click="toggleTree" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-neutral-700 cursor-pointer transition-colors" :title="treeCollapsed ? '展开' : '收起'" aria-label="切换文件夹面板">
+        <svg class="w-4 h-4 text-slate-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+        </svg>
+      </button>
+    </div>
+    <div v-if="treeCollapsed" class="hidden"></div>
+    <template v-else="">
+      <div v-if="treeLoading" class="px-2 py-2 space-y-2" aria-live="polite" aria-busy="true">
+        <div class="h-8 rounded bg-slate-100 dark:bg-neutral-700 animate-pulse"></div>
+        <div class="h-8 rounded bg-slate-100 dark:bg-neutral-700 animate-pulse w-4/5"></div>
+        <div class="h-8 rounded bg-slate-100 dark:bg-neutral-700 animate-pulse w-3/5"></div>
+        <div class="h-8 rounded bg-slate-100 dark:bg-neutral-700 animate-pulse w-5/6"></div>
+        <p class="text-slate-400 dark:text-neutral-500 text-sm pt-1">加载中…</p>
+      </div>
+      <div v-else-if="listError" class="px-2 py-4 text-red-600 dark:text-red-400 text-sm" role="alert">{{ listError }}</div>
+      <ul v-else="" class="flex-1 overflow-auto py-2 space-y-0.5" role="tree" aria-label="文件夹列表">
+        <li role="none">
+          <button type="button" @click="navigateTo('')" :class="currentFolder === '' ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300' : 'hover:bg-slate-50 dark:hover:bg-neutral-800'" class="w-full text-left px-3 py-1.5 rounded-md text-sm flex items-center gap-2 cursor-pointer transition-colors" :aria-current="currentFolder === '' ? 'true' : null" role="treeitem">
+            <svg class="w-4 h-4 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+            <span class="truncate">根目录</span>
+          </button>
+        </li>
+        <kfile-viewer-folder-node v-for="f in topFolders" :key="f.FullName || f.Name" :folder="f" :level="0"></kfile-viewer-folder-node>
+      </ul>
+    </template>
+  </aside>
+</template>
+<script>
+  defineComponent('kfile-viewer-folder-node', {
+    template: '#kfile-viewer-folder-node',
+    props: {
+      folder: { type: Object, required: true },
+      level: { type: Number, default: 0 }
+    },
+    setup() {
+      return inject('store')
+    }
+  })
+
+  defineComponent('kfile-viewer-file-tree', {
+    template: '#kfile-viewer-file-tree',
+    setup() {
+      return inject('store')
+    }
+  })
+</script>

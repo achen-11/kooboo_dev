@@ -1,4 +1,4 @@
-<section class="download-page" aria-labelledby="download-page-title" data-download-page>
+<section class="download-page" aria-labelledby="download-page-title" data-download-page="">
     <div class="download-page__inner">
         <h1 id="download-page-title">Download Local Version of Kooboo</h1>
 
@@ -52,7 +52,7 @@
             </article>
         </div>
 
-        <div class="download-panel download-panel--server" id="download-panel-server" role="tabpanel" aria-labelledby="download-tab-server" data-download-panel="server" hidden>
+        <div class="download-panel download-panel--server" id="download-panel-server" role="tabpanel" aria-labelledby="download-tab-server" data-download-panel="server" hidden="">
             <article class="download-command-card">
                 <div class="download-command-card__heading">
                     <img src="/site/download/linux.svg" alt="" width="48" height="48" aria-hidden="true">
@@ -63,7 +63,7 @@
                     <p>Use wget to install or update:</p>
                     <div class="download-command">
                         <code>sudo wget -O - https://www.kooboo.com/install.sh | /bin/bash</code>
-                        <button type="button" data-copy-command aria-label="Copy wget install command"></button>
+                        <button type="button" data-copy-command="" aria-label="Copy wget install command"></button>
                     </div>
                 </div>
 
@@ -71,7 +71,7 @@
                     <p>Or use curl to install or update:</p>
                     <div class="download-command">
                         <code>sudo /bin/bash -c "$(curl -fsSL https://www.kooboo.com/install.sh)"</code>
-                        <button type="button" data-copy-command aria-label="Copy curl install command"></button>
+                        <button type="button" data-copy-command="" aria-label="Copy curl install command"></button>
                     </div>
                 </div>
 
@@ -79,7 +79,7 @@
                     <p>After installation successfully, use below commands to start or stop service:</p>
                     <div class="download-command">
                         <code>sudo systemctl status kooboo<br>sudo systemctl stop kooboo<br>sudo systemctl start kooboo</code>
-                        <button type="button" data-copy-command aria-label="Copy service commands"></button>
+                        <button type="button" data-copy-command="" aria-label="Copy service commands"></button>
                     </div>
                 </div>
             </article>
@@ -94,7 +94,7 @@
                     <p>Run:</p>
                     <div class="download-command">
                         <code>docker run -d -p 80:80 -v /var/lib/kooboo:/data --name kooboo kooboo/kooboo:latest</code>
-                        <button type="button" data-copy-command aria-label="Copy Docker command"></button>
+                        <button type="button" data-copy-command="" aria-label="Copy Docker command"></button>
                     </div>
                 </div>
             </article>

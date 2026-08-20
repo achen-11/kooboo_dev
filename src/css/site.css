@@ -1851,7 +1851,7 @@ body:not(:has(.home-hero)) .site-footer {
 }
 
 .innovation-hero__content {
-    width: min(626px, calc(100% - 48px));
+    width: min(1124px, calc(100% - 48px));
     padding-top: 58px;
 }
 
@@ -1864,7 +1864,7 @@ body:not(:has(.home-hero)) .site-footer {
 
 .innovation-hero__subtitle {
     margin-top: 24px;
-    max-width: 626px;
+    white-space: nowrap;
     font-size: 14px;
     font-weight: 400;
     line-height: 1.5;
@@ -2827,6 +2827,10 @@ body:not(:has(.home-hero)) .site-footer {
         padding-top: 62px;
     }
 
+    .innovation-hero__subtitle {
+        white-space: normal;
+    }
+
     .innovation-hero__title {
         font-size: 40px;
     }
@@ -3257,6 +3261,7 @@ body:not(:has(.home-hero)) .site-footer {
 
     .innovation-hero__subtitle {
         margin-top: 18px;
+        white-space: normal;
         font-size: 14px;
     }
 

@@ -1,5 +1,5 @@
 <script env="server">
-    var koobooCore = k.content.KoobooCore.all() || [];
+    var koobooCore = k.content.KoobooCore.all();
 </script>
 
 <section class="innovation-page bg-[var(--color-white)]" aria-labelledby="innovation-title">
@@ -19,7 +19,7 @@
             <img class="innovation-card__icon" k-attribute="src item.Icon" width="48" height="48" alt="" aria-hidden="true">
             <h2 k-content="item.Title">Native experiments</h2>
             <p k-content="item.Description">A/B testing is integrated into the OS kernel.No external scripts or performance hits</p>
-            <a class="innovation-card__link" k-attribute="href '/innovation/marketing?slug=' + item.Name">
+            <a class="innovation-card__link" href="/articles/{item.slug}">
                 <span k-label="Case study">Case study</span>
                 <span aria-hidden="true">&rarr;</span>
             </a>
