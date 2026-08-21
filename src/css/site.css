@@ -649,6 +649,10 @@ a {
     -webkit-backdrop-filter: blur(20px);
 }
 
+body:has(.price-page) .site-header:not(.is-scrolled) {
+    border-bottom-color: rgba(217, 217, 217, 0.5);
+}
+
 body:has(.home-hero) .site-header {
     position: sticky;
     top: 0;
@@ -2312,15 +2316,19 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
 
 .price-plan-card {
     min-height: 524px;
-    padding: 1px;
     overflow: hidden;
+    border: 1px solid transparent;
     border-radius: 24px;
-    background: #f6f9fa;
     cursor: default !important;
+    background:
+        linear-gradient(#f6f9fa, #f6f9fa) padding-box,
+        #f6f9fa border-box;
 }
 
-.price-plan-card:nth-child(2) {
-    background: var(--gradient-brand);
+.price-plan-card--featured {
+    background:
+        linear-gradient(#f6f9fa, #f6f9fa) padding-box,
+        var(--gradient-brand) border-box;
 }
 
 .price-plan-card__content {
@@ -2407,29 +2415,26 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
     letter-spacing: 0;
 }
 
-.price-plan-card:not(:nth-child(2)) .price-plan-card__button:hover,
-.price-plan-card:not(:nth-child(2)) .price-plan-card__button:active,
-.price-plan-card:not(:nth-child(2)) .price-plan-card__button:focus-visible {
+
+.price-plan-card:not(.price-plan-card--featured) .price-plan-card__button:hover,
+.price-plan-card:not(.price-plan-card--featured) .price-plan-card__button:active,
+.price-plan-card:not(.price-plan-card--featured) .price-plan-card__button:focus-visible {
     border-color: var(--color-border-hover);
 }
 
-.price-plan-card:nth-child(2) .price-plan-card__button {
+.price-plan-card--featured .price-plan-card__button {
     background: var(--gradient-brand);
     color: var(--color-white);
     font-weight: 500;
 }
 
-.price-plan-card:nth-child(2) .price-plan-card__button:hover,
-.price-plan-card:nth-child(2) .price-plan-card__button:active {
+.price-plan-card--featured .price-plan-card__button:hover,
+.price-plan-card--featured .price-plan-card__button:active {
     opacity: 0.8;
 }
 
-.price-plan-card:nth-child(2) .featured-arrow {
+.price-plan-card--featured .featured-arrow {
     display: none !important;
-}
-
-.price-plan-card:not(:nth-child(2)) .featured-arrow {
-    display: inline !important;
 }
 
 .price-plan-card__button:focus-visible {

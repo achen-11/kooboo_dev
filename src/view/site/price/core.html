@@ -3,6 +3,16 @@
 	<query as="faqItems" source="content" resource="Faq" action="list" export></query>
 </k-data>
 
+<script env="server" type="module">
+	import { resolveStartNowUrl } from "./utils.admin-url-from-token";
+
+	const accessToken = k.account.getAccessToken();
+	const isLoggedIn = k.account.isLogin || Boolean(accessToken);
+	const startNowUrl = resolveStartNowUrl(accessToken, isLoggedIn);
+
+	export { startNowUrl };
+</script>
+
 <script env="client">
 	document.addEventListener('DOMContentLoaded', function () {
 		var cards = document.querySelectorAll('.price-plan-card')
@@ -55,7 +65,7 @@
                         <span class="price-plan-card__period" k-label="/year">/year</span>
                     </p>
 
-                    <a class="price-plan-card__button" href="/claim">
+                    <a class="price-plan-card__button" href="https://www.kooboo.com/en/_start/login?lang=en" k-attribute="href startNowUrl">
                         <span k-label="Get started">Get started</span>
                         <span class="featured-arrow" aria-hidden="true">&rarr;</span>
                     </a>
