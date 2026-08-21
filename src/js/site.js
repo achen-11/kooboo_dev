@@ -920,7 +920,7 @@ function initPromptTypingPlaceholder(textarea) {
     const tick = () => {
         if (userEdited || textarea.value) return;
 
-        if (document.hidden || document.activeElement === textarea) {
+        if (document.hidden) {
             window.setTimeout(tick, 500);
             return;
         }
