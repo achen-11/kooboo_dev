@@ -2166,7 +2166,7 @@ declare namespace Kooboo.Sites.Scripting.Global.NET {
     sftpClient: KScript.Sftp.SftpClient;
     telnetClient: KScript.Telnet.TelnetClient;
     /** ```ts
-const result= k.utils.ping('baidu.com')
+const result= k.net.ping('baidu.com')
 ```
  */
     ping(command: string): PingResult;
@@ -5983,7 +5983,7 @@ var fileResult= request.tasks[0].fileResult; // saved file info
 declare namespace KScript.Ssh {
   interface SshClient {
     /** ```ts
-k.utils.sshClient.passwordConnect('x.x.x.x','root','password',client=>{
+k.net.sshClient.passwordConnect('x.x.x.x','root','password',client=>{
     var result = client.RunCommand('ls')
 })
 ```
@@ -5992,7 +5992,7 @@ k.utils.sshClient.passwordConnect('x.x.x.x','root','password',client=>{
     /** ```ts
 // Generate supported keys
 // ssh-keygen -m PEM -t rsa -b 4096 -f /<save_path>/<myhost>_rsa -P \"\"
-k.utils.sshClient.privateKeyConnect('x.x.x.x','root','privateKey',client=>{
+k.net.sshClient.privateKeyConnect('x.x.x.x','root','privateKey',client=>{
     var result = client.RunCommand('ls')
 })
 ```
@@ -6008,7 +6008,7 @@ k.utils.sshClient.privateKeyConnect('x.x.x.x','root','privateKey',client=>{
 declare namespace KScript.Sftp {
   interface SftpClient {
     /** ```ts
-k.utils.sftpClient.passwordConnect('x.x.x.x','root','password',client=>{
+k.net.sftpClient.passwordConnect('x.x.x.x','root','password',client=>{
     var result = client.Download('/root/1.txt')
 })
 ```
@@ -6017,7 +6017,7 @@ k.utils.sftpClient.passwordConnect('x.x.x.x','root','password',client=>{
     /** ```ts
 // Generate supported keys
 // ssh-keygen -m PEM -t rsa -b 4096 -f /<save_path>/<myhost>_rsa -P \"\"
-k.utils.sftpClient.privateKeyConnect('x.x.x.x','root','privateKey',client=>{
+k.net.sftpClient.privateKeyConnect('x.x.x.x','root','privateKey',client=>{
     var result = client.Download('/root/1.txt')
 })
 ```
@@ -6034,7 +6034,7 @@ k.utils.sftpClient.privateKeyConnect('x.x.x.x','root','privateKey',client=>{
 declare namespace KScript.Telnet {
   interface TelnetClient {
     /** ```ts
-k.utils.telnetClient.connect('x.x.x.x',25,client=>{
+k.net.telnetClient.connect('x.x.x.x',25,client=>{
     client.Read(); // 220 Kooboo Smtp Server is ready
     client.WriteLine('HELO localhost');
     client.Read(); // Hello localhost Kooboo Smtp Server
@@ -16897,10 +16897,14 @@ declare namespace Kooboo.Sites.ScriptDebugger {
   }
 
   interface DebugInfo {
+    currentLine: number;
     variables: DebugVariables;
   }
 
   interface DebugVariables {
+    local: any;
+    module: any;
+    global: any;
   }
 
 }
@@ -20885,13 +20889,19 @@ declare namespace Kooboo.KContent {
     Faq: Kooboo.KContent.Folders.Faq;
     ProductivityBanner: Kooboo.KContent.Folders.ProductivityBanner;
     Pricing: Kooboo.KContent.Folders.Pricing;
+    ClientInfoBanner: Kooboo.KContent.Folders.ClientInfoBanner;
     BusinessBanner: Kooboo.KContent.Folders.BusinessBanner;
     PublishBanner: Kooboo.KContent.Folders.PublishBanner;
+    ClientInfoDocEntry: Kooboo.KContent.Folders.ClientInfoDocEntry;
+    Favorite: Kooboo.KContent.Folders.Favorite;
     KoobooCore: Kooboo.KContent.Folders.KoobooCore;
     PerformanceBanner: Kooboo.KContent.Folders.PerformanceBanner;
     Label: Kooboo.KContent.Folders.Label;
     TemplateItem: Kooboo.KContent.Folders.TemplateItem;
     ProductionBanner: Kooboo.KContent.Folders.ProductionBanner;
+    ClientInfoUpdate: Kooboo.KContent.Folders.ClientInfoUpdate;
+    Downloads: Kooboo.KContent.Folders.Downloads;
+    Package: Kooboo.KContent.Folders.Package;
     TemplateCategory: Kooboo.KContent.Folders.TemplateCategory;
     HomeHero: Kooboo.KContent.FolderTypes.HomeHero;
     StartBuildingBanner: Kooboo.KContent.FolderTypes.StartBuildingBanner;
@@ -21061,6 +21071,39 @@ declare namespace Kooboo.KContent.Types {
     Sort: string;
   }
 
+  interface ClientInfoDocEntry {
+    /** Name TextBox */
+    Name: string;
+    /** ICO TextBox */
+    ICO: string;
+    /** URL TextBox */
+    URL: string;
+  }
+
+  interface Package {
+    /** Version TextBox */
+    Version: string;
+    /** Platform TextBox */
+    Platform: string;
+    /** Url TextBox */
+    Url: string;
+    /** ForceUpgrade Switch */
+    ForceUpgrade: string;
+  }
+
+  interface Favorite {
+    /** type RadioBox */
+    type: string;
+    /** referenceId TextBox */
+    referenceId: string;
+    /** remark TextArea */
+    remark: string;
+    /** culture RadioBox */
+    culture: string;
+    /** cover MediaFile */
+    cover: string;
+  }
+
   interface HomeHero {
     /** Title TextBox */
     Title: string;
@@ -21075,16 +21118,16 @@ declare namespace Kooboo.KContent.Types {
   interface BusinessBanner {
     /** Title TextBox */
     Title: string;
-    /** Description TextBox */
-    Description: string;
+    /** Url TextBox */
+    Url: string;
+    /** UrlName TextBox */
+    UrlName: string;
     /** Image MediaFile */
     Image: string;
     /** Image2 MediaFile */
     Image2: string;
-    /** UrlName TextBox */
-    UrlName: string;
-    /** Url TextBox */
-    Url: string;
+    /** Description TextBox */
+    Description: string;
   }
 
   interface TemplateCategory {
@@ -21103,6 +21146,19 @@ declare namespace Kooboo.KContent.Types {
     Path: string;
     /** Image MediaFile */
     Image: string;
+  }
+
+  interface ClientInfoBanner {
+    /** Title TextBox */
+    Title: string;
+    /** Summary TextBox */
+    Summary: string;
+    /** LinkText TextBox */
+    LinkText: string;
+    /** Url TextBox */
+    Url: string;
+    /** IsOnlineServer Switch */
+    IsOnlineServer: string;
   }
 
   interface Label {
@@ -21165,6 +21221,17 @@ declare namespace Kooboo.KContent.Types {
     Body: string;
   }
 
+  interface Downloads {
+    /** Title TextBox */
+    Title: string;
+    /** Summary RichEditor */
+    Summary: string;
+    /** LinkText TextBox */
+    LinkText: string;
+    /** FileUrl TextBox */
+    FileUrl: string;
+  }
+
   interface ProductivityBanner {
     /** Title TextBox */
     Title: string;
@@ -21185,6 +21252,19 @@ declare namespace Kooboo.KContent.Types {
     Path: string;
     /** Image MediaFile */
     Image: string;
+  }
+
+  interface ClientInfoUpdate {
+    /** Title TextBox */
+    Title: string;
+    /** Summary TextArea */
+    Summary: string;
+    /** Image MediaFile */
+    Image: string;
+    /** Url TextBox */
+    Url: string;
+    /** Date TextBox */
+    Date: string;
   }
 
 }
@@ -21281,6 +21361,9 @@ declare namespace Kooboo.KContent.MutationTypes {
   interface Pricing extends Kooboo.KContent.Types.Pricing, Kooboo.KContent.contentTypeBase {
   }
 
+  interface ClientInfoBanner extends Kooboo.KContent.Types.ClientInfoBanner, Kooboo.KContent.contentTypeBase {
+  }
+
   interface BusinessBanner extends Kooboo.KContent.Types.BusinessBanner, Kooboo.KContent.contentTypeBase {
   }
 
@@ -21288,6 +21371,12 @@ declare namespace Kooboo.KContent.MutationTypes {
   }
 
   interface HomeHero extends Kooboo.KContent.Types.HomeHero, Kooboo.KContent.contentTypeBase {
+  }
+
+  interface ClientInfoDocEntry extends Kooboo.KContent.Types.ClientInfoDocEntry, Kooboo.KContent.contentTypeBase {
+  }
+
+  interface Favorite extends Kooboo.KContent.Types.Favorite, Kooboo.KContent.contentTypeBase {
   }
 
   interface KoobooCore extends Kooboo.KContent.Types.KoobooCore, Kooboo.KContent.contentTypeBase {
@@ -21308,6 +21397,15 @@ declare namespace Kooboo.KContent.MutationTypes {
   interface ProductionBanner extends Kooboo.KContent.Types.ProductionBanner, Kooboo.KContent.contentTypeBase {
   }
 
+  interface ClientInfoUpdate extends Kooboo.KContent.Types.ClientInfoUpdate, Kooboo.KContent.contentTypeBase {
+  }
+
+  interface Downloads extends Kooboo.KContent.Types.Downloads, Kooboo.KContent.contentTypeBase {
+  }
+
+  interface Package extends Kooboo.KContent.Types.Package, Kooboo.KContent.contentTypeBase {
+  }
+
   interface TemplateCategory extends Kooboo.KContent.Types.TemplateCategory, Kooboo.KContent.contentTypeBase {
   }
 
@@ -21322,6 +21420,9 @@ declare namespace Kooboo.KContent.FolderTypes {
   interface Pricing extends Kooboo.KContent.Types.Pricing, Required<Kooboo.KContent.contentTypeBase> {
   }
 
+  interface ClientInfoBanner extends Kooboo.KContent.Types.ClientInfoBanner, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
   interface BusinessBanner extends Kooboo.KContent.Types.BusinessBanner, Required<Kooboo.KContent.contentTypeBase> {
   }
 
@@ -21331,6 +21432,12 @@ declare namespace Kooboo.KContent.FolderTypes {
   interface HomeHero extends Kooboo.KContent.Types.HomeHero, Required<Kooboo.KContent.contentTypeBase> {
     Labels: Kooboo.KContent.FolderTypes.Label[];
     relatedContent: Kooboo.KContent.FolderTypes.HomeHero.relatedContent;
+  }
+
+  interface ClientInfoDocEntry extends Kooboo.KContent.Types.ClientInfoDocEntry, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
+  interface Favorite extends Kooboo.KContent.Types.Favorite, Required<Kooboo.KContent.contentTypeBase> {
   }
 
   interface KoobooCore extends Kooboo.KContent.Types.KoobooCore, Required<Kooboo.KContent.contentTypeBase> {
@@ -21351,6 +21458,15 @@ declare namespace Kooboo.KContent.FolderTypes {
   }
 
   interface ProductionBanner extends Kooboo.KContent.Types.ProductionBanner, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
+  interface ClientInfoUpdate extends Kooboo.KContent.Types.ClientInfoUpdate, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
+  interface Downloads extends Kooboo.KContent.Types.Downloads, Required<Kooboo.KContent.contentTypeBase> {
+  }
+
+  interface Package extends Kooboo.KContent.Types.Package, Required<Kooboo.KContent.contentTypeBase> {
   }
 
   interface TemplateCategory extends Kooboo.KContent.Types.TemplateCategory, Required<Kooboo.KContent.contentTypeBase> {
@@ -21387,10 +21503,19 @@ declare namespace Kooboo.KContent.Folders {
   interface Pricing extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.Pricing,Kooboo.KContent.MutationTypes.Pricing> {
   }
 
+  interface ClientInfoBanner extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.ClientInfoBanner,Kooboo.KContent.MutationTypes.ClientInfoBanner> {
+  }
+
   interface BusinessBanner extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.BusinessBanner,Kooboo.KContent.MutationTypes.BusinessBanner> {
   }
 
   interface PublishBanner extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.PublishBanner,Kooboo.KContent.MutationTypes.PublishBanner> {
+  }
+
+  interface ClientInfoDocEntry extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.ClientInfoDocEntry,Kooboo.KContent.MutationTypes.ClientInfoDocEntry> {
+  }
+
+  interface Favorite extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.Favorite,Kooboo.KContent.MutationTypes.Favorite> {
   }
 
   interface KoobooCore extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.KoobooCore,Kooboo.KContent.MutationTypes.KoobooCore> {
@@ -21406,6 +21531,15 @@ declare namespace Kooboo.KContent.Folders {
   }
 
   interface ProductionBanner extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.ProductionBanner,Kooboo.KContent.MutationTypes.ProductionBanner> {
+  }
+
+  interface ClientInfoUpdate extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.ClientInfoUpdate,Kooboo.KContent.MutationTypes.ClientInfoUpdate> {
+  }
+
+  interface Downloads extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.Downloads,Kooboo.KContent.MutationTypes.Downloads> {
+  }
+
+  interface Package extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.Package,Kooboo.KContent.MutationTypes.Package> {
   }
 
   interface TemplateCategory extends Kooboo.KContent.folderBase<Kooboo.KContent.FolderTypes.TemplateCategory,Kooboo.KContent.MutationTypes.TemplateCategory> {

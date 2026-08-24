@@ -40,19 +40,14 @@ export function resolveAdminBaseFromToken(token: string) {
   const origin = serverOriginFromRedirect(domain);
   return origin ? `${origin}/_Admin/` : "";
 }
-export function resolveStartNowUrl(
-  token: string,
-  isLoggedIn: boolean,
-  loggedOutUrl = "https://www.kooboo.com/en/_start/login?lang=en",
-  lang = "en"
-) {
-  if (!isLoggedIn) {
-    return loggedOutUrl;
-  }
-
+export function resolveStartNowUrl(token: string, isLoggedIn: boolean, returnUrl = "/", lang = "en") {
   const resolvedAdminBaseUrl = resolveAdminBaseFromToken(token) || "/_Admin";
   const adminBaseUrl = trimTrailingSlash(resolvedAdminBaseUrl) || "/_Admin";
-  return `${adminBaseUrl}/?lang=${encodeURIComponent(lang)}`;
+  const langParam = `lang=${encodeURIComponent(lang)}`;
+  if (isLoggedIn) {
+    return `${adminBaseUrl}/?${langParam}`;
+  }
+  return `${adminBaseUrl}/login?returnurl=${encodeURIComponent(returnUrl)}&${langParam}`;
 }
 export function userDisplayFromToken(token: string) {
   const payload = parseJwtPayloadResult(token);

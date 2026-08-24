@@ -35,7 +35,7 @@
     });
 </script>
 
-<section class="template-gallery" aria-labelledby="template-gallery-title" data-template-gallery k-attribute="data-template-default-filter templateDefaultFilter">
+<section class="template-gallery" aria-labelledby="template-gallery-title" data-template-gallery="" k-attribute="data-template-default-filter templateDefaultFilter">
     <div class="template-gallery__inner">
         <div class="template-gallery__filters" role="group" aria-label="Template categories">
             <button class="template-gallery__filter" type="button" aria-pressed="false" k-for="category in templateCategories" repeat-self="true" k-attribute="data-template-filter category.FilterKey" k-content="category.Name">E-commerce</button>
@@ -49,7 +49,7 @@
         </div>
 
         <div class="template-gallery__grid">
-            <article class="template-card" data-template-card k-for="item in templateItems" repeat-self="true" k-attribute="data-template-categories item.FilterKeys">
+            <article class="template-card" data-template-card="" k-for="item in templateItems" repeat-self="true" k-attribute="data-template-categories item.FilterKeys">
                 <div class="template-card__media">
                     <img src="/site/templates/template-night-voyage.webp" alt="Night Voyage template preview" width="640" height="360" loading="eager" fetchpriority="high" decoding="async" k-attribute="src item.OptimizedPreviewImage; alt item.AltText">
                     <a class="template-card__action" href="/_Admin/templates?lang=en" target="_blank" data-template-admin-path="/templates?lang=en" k-attribute="href item.AdminHref; data-template-admin-path item.AdminPath" k-label="Use this template">Use this template</a>
