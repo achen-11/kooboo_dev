@@ -104,9 +104,8 @@
 
 .template-card__media {
     position: relative;
-    aspect-ratio: 320 / 200;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
-    border: 1px solid #e5e7eb;
     border-radius: 8px;
     background: #f6f9fa;
 }
@@ -124,7 +123,7 @@
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     transition: transform 260ms ease;
 }
 
@@ -2591,7 +2590,6 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
 
 .home-publish-banner {
     padding-top: clamp(72px, 8vh, 112px);
-    padding-bottom: 96px;
 }
 
 @keyframes home-aurora-slide-up {

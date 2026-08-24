@@ -24,8 +24,12 @@ function initHomeBusinessAccordion() {
             .filter(Boolean);
         const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
         const carouselState = new Map();
+        const rotationInterval = Number(root.dataset.businessAccordionInterval) || 6000;
         let isRootVisible = !("IntersectionObserver" in window);
         let isPageVisible = !document.hidden;
+        let isPointerInside = false;
+        let isFocusWithin = false;
+        let rotationTimer = null;
 
         const createCarouselState = (carousel) => {
             const slides = Array.from(carousel.querySelectorAll("[data-business-slide]"));
@@ -155,7 +159,7 @@ function initHomeBusinessAccordion() {
             const observer = new IntersectionObserver(
                 ([entry]) => {
                     isRootVisible = entry.isIntersecting;
-                    updateCarouselPlayback();
+                    updatePlayback();
                 },
                 { threshold: 0.2 }
             );
@@ -165,7 +169,7 @@ function initHomeBusinessAccordion() {
 
         document.addEventListener("visibilitychange", () => {
             isPageVisible = !document.hidden;
-            updateCarouselPlayback();
+            updatePlayback();
         });
 
         const setActive = (key) => {
@@ -205,12 +209,69 @@ function initHomeBusinessAccordion() {
             });
         };
 
+        const stopRotation = () => {
+            if (!rotationTimer) return;
+
+            window.clearInterval(rotationTimer);
+            rotationTimer = null;
+        };
+
+        const startRotation = () => {
+            stopRotation();
+
+            if (
+                reducedMotion ||
+                items.length < 2 ||
+                !isRootVisible ||
+                !isPageVisible ||
+                isPointerInside ||
+                isFocusWithin
+            ) return;
+
+            rotationTimer = window.setInterval(() => {
+                const activeIndex = Math.max(
+                    0,
+                    items.findIndex((item) => item.classList.contains("is-active"))
+                );
+                const nextItem = items[(activeIndex + 1) % items.length];
+
+                if (nextItem) {
+                    setActive(nextItem.dataset.businessItem);
+                }
+            }, rotationInterval);
+        };
+
+        function updatePlayback() {
+            updateCarouselPlayback();
+            startRotation();
+        }
+
         items.forEach((item) => {
             const trigger = item.querySelector(".home-business__trigger");
 
             trigger?.addEventListener("click", () => {
                 setActive(item.dataset.businessItem);
+                startRotation();
             });
+        });
+
+        root.addEventListener("mouseenter", () => {
+            isPointerInside = true;
+            stopRotation();
+        });
+        root.addEventListener("mouseleave", () => {
+            isPointerInside = false;
+            startRotation();
+        });
+        root.addEventListener("focusin", () => {
+            isFocusWithin = true;
+            stopRotation();
+        });
+        root.addEventListener("focusout", (event) => {
+            if (!root.contains(event.relatedTarget)) {
+                isFocusWithin = false;
+                startRotation();
+            }
         });
 
         root.addEventListener("keydown", (event) => {
@@ -231,16 +292,19 @@ function initHomeBusinessAccordion() {
             triggers[nextIndex]?.focus();
         });
 
-        const activeItem = items.find((item) => item.classList.contains("is-active")) || items[0];
+        const activeItem = items[0];
 
         if (activeItem) {
             setActive(activeItem.dataset.businessItem);
         }
+
+        updatePlayback();
     });
 }
 
 function initSiteScrollReveal() {
     if (!document.querySelector("main")) return;
+    if (document.querySelector(".template-gallery, .innovation-page, .price-page, .download-page")) return;
 
     const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     const revealSpecs = [
@@ -364,20 +428,15 @@ if (document.readyState === "loading") {
 
 const ADMIN_BASE = "/_Admin/";
 const AI_PROVIDERS_API = "/api/ai-models";
-const AVAILABLE_DOMAINS_API = "/_api/v2/Domain/Available";
-const CREATE_SITE_API = "/_api/v2/Site/Create";
 const STARTER_PROMPT_QUERY = "prompt";
 const STARTER_PROVIDER_QUERY = "provider";
 const STARTER_MODEL_QUERY = "model";
-const STARTER_SITE_CREATED_QUERY = "starterSiteCreated";
 const MODEL_PREFERENCE_KEY = "kooboo_ai_chat_model_preference";
 const MODEL_VALUE_SEP = "|";
 
 const PROMPT_GENERATOR_STRINGS = {
     noModelsAvailable: "No models available",
     loadModelsFailed: "Failed to load models",
-    creatingSite: "Creating...",
-    createSiteFailed: "Failed to create the site. Please try again.",
     placeholderPrefix: "What kind of website do you need? Try this: ",
     placeholderPrompts: [
         "help me generate a coffee website with online ordering...",
@@ -404,22 +463,6 @@ function getAdminBase() {
     return ADMIN_BASE;
 }
 
-function getKoobooBaseUrl() {
-    const adminBase = trimTrailingSlash(getAdminBase());
-    return adminBase.replace(/\/_Admin$/i, "") || "/";
-}
-
-function buildKoobooApiUrl(path, params) {
-    const baseUrl = new URL(`${trimTrailingSlash(getKoobooBaseUrl())}/`, window.location.origin);
-    const url = new URL(String(path).replace(/^\/+/, ""), baseUrl);
-    Object.entries(params || {}).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-            url.searchParams.set(key, String(value));
-        }
-    });
-    return url.href;
-}
-
 function getCookieValue(name) {
     const prefix = `${name}=`;
     return (
@@ -429,114 +472,6 @@ function getCookieValue(name) {
             .find((part) => part.startsWith(prefix))
             ?.slice(prefix.length) ?? ""
     );
-}
-
-function isKoobooLoggedIn() {
-    return Boolean(getCookieValue("jwt_token"));
-}
-
-function requestKoobooApi(path, { method = "GET", params } = {}) {
-    const accessToken = getCookieValue("jwt_token");
-    if (!accessToken) throw new Error("Kooboo access token is missing");
-
-    const url = buildKoobooApiUrl(path, params);
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open(method, url, true);
-        xhr.setRequestHeader("Accept", "application/json");
-        xhr.setRequestHeader("Authorization", `Bearer ${accessToken}`);
-
-        xhr.onload = () => {
-            const responseText = xhr.responseText;
-            let data = null;
-            if (responseText) {
-                try {
-                    data = JSON.parse(responseText);
-                } catch {
-                    data = responseText;
-                }
-            }
-
-            if (xhr.status >= 200 && xhr.status < 300) {
-                resolve(data);
-                return;
-            }
-
-            const message = Array.isArray(data)
-                ? data.filter(Boolean).join("; ")
-                : typeof data === "string"
-                  ? data
-                  : `Kooboo API request failed: ${xhr.status}`;
-            const error = new Error(
-                message || `Kooboo API request failed: ${xhr.status}`
-            );
-            error.status = xhr.status;
-            reject(error);
-        };
-
-        xhr.onerror = () => {
-            const error = new Error("Kooboo API network request failed");
-            error.status = xhr.status;
-            reject(error);
-        };
-
-        xhr.send(null);
-    });
-}
-
-function formatSiteTimestamp(date = new Date()) {
-    const pad = (value) => String(value).padStart(2, "0");
-    return [
-        pad(date.getFullYear() % 100),
-        pad(date.getMonth() + 1),
-        pad(date.getDate()),
-        pad(date.getHours()),
-        pad(date.getMinutes()),
-        pad(date.getSeconds()),
-    ].join("");
-}
-
-function buildRandomSiteName() {
-    const stamp = formatSiteTimestamp();
-    const suffix = Math.random().toString(36).slice(2, 6);
-    return `ai_site_${stamp}_${suffix}`;
-}
-
-function buildStarterSiteParams(root) {
-    const rootDomain = root?.domainName ?? root?.DomainName;
-    const sudDomainUseDash =
-        root?.sudDomainUseDash ?? root?.SudDomainUseDash ?? false;
-    if (!rootDomain) throw new Error("No available domain");
-
-    const siteName = buildRandomSiteName();
-    return {
-        subDomain: siteName,
-        rootDomain,
-        siteName,
-        sudDomainUseDash,
-        siteType: "p",
-    };
-}
-
-async function createStarterSite() {
-    const domains = await requestKoobooApi(AVAILABLE_DOMAINS_API);
-    const root = Array.isArray(domains) ? domains[0] : null;
-    const siteParams = buildStarterSiteParams(root);
-    const site = await requestKoobooApi(CREATE_SITE_API, {
-        method: "POST",
-        params: siteParams,
-    });
-    const siteId =
-        (typeof site === "string" ? site : null) ??
-        site?.id ??
-        site?.Id ??
-        site?.ID ??
-        site?.siteId ??
-        site?.SiteId ??
-        site?.model?.id ??
-        site?.Model?.Id;
-    if (!siteId) throw new Error("Site creation returned no site id");
-    return siteId;
 }
 
 function readPromptFromGenerator(root) {
@@ -658,13 +593,11 @@ function populateModelSelect(select, providers, preferred) {
     return Boolean(selectedValue);
 }
 
-function buildAiChatUrl(siteId, handoff, accessToken) {
+function buildAiChatStartUrl(handoff, accessToken) {
     const url = new URL(
-        `${trimTrailingSlash(getAdminBase())}/ai-chat/overview`,
+        `${trimTrailingSlash(getAdminBase())}/ai-chat/start`,
         window.location.origin
     );
-    url.searchParams.set("SiteId", siteId);
-    url.searchParams.set(STARTER_SITE_CREATED_QUERY, "1");
     if (handoff.prompt) url.searchParams.set(STARTER_PROMPT_QUERY, handoff.prompt);
     if (handoff.provider) {
         url.searchParams.set(STARTER_PROVIDER_QUERY, handoff.provider);
@@ -672,43 +605,10 @@ function buildAiChatUrl(siteId, handoff, accessToken) {
     if (handoff.model) url.searchParams.set(STARTER_MODEL_QUERY, handoff.model);
     if (accessToken) url.searchParams.set("access_token", accessToken);
     url.searchParams.set("lang", "en");
-    return url.href;
+    return url;
 }
 
-function buildLoginUrl() {
-    const params = new URLSearchParams();
-    params.set("returnurl", "/");
-    params.set("lang", "en");
-    return `${getAdminBase()}/login?${params.toString()}`;
-}
-
-function setPromptGeneratorsBusy(busy) {
-    document.querySelectorAll(".prompt-generator").forEach((root) => {
-        const button = root.querySelector(".prompt-generator__btn");
-        const select = root.querySelector(".prompt-generator__model-select");
-        if (!button) return;
-
-        if (!button.dataset.idleLabel) {
-            button.dataset.idleLabel = button.textContent?.trim() || "Generate now";
-        }
-        button.disabled = busy || !select?.value;
-        button.setAttribute("aria-busy", busy ? "true" : "false");
-        button.textContent = busy
-            ? promptGeneratorText("creatingSite")
-            : button.dataset.idleLabel;
-    });
-}
-
-function showPromptGeneratorError(root, message = "") {
-    const status = root.querySelector(".prompt-generator__status");
-    if (!status) return;
-    status.textContent = message;
-    status.hidden = !message;
-}
-
-let sharedStarterSitePromise = null;
-
-async function navigateToGenerate(root) {
+function navigateToGenerate(root) {
     const prompt = readPromptFromGenerator(root);
     const modelSelection = readModelFromGenerator(root);
 
@@ -730,31 +630,9 @@ async function navigateToGenerate(root) {
 
     saveModelPreference(handoff.provider, handoff.model);
 
-    if (!isKoobooLoggedIn()) {
-        window.location.href = buildLoginUrl();
-        return;
-    }
-
-    if (sharedStarterSitePromise) return sharedStarterSitePromise;
-
-    showPromptGeneratorError(root);
-    setPromptGeneratorsBusy(true);
-    sharedStarterSitePromise = createStarterSite();
-
-    try {
-        const siteId = await sharedStarterSitePromise;
-        const accessToken = getCookieValue("jwt_token");
-        window.location.href = buildAiChatUrl(siteId, handoff, accessToken);
-    } catch (error) {
-        console.error("[prompt-generator] create site failed:", error);
-        showPromptGeneratorError(
-            root,
-            promptGeneratorText("createSiteFailed")
-        );
-        setPromptGeneratorsBusy(false);
-    } finally {
-        sharedStarterSitePromise = null;
-    }
+    const accessToken = getCookieValue("jwt_token");
+    const startUrl = buildAiChatStartUrl(handoff, accessToken);
+    window.location.href = startUrl.href;
 }
 
 let sharedAiProvidersPromise = null;
@@ -799,7 +677,7 @@ async function initPromptGenerator(root) {
         button.disabled = true;
     }
 
-    button.addEventListener("click", () => void navigateToGenerate(root));
+    button.addEventListener("click", () => navigateToGenerate(root));
 }
 
 function initPromptGenerators() {
