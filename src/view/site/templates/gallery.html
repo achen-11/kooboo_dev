@@ -1,38 +1,34 @@
-<k-data>
-    <query as="templateCategories" source="content" resource="TemplateCategory" action="list" order="Sort" export></query>
-    <query as="templateItems" source="content" resource="TemplateItem" action="list" order="Sort" export></query>
-</k-data>
-
 <script env="server">
 
-    var categoryKeysByItemId = {};
-
-    function addTemplateCategory(itemId, categoryKey) {
-        if (!categoryKeysByItemId[itemId]) categoryKeysByItemId[itemId] = [];
-        categoryKeysByItemId[itemId].push(categoryKey);
-    }
+    var templateCategories = k.content.TemplateCategory.all({ orderBy: "Sort" });
+    var templateItems = [];
+    var templateItemsById = {};
 
     templateCategories.forEach(function (category) {
         category.FilterKey = category.id;
         category.Templates.forEach(function (item) {
-            addTemplateCategory(item.id, category.FilterKey);
+            var templateItem = templateItemsById[item.id];
+            if (!templateItem) {
+                var templateId = String(item.TemplateId || "").trim();
+                var previewImage = String(item.PreviewImage || "");
+                item.OptimizedPreviewImage = previewImage.toLowerCase().lastIndexOf(".png") === previewImage.length - 4
+                    ? previewImage.slice(0, -4) + ".webp"
+                    : previewImage;
+                item.AdminPath = templateId
+                    ? "/template/detail?templateId=" + encodeURIComponent(templateId) + "&lang=en"
+                    : "/templates?lang=en";
+                item.AdminHref = "/_Admin" + item.AdminPath;
+                templateItemsById[item.id] = item;
+                templateItems.push(item);
+                templateItem = item;
+            }
+            templateItem.FilterKeys = templateItem.FilterKeys
+                ? templateItem.FilterKeys + " " + category.FilterKey
+                : category.FilterKey;
         });
     });
 
     var templateDefaultFilter = templateCategories[0].FilterKey;
-
-    templateItems.forEach(function (item) {
-        var templateId = String(item.TemplateId || "").trim();
-        var previewImage = String(item.PreviewImage || "");
-        item.FilterKeys = (categoryKeysByItemId[item.id] || []).join(" ");
-        item.OptimizedPreviewImage = previewImage.toLowerCase().lastIndexOf(".png") === previewImage.length - 4
-            ? previewImage.slice(0, -4) + ".webp"
-            : previewImage;
-        item.AdminPath = templateId
-            ? "/template/detail?templateId=" + encodeURIComponent(templateId) + "&lang=en"
-            : "/templates?lang=en";
-        item.AdminHref = "/_Admin" + item.AdminPath;
-    });
 </script>
 
 <section class="template-gallery" aria-labelledby="template-gallery-title" data-template-gallery="" k-attribute="data-template-default-filter templateDefaultFilter">
@@ -43,8 +39,8 @@
 
         <div class="template-gallery__heading">
             <div>
-                <h1 id="template-gallery-title">Choose a starting point and quickly create a website</h1>
-                <p>From corporate websites, e-commerce platforms, choose a template to create your website with one click</p>
+                <h1 id="template-gallery-title">Start with a template and build faster</h1>
+                <p>Choose from corporate websites, e-commerce stores, applications, and tools. Launch your website with one click.</p>
             </div>
         </div>
 
