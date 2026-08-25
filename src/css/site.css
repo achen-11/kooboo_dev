@@ -521,15 +521,6 @@ body:has(.download-page) {
         grid-template-columns: 1fr;
     }
 
-    .template-card__action {
-        opacity: 1;
-        transform: translate(-50%, -50%);
-    }
-
-    .template-card__media::after {
-        opacity: 0.48;
-    }
-
     .download-page {
         min-height: calc(100svh - 64px);
         padding: 40px 0 72px;
