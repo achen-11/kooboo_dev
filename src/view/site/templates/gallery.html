@@ -1,53 +1,73 @@
-<script env="server">
+<script env="server" type="module">
+    import { categorySlug, categoryUrl, formatTemplateItem } from "./utils.template-gallery";
 
-    var templateCategories = k.content.TemplateCategory.all({ orderBy: "Sort" });
-    var templateItems = [];
-    var templateItemsById = {};
-
-    templateCategories.forEach(function (category) {
-        category.FilterKey = category.id;
-        category.Templates.forEach(function (item) {
-            var templateItem = templateItemsById[item.id];
-            if (!templateItem) {
-                var templateId = String(item.TemplateId || "").trim();
-                var previewImage = String(item.PreviewImage || "");
-                item.OptimizedPreviewImage = previewImage.toLowerCase().lastIndexOf(".png") === previewImage.length - 4
-                    ? previewImage.slice(0, -4) + ".webp"
-                    : previewImage;
-                item.AdminPath = templateId
-                    ? "/template/detail?templateId=" + encodeURIComponent(templateId) + "&lang=en"
-                    : "/templates?lang=en";
-                item.AdminHref = "/_Admin" + item.AdminPath;
-                templateItemsById[item.id] = item;
-                templateItems.push(item);
-                templateItem = item;
-            }
-            templateItem.FilterKeys = templateItem.FilterKeys
-                ? templateItem.FilterKeys + " " + category.FilterKey
-                : category.FilterKey;
-        });
+    const templateCategories = k.content.TemplateCategory.all({ orderBy: "Sort" });
+    templateCategories.forEach((category) => {
+        category.Slug = categorySlug(category.Name);
+        category.FilterUrl = categoryUrl(category.Name);
     });
 
-    var templateDefaultFilter = templateCategories[0].FilterKey;
+    const routeCategory = String(k.request.get("category") || "")
+        .trim()
+        .toLowerCase() || "e-commerce"
+
+    let activeCategory = templateCategories.find((category) => category.Name.toLowerCase() === routeCategory);
+
+    if (!activeCategory && templateCategories.length) {
+        k.response.redirect(categoryUrl(templateCategories[0].Name));
+    }
+
+    let templateItems = [];
+
+    if (activeCategory) {
+        templateCategories.forEach((category) => {
+            category.IsActive = category.id === activeCategory.id;
+            category.FilterClass = category.IsActive
+                ? "template-gallery__filter is-active"
+                : "template-gallery__filter";
+            category.AriaCurrent = category.IsActive ? "page" : "false";
+        });
+
+        activeCategory.PageHeading = `${activeCategory.Name} templates`;
+
+        const categoryWithItems = k.content.TemplateCategory.get(activeCategory.id);
+        if (categoryWithItems?.Templates?.length) {
+            templateItems = categoryWithItems.Templates.map((item) =>
+                formatTemplateItem(item, activeCategory.id)
+            );
+        }
+
+        k.page.setTitle(`${activeCategory.Name} Templates | Kooboo Marketplace`);
+        k.page.setNameMeta(
+            "description",
+            `Browse ${activeCategory.Name} website templates on Kooboo. Launch your site with one click.`
+        );
+    }
+
+    export {
+        templateCategories,
+        templateItems,
+        activeCategory,
+    };
 </script>
 
-<section class="template-gallery" aria-labelledby="template-gallery-title" data-template-gallery="" k-attribute="data-template-default-filter templateDefaultFilter">
+<section class="template-gallery" aria-labelledby="template-gallery-title">
     <div class="template-gallery__inner">
-        <div class="template-gallery__filters" role="group" aria-label="Template categories">
-            <button class="template-gallery__filter" type="button" aria-pressed="false" k-for="category in templateCategories" repeat-self="true" k-attribute="data-template-filter category.FilterKey" k-content="category.Name">E-commerce</button>
-        </div>
+        <nav class="template-gallery__filters" aria-label="Template categories">
+            <a class="template-gallery__filter" k-for="category in templateCategories" repeat-self="true" k-attribute="class category.FilterClass; href category.FilterUrl; aria-current category.AriaCurrent" k-content="category.Name">E-commerce</a>
+        </nav>
 
         <div class="template-gallery__heading">
             <div>
-                <h1 id="template-gallery-title">Start with a template and build faster</h1>
+                <h1 id="template-gallery-title" k-content="activeCategory.PageHeading">Start with a template and build faster</h1>
                 <p>Choose from corporate websites, e-commerce stores, applications, and tools. Launch your website with one click.</p>
             </div>
         </div>
 
         <div class="template-gallery__grid">
-            <article class="template-card" data-template-card="" k-for="item in templateItems" repeat-self="true" k-attribute="data-template-categories item.FilterKeys">
+            <article class="template-card" k-for="item in templateItems" repeat-self="true">
                 <div class="template-card__media">
-                    <img src="/site/templates/template-night-voyage.webp" alt="Night Voyage template preview" width="640" height="360" loading="eager" fetchpriority="high" decoding="async" k-attribute="src item.OptimizedPreviewImage; alt item.AltText">
+                    <img src="/site/templates/template-night-voyage.png?format=webp" alt="Night Voyage template preview" width="640" height="360" loading="lazy" decoding="async" k-attribute="src item.PreviewImage; alt item.AltText">
                     <a class="template-card__action" href="/_Admin/templates?lang=en" target="_blank" data-template-admin-path="/templates?lang=en" k-attribute="href item.AdminHref; data-template-admin-path item.AdminPath" k-label="Use this template">Use this template</a>
                 </div>
                 <h2 k-content="item.Name">Night Voyage</h2>

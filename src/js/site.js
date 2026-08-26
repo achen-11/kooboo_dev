@@ -890,30 +890,6 @@ function initPromptGeneratorFeatures() {
 }
 
 function initTemplateGallery() {
-    document.querySelectorAll("[data-template-gallery]").forEach((gallery) => {
-        const filters = Array.from(gallery.querySelectorAll("[data-template-filter]"));
-        const cards = Array.from(gallery.querySelectorAll("[data-template-card]"));
-        const setFilter = (filter) => {
-            filters.forEach((button) => {
-                const isActive = button.dataset.templateFilter === filter;
-                button.classList.toggle("is-active", isActive);
-                button.setAttribute("aria-pressed", String(isActive));
-            });
-
-            cards.forEach((card) => {
-                const categories = (card.dataset.templateCategories || "").split(/\s+/);
-                card.hidden = filter !== "all" && !categories.includes(filter);
-            });
-        };
-
-        filters.forEach((button) => {
-            button.addEventListener("click", () => setFilter(button.dataset.templateFilter));
-        });
-
-        const defaultFilter = gallery.dataset.templateDefaultFilter || filters[0]?.dataset.templateFilter;
-        if (defaultFilter) setFilter(defaultFilter);
-    });
-
     document.querySelectorAll("[data-template-admin-path]").forEach((link) => {
         const path = link.dataset.templateAdminPath;
         if (!path) return;

@@ -58,6 +58,10 @@
     line-height: 20px;
     white-space: nowrap;
     cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .template-gallery__filter.is-active {

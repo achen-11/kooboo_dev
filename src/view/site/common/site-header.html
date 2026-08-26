@@ -13,7 +13,7 @@
         resolveAdminBaseFromToken(accessToken) || "/_Admin";
     const adminBaseUrl = resolvedAdminBaseUrl.replace(/\/+$/, "") || "/_Admin";
     const langParam = "lang=en";
-    const loginUrl = resolveStartNowUrl(accessToken, false);
+    const loginUrl = "/_Admin/login?lang=en"
     const startNowUrl = resolveStartNowUrl(accessToken, isLoggedIn);
     let consoleUrl = adminBaseUrl + "/?" + langParam;
     let logoutUrl =
@@ -67,7 +67,7 @@
                 <a class="site-header__mobile-link" href="/pricing" k-label="menu.pricing">Price</a>
                 <a class="site-header__mobile-link" href="/download">Download</a>
                 <a class="site-header__mobile-link" href="https://docs.kooboo.com" target="_blank" rel="noopener" k-label="menu.docs">Doc</a>
-                <a k-if="showLogin" class="site-header__mobile-link" href="/_Admin/start?returnurl=/&amp;lang=en" k-attribute="href loginUrl" k-label="SignIn">Login</a>
+                <!-- <a k-if="showLogin" class="site-header__mobile-link" href="/_Admin/start?returnurl=/&amp;lang=en" k-attribute="href loginUrl" k-label="SignIn">Login</a> -->
                 <div k-if="isLoggedIn" class="site-header__mobile-user">
                     <div class="site-header__mobile-user-meta">
                         <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
@@ -96,7 +96,7 @@
         </nav>
 
         <div class="site-header__actions">
-            <a k-if="showLogin" class="site-header__secondary-action" href="/_Admin/start?returnurl=/&amp;lang=en" k-attribute="href loginUrl" k-label="SignIn">Login</a>
+            <!-- <a k-if="showLogin" class="site-header__secondary-action" href="/_Admin/login?lang=en" k-attribute="href loginUrl" k-label="SignIn">Login</a> -->
             <details k-if="isLoggedIn" class="site-header__user-menu">
                 <summary class="site-header__user-trigger" aria-label="Account menu">
                     <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
