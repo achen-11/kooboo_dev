@@ -12,16 +12,15 @@
     const resolvedAdminBaseUrl =
         resolveAdminBaseFromToken(accessToken) || "/_Admin";
     const adminBaseUrl = resolvedAdminBaseUrl.replace(/\/+$/, "") || "/_Admin";
-    let loginUrl =
-        adminBaseUrl + "/login?returnurl=" + encodeURIComponent(loginReturnUrl);
-    let consoleUrl = adminBaseUrl + "/";
-    let logoutUrl =
-        "/_api/v2/user/logout?returnUrl=" + encodeURIComponent(loginReturnUrl);
     const langParam = "lang=en";
-    loginUrl += "&" + langParam;
-    consoleUrl += "?" + langParam;
-    logoutUrl += "&" + langParam;
+    const loginUrl = resolveStartNowUrl(accessToken, false);
     const startNowUrl = resolveStartNowUrl(accessToken, isLoggedIn);
+    let consoleUrl = adminBaseUrl + "/?" + langParam;
+    let logoutUrl =
+        "/_api/v2/user/logout?returnUrl=" +
+        encodeURIComponent(loginReturnUrl) +
+        "&" +
+        langParam;
 
     let userDisplayName = "";
     let userInitials = "";
@@ -68,7 +67,7 @@
                 <a class="site-header__mobile-link" href="/pricing" k-label="menu.pricing">Price</a>
                 <a class="site-header__mobile-link" href="/download">Download</a>
                 <a class="site-header__mobile-link" href="https://docs.kooboo.com" target="_blank" rel="noopener" k-label="menu.docs">Doc</a>
-                <a k-if="showLogin" class="site-header__mobile-link" href="/_Admin/login?returnurl=/&amp;lang=en" k-attribute="href loginUrl" k-label="SignIn">Login</a>
+                <a k-if="showLogin" class="site-header__mobile-link" href="/_Admin/start?returnurl=/&amp;lang=en" k-attribute="href loginUrl" k-label="SignIn">Login</a>
                 <div k-if="isLoggedIn" class="site-header__mobile-user">
                     <div class="site-header__mobile-user-meta">
                         <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
@@ -79,7 +78,7 @@
                         <button class="site-header__mobile-link site-header__mobile-link--muted site-header__mobile-logout-button" type="submit" k-label="SignOut">Logout</button>
                     </form>
                 </div>
-                <a class="site-header__mobile-claim" href="https://www.kooboo.com/en/_start/login?lang=en" k-attribute="href startNowUrl" k-label="Start now">Start now</a>
+                <a class="site-header__mobile-claim" href="/_Admin/start?returnurl=/&amp;lang=en" k-attribute="href startNowUrl" k-label="Start now">Start now</a>
             </nav>
         </details>
 
@@ -97,7 +96,7 @@
         </nav>
 
         <div class="site-header__actions">
-            <a k-if="showLogin" class="site-header__secondary-action" href="/_Admin/login?returnurl=/&amp;lang=en" k-attribute="href loginUrl" k-label="SignIn">Login</a>
+            <a k-if="showLogin" class="site-header__secondary-action" href="/_Admin/start?returnurl=/&amp;lang=en" k-attribute="href loginUrl" k-label="SignIn">Login</a>
             <details k-if="isLoggedIn" class="site-header__user-menu">
                 <summary class="site-header__user-trigger" aria-label="Account menu">
                     <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
@@ -111,7 +110,7 @@
                     </form>
                 </div>
             </details>
-            <a class="site-header__primary-action" href="https://www.kooboo.com/en/_start/login?lang=en" k-attribute="href startNowUrl">
+            <a class="site-header__primary-action" href="/_Admin/start?returnurl=/&amp;lang=en" k-attribute="href startNowUrl">
                 <span k-label="Start now">Start now</span>
                 <span class="site-header__primary-icon" aria-hidden="true"></span>
             </a>
