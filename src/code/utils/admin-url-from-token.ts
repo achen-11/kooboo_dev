@@ -48,9 +48,9 @@ export function resolveStartNowUrl(token: string, isLoggedIn: boolean, returnUrl
     return `${adminBaseUrl}/?${langParam}`;
   }
   if (returnUrl) {
-    return `${adminBaseUrl}/start?returnurl=${encodeURIComponent(returnUrl)}&${langParam}`;
+    return `${adminBaseUrl}/login?returnurl=${encodeURIComponent(returnUrl)}&${langParam}`;
   }
-  return `${adminBaseUrl}/start?${langParam}`;
+  return `${adminBaseUrl}/login?${langParam}`;
 }
 export function userDisplayFromToken(token: string) {
   const payload = parseJwtPayloadResult(token);
