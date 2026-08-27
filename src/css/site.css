@@ -1724,7 +1724,7 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
 
 .home-production-card__body {
     width: min(100%, 261px);
-    margin-top: 32px;
+    margin-top: 0;
     text-align: center;
 }
 
@@ -1769,8 +1769,8 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
     left: 6.95%;
     z-index: 1;
     margin: 0;
-    color: var(--color-title);
-    font-size: 32px;
+    color: #374151;
+    font-size: 24px;
     font-weight: 600;
     line-height: 1.22;
     letter-spacing: 0;
@@ -1783,7 +1783,7 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
     z-index: 1;
     width: min(370px, calc(100% - 48px));
     display: grid;
-    gap: 56px;
+    gap: 32px;
 }
 
 .home-performance-feature {
@@ -1800,7 +1800,7 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
 
 .home-performance-feature h3 {
     margin: 0;
-    color: var(--color-title);
+    color: #374151;
     font-size: 24px;
     font-weight: 600;
     line-height: 1.4;
@@ -1810,7 +1810,7 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
 .home-performance-feature p {
     margin: 8px 0 0;
     color: var(--color-body);
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 400;
     line-height: 1.4;
     letter-spacing: 0;
@@ -1938,8 +1938,13 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
 }
 
 .innovation-hero__subtitle {
+    max-width: 384px;
     margin-top: 24px;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+    word-spacing: 1px;
     font-size: 14px;
     font-weight: 400;
     line-height: 1.5;
@@ -2881,7 +2886,6 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
 
     .home-performance__title {
         max-width: 606px;
-        font-size: 32px;
     }
 
     .home-performance__features {
@@ -2920,7 +2924,7 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
     }
 
     .innovation-hero__subtitle {
-        white-space: normal;
+        max-width: 384px;
     }
 
     .innovation-hero__title {
@@ -3258,7 +3262,7 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
     }
 
     .home-production-card__body {
-        margin-top: 24px;
+        margin-top: 0;
     }
 
     .home-production-card h3 {
@@ -3276,7 +3280,6 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
     }
 
     .home-performance__title {
-        font-size: 28px;
         line-height: 1.25;
     }
 
@@ -3359,7 +3362,6 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
 
     .innovation-hero__subtitle {
         margin-top: 18px;
-        white-space: normal;
         font-size: 14px;
     }
 
