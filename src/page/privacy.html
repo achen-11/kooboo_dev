@@ -1,2 +1,10 @@
 <!-- @k-url /privacy --> 
-<layout id="main"><placeholder id="Main"><view id="common/privacy"></view></placeholder></layout>
+<layout id="main"><placeholder id="Main">
+    <script env="server">
+        k.page.setTitle("Privacy Policy | Kooboo");
+        k.page.setNameMeta(
+            "description",
+            "Read Kooboo's Privacy Policy to learn how personal data and cookies are used, how information is retained, and how to request data deletion."
+        );
+    </script>
+    <view id="common/privacy"></view></placeholder></layout>

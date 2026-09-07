@@ -1,6 +1,13 @@
 <!-- @k-url /templates/{category} -->
 <layout id="main">
     <placeholder id="Main">
+        <script env="server">
+            k.page.setTitle("Website Templates by Category | Kooboo");
+            k.page.setNameMeta(
+                "description",
+                "Explore website templates by category in Kooboo Marketplace. Preview designs, choose a template for your project, and launch your site with one click."
+            );
+        </script>
         <view id="site/templates/gallery"></view>
     </placeholder>
 </layout>

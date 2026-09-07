@@ -1,2 +1,10 @@
 <!-- @k-url /articles/{slug} --> 
-<layout id="main"><placeholder id="Main"><view id="site/innovation/detail"></view></placeholder></layout>
+<layout id="main"><placeholder id="Main">
+    <script env="server">
+        k.page.setTitle("Web Platform Features & Innovation | Kooboo");
+        k.page.setNameMeta(
+            "description",
+            "Explore Kooboo's web platform features, from AI and visual editing to e-commerce, email marketing, and analytics, with detailed guides to each capability."
+        );
+    </script>
+    <view id="site/innovation/detail"></view></placeholder></layout>

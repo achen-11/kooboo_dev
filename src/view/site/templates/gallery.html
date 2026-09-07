@@ -37,11 +37,13 @@
             );
         }
 
-        k.page.setTitle(`${activeCategory.Name} Templates | Kooboo Marketplace`);
-        k.page.setNameMeta(
-            "description",
-            `Browse ${activeCategory.Name} website templates on Kooboo. Launch your site with one click.`
-        );
+        if (k.request.get("category")) {
+            k.page.setTitle(`${activeCategory.Name} Templates | Kooboo Marketplace`);
+            k.page.setNameMeta(
+                "description",
+                `Browse ${activeCategory.Name} website templates in Kooboo Marketplace. Preview designs, choose a template, and launch your site with one click.`
+            );
+        }
     }
 
     export {

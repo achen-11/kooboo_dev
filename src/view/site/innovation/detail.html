@@ -3,6 +3,18 @@
     <query as="coreDetail" source="content" resource="KoobooCore" action="item" id="slug" export=""></query>
 </k-data>
 
+<script env="server">
+    const article = k.state.get("coreDetail");
+    const articleTitle = article?.Title?.trim();
+    const articleDescription = article?.Description?.replace(/\s+/g, " ").trim();
+    if (articleTitle) {
+        k.page.setTitle(`${articleTitle} | Kooboo`);
+    }
+    if (articleDescription) {
+        k.page.setNameMeta("description", articleDescription);
+    }
+</script>
+
 <section class="innovation-detail-page" aria-labelledby="innovation-detail-title">
     <div class="innovation-detail-page__inner">
         <header class="innovation-detail-header">
