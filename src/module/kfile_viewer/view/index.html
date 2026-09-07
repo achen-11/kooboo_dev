@@ -6,13 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KFile 文件管理</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/theme-sync.js"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' };
+    if (window.KFileThemeSync) window.KFileThemeSync.start();
+  </script>
   <script src="/js/marked.min.js"></script>
   <script src="/js/vue-prod.js"></script>
   <script src="/js/vue-router.js"></script>
   <script src="/js/axios.min.js"></script>
   <script env="server">
-    const baseUrl = (k.module.baseUrl.startsWith('http:') ? 'https:' + k.module.baseUrl.slice(5) : k.module.baseUrl) + '/api/files'
-    k.utils.clientJS.setVariable("baseUrl", { value: baseUrl})
+    function ensureHttps(url) {
+      return url.startsWith('http:') ? 'https:' + url.slice(5) : url
+    }
+    const moduleBase = ensureHttps(k.module.baseUrl).replace(/\/$/, '')
+    const apiBaseUrl = moduleBase + '/api/files'
+    const sitePublicUrl = k.site.info.makeAbsUrl('/').replace(/\/$/, '')
+    k.utils.clientJS.setVariable("baseUrl", { value: apiBaseUrl })
+    k.utils.clientJS.setVariable("sitePublicUrl", { value: sitePublicUrl })
   </script>
   <script>
     /* 
@@ -70,6 +81,7 @@
 
   </script>
   <script src="/js/http.js"></script>
+  <script src="/js/file-utils.js"></script>
   <script src="/js/store.js"></script>
   <script src="/js/vue-router.js"></script>
   <style>
@@ -146,11 +158,34 @@
       background: none;
       padding: 0;
     }
+
+    .dark .preview-markdown {
+      color: #cbd5e1;
+    }
+
+    .dark .preview-markdown h2 {
+      border-bottom-color: #404040;
+    }
+
+    .dark .preview-markdown th,
+    .dark .preview-markdown td {
+      border-color: #404040;
+    }
+
+    .dark .preview-markdown th {
+      background: #333333;
+    }
+
+    .dark .preview-markdown code,
+    .dark .preview-markdown pre {
+      background: #333333;
+      color: #e2e8f0;
+    }
   </style>
 </head>
 
-<body class="bg-slate-100 text-slate-900 min-h-screen">
-  <div id="app" class="dark:bg-[#252526] dark:text-neutral-200 flex flex-col h-screen">
+<body class="bg-slate-100 text-slate-900 dark:bg-[#252526] dark:text-neutral-200 min-h-screen">
+  <div id="app" class="flex flex-col h-screen">
     <router-view>
     </router-view>
   </div>

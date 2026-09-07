@@ -1,0 +1,25 @@
+<k-data>
+    <let as="slug" from="slug"></let>
+    <query as="coreDetail" source="content" resource="KoobooCore" action="item" id="slug" export=""></query>
+</k-data>
+
+<section class="innovation-detail-page" aria-labelledby="innovation-detail-title">
+    <div class="innovation-detail-page__inner">
+        <header class="innovation-detail-header">
+            <a class="innovation-detail-header__back" href="/innovation" aria-label="Back to Innovation">
+                <img src="/site/icons/icon-innovation-detail-back.svg" width="24" height="24" alt="" aria-hidden="true">
+            </a>
+
+            <img class="innovation-detail-header__icon" k-attribute="src coreDetail.Icon" width="48" height="48" alt="" aria-hidden="true">
+
+            <div class="innovation-detail-header__copy">
+                <h1 id="innovation-detail-title" k-content="coreDetail.Title">Marketing</h1>
+                <div k-content="coreDetail.Description">A/B testing is integrated into the OS kernel.No external scripts or performance hits</div>
+            </div>
+        </header>
+
+        <div class="innovation-detail-page__content-slot" aria-label="Innovation detail content">
+            <div class="innovation-detail-article" k-content="coreDetail.Body"></div>
+        </div>
+    </div>
+</section>

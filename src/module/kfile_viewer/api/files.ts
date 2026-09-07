@@ -1,3 +1,5 @@
+// @k-url /_kfile_viewer/api/files
+//\@k-url\s /_kfile_viewer/api/files
 // 子级路由需在通配路由上方声明1
 
 // --- 文件夹 ---
@@ -33,8 +35,11 @@ k.api.get("readBinary", (fileName: string) => {
 k.api.get("exists", (fileName: string) => {
   return k.file.exists(fileName);
 });
+k.api.get("folderExists", (folder: string) => {
+  return !folder || k.file.folderExists(folder);
+});
 k.api.get("url", (fileName: string) => {
-  return k.file.url(fileName);
+  return k.site.info.makeAbsUrl(k.file.url(fileName));
 });
 k.api.get("getAllFiles", () => {
   return k.file.getAllFiles();

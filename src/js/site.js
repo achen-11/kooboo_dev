@@ -24,6 +24,12 @@ function initHomeBusinessAccordion() {
             .filter(Boolean);
         const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
         const carouselState = new Map();
+        const rotationInterval = Number(root.dataset.businessAccordionInterval) || 6000;
+        let isRootVisible = !("IntersectionObserver" in window);
+        let isPageVisible = !document.hidden;
+        let isPointerInside = false;
+        let isFocusWithin = false;
+        let rotationTimer = null;
 
         const createCarouselState = (carousel) => {
             const slides = Array.from(carousel.querySelectorAll("[data-business-slide]"));
@@ -31,22 +37,62 @@ function initHomeBusinessAccordion() {
             const interval = Number(carousel.dataset.businessCarouselInterval) || 4500;
             let activeIndex = Math.max(0, slides.findIndex((slide) => slide.classList.contains("is-active")));
             let timer = null;
+            let transitionTimer = null;
 
-            const setSlide = (index) => {
-                if (!slides.length) return;
-
-                activeIndex = (index + slides.length) % slides.length;
-
-                slides.forEach((slide, slideIndex) => {
-                    slide.classList.toggle("is-active", slideIndex === activeIndex);
-                });
-
+            const updateControls = () => {
                 controls.forEach((control, controlIndex) => {
                     const isActive = controlIndex === activeIndex;
 
                     control.classList.toggle("is-active", isActive);
                     control.setAttribute("aria-current", String(isActive));
                 });
+            };
+
+            const setSlide = (index, direction = 1, immediate = false) => {
+                if (!slides.length) return;
+
+                const nextIndex = (index + slides.length) % slides.length;
+
+                if (!immediate && nextIndex === activeIndex) return;
+
+                window.clearTimeout(transitionTimer);
+                slides.forEach((slide) => slide.classList.remove("is-leaving"));
+
+                if (immediate || reducedMotion) {
+                    activeIndex = nextIndex;
+
+                    slides.forEach((slide, slideIndex) => {
+                        slide.classList.toggle("is-active", slideIndex === activeIndex);
+                        slide.style.removeProperty("--home-business-slide-enter-x");
+                        slide.style.removeProperty("--home-business-slide-exit-x");
+                    });
+
+                    updateControls();
+                    return;
+                }
+
+                const previousSlide = slides[activeIndex];
+                const nextSlide = slides[nextIndex];
+                const travelDirection = direction >= 0 ? 1 : -1;
+
+                nextSlide.classList.remove("is-active");
+                nextSlide.style.setProperty("--home-business-slide-enter-x", `${travelDirection * 5}%`);
+                previousSlide.style.setProperty("--home-business-slide-exit-x", `${travelDirection * -4}%`);
+
+                // Commit the incoming slide's starting position before transitioning it into view.
+                void nextSlide.offsetWidth;
+
+                previousSlide.classList.add("is-leaving");
+                previousSlide.classList.remove("is-active");
+                nextSlide.classList.add("is-active");
+                activeIndex = nextIndex;
+                updateControls();
+
+                transitionTimer = window.setTimeout(() => {
+                    previousSlide.classList.remove("is-leaving");
+                    previousSlide.style.removeProperty("--home-business-slide-exit-x");
+                    nextSlide.style.removeProperty("--home-business-slide-enter-x");
+                }, 950);
             };
 
             const stop = () => {
@@ -59,16 +105,22 @@ function initHomeBusinessAccordion() {
             const start = () => {
                 stop();
 
-                if (reducedMotion || slides.length < 2 || !carousel.classList.contains("is-active")) return;
+                if (
+                    reducedMotion ||
+                    slides.length < 2 ||
+                    !carousel.classList.contains("is-active") ||
+                    !isRootVisible ||
+                    !isPageVisible
+                ) return;
 
                 timer = window.setInterval(() => {
-                    setSlide(activeIndex + 1);
+                    setSlide(activeIndex + 1, 1);
                 }, interval);
             };
 
             controls.forEach((control, controlIndex) => {
                 control.addEventListener("click", () => {
-                    setSlide(controlIndex);
+                    setSlide(controlIndex, controlIndex > activeIndex ? 1 : -1);
                     start();
                 });
             });
@@ -82,13 +134,42 @@ function initHomeBusinessAccordion() {
                 }
             });
 
-            setSlide(activeIndex);
+            setSlide(activeIndex, 1, true);
 
             return { start, stop };
         };
 
         carousels.forEach((carousel) => {
             carouselState.set(carousel, createCarouselState(carousel));
+        });
+
+        const updateCarouselPlayback = () => {
+            carousels.forEach((carousel) => {
+                const state = carouselState.get(carousel);
+
+                if (isRootVisible && isPageVisible && carousel.classList.contains("is-active")) {
+                    state?.start();
+                } else {
+                    state?.stop();
+                }
+            });
+        };
+
+        if ("IntersectionObserver" in window) {
+            const observer = new IntersectionObserver(
+                ([entry]) => {
+                    isRootVisible = entry.isIntersecting;
+                    updatePlayback();
+                },
+                { threshold: 0.2 }
+            );
+
+            observer.observe(root);
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            isPageVisible = !document.hidden;
+            updatePlayback();
         });
 
         const setActive = (key) => {
@@ -128,12 +209,69 @@ function initHomeBusinessAccordion() {
             });
         };
 
+        const stopRotation = () => {
+            if (!rotationTimer) return;
+
+            window.clearInterval(rotationTimer);
+            rotationTimer = null;
+        };
+
+        const startRotation = () => {
+            stopRotation();
+
+            if (
+                reducedMotion ||
+                items.length < 2 ||
+                !isRootVisible ||
+                !isPageVisible ||
+                isPointerInside ||
+                isFocusWithin
+            ) return;
+
+            rotationTimer = window.setInterval(() => {
+                const activeIndex = Math.max(
+                    0,
+                    items.findIndex((item) => item.classList.contains("is-active"))
+                );
+                const nextItem = items[(activeIndex + 1) % items.length];
+
+                if (nextItem) {
+                    setActive(nextItem.dataset.businessItem);
+                }
+            }, rotationInterval);
+        };
+
+        function updatePlayback() {
+            updateCarouselPlayback();
+            startRotation();
+        }
+
         items.forEach((item) => {
             const trigger = item.querySelector(".home-business__trigger");
 
             trigger?.addEventListener("click", () => {
                 setActive(item.dataset.businessItem);
+                startRotation();
             });
+        });
+
+        root.addEventListener("mouseenter", () => {
+            isPointerInside = true;
+            stopRotation();
+        });
+        root.addEventListener("mouseleave", () => {
+            isPointerInside = false;
+            startRotation();
+        });
+        root.addEventListener("focusin", () => {
+            isFocusWithin = true;
+            stopRotation();
+        });
+        root.addEventListener("focusout", (event) => {
+            if (!root.contains(event.relatedTarget)) {
+                isFocusWithin = false;
+                startRotation();
+            }
         });
 
         root.addEventListener("keydown", (event) => {
@@ -154,11 +292,125 @@ function initHomeBusinessAccordion() {
             triggers[nextIndex]?.focus();
         });
 
-        const activeItem = items.find((item) => item.classList.contains("is-active")) || items[0];
+        const activeItem = items[0];
 
         if (activeItem) {
             setActive(activeItem.dataset.businessItem);
         }
+
+        updatePlayback();
+    });
+}
+
+function initSiteScrollReveal() {
+    if (!document.querySelector("main")) return;
+    if (document.querySelector(".template-gallery, .innovation-page, .price-page, .download-page")) return;
+
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const revealSpecs = [
+        { selector: ".home-publish-banner__container > div", delay: 0 },
+        { selector: ".home-publish-banner__flow", delay: 90 },
+        { selector: ".home-productivity__title", delay: 0 },
+        { selector: ".home-productivity-card", delay: 80, stagger: 80, staggerCycle: 3 },
+        { selector: ".home-business__title", delay: 0 },
+        { selector: ".home-business__stage", delay: 80 },
+        { selector: ".home-production__title", delay: 0 },
+        { selector: ".home-production-card", delay: 70, stagger: 70, staggerCycle: 3 },
+        { selector: ".home-performance__stage", delay: 0 },
+        { selector: ".home-start-building__header", delay: 0 },
+        { selector: ".home-start-building__prompt", delay: 100 },
+        { selector: ".download-page__inner > h1", delay: 0 },
+        { selector: ".download-card", delay: 70, stagger: 70, staggerCycle: 3 },
+        { selector: ".download-linux", delay: 80 },
+        { selector: ".innovation-hero__content", delay: 0 },
+        { selector: ".innovation-card", delay: 60, stagger: 65, staggerCycle: 3 },
+        { selector: ".innovation-detail-header", delay: 0 },
+        { selector: ".innovation-detail-article > *", delay: 30, stagger: 55, staggerCycle: 4 },
+        { selector: ".template-gallery__filters", delay: 0 },
+        { selector: ".template-gallery__heading", delay: 60 },
+        { selector: ".template-card", delay: 70, stagger: 65, staggerCycle: 4 },
+        { selector: ".price-plans > .price-page__title", delay: 0 },
+        { selector: ".price-plan-card", delay: 70, stagger: 75, staggerCycle: 3 },
+        { selector: ".price-faq > .price-page__title", delay: 0 },
+        { selector: ".price-faq__item", delay: 50, stagger: 55, staggerCycle: 4 },
+        { selector: ".component-summary > div > :first-child", delay: 0 },
+        { selector: ".component-summary > div > :nth-child(2) > *", delay: 50, stagger: 70, staggerCycle: 3 },
+        { selector: "main > div > div.mx-auto.max-w-screen-xl > *", delay: 30, stagger: 70, staggerCycle: 3 },
+    ];
+    const revealItems = [];
+    const seenItems = new Set();
+
+    revealSpecs.forEach(({ selector, delay, stagger = 0, staggerCycle = 0 }) => {
+        document.querySelectorAll(selector).forEach((element, index) => {
+            if (seenItems.has(element)) return;
+
+            const staggerIndex = staggerCycle ? index % staggerCycle : index;
+
+            seenItems.add(element);
+            element.classList.add("site-scroll-reveal");
+            element.style.setProperty("--site-reveal-delay", `${delay + staggerIndex * stagger}ms`);
+            revealItems.push(element);
+        });
+    });
+
+    if (!revealItems.length) return;
+
+    document.documentElement.classList.add("site-reveal-ready");
+
+    if (reducedMotion || !("IntersectionObserver" in window)) {
+        revealItems.forEach((element) => element.classList.add("is-visible"));
+        return;
+    }
+
+    const viewportRevealLine = window.innerHeight * 0.92;
+    const addInitialRevealMask = (element) => {
+        const rect = element.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+
+        const mask = document.createElement("span");
+        const delay = element.style.getPropertyValue("--site-reveal-delay") || "0ms";
+
+        mask.className = "site-initial-reveal-mask";
+        mask.setAttribute("aria-hidden", "true");
+        mask.style.left = `${rect.left + window.scrollX}px`;
+        mask.style.top = `${rect.top + window.scrollY}px`;
+        mask.style.width = `${rect.width}px`;
+        mask.style.height = `${rect.height}px`;
+        mask.style.borderRadius = getComputedStyle(element).borderRadius;
+        mask.style.setProperty("--site-reveal-delay", delay);
+        document.body.appendChild(mask);
+
+        mask.addEventListener("animationend", () => mask.remove(), { once: true });
+        window.setTimeout(() => mask.remove(), 1200);
+    };
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+
+                entry.target.classList.add("is-visible");
+                observer.unobserve(entry.target);
+            });
+        },
+        {
+            rootMargin: "0px 0px -10% 0px",
+            threshold: 0.08,
+        }
+    );
+
+    revealItems.forEach((element) => {
+        if (element.getBoundingClientRect().top <= viewportRevealLine) {
+            element.classList.add("is-initial-reveal", "is-visible");
+            addInitialRevealMask(element);
+        } else {
+            observer.observe(element);
+        }
+    });
+}
+
+function scheduleSiteScrollReveal() {
+    window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(initSiteScrollReveal);
     });
 }
 
@@ -166,28 +418,25 @@ if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
         initSiteHeaderScrollState();
         initHomeBusinessAccordion();
+        scheduleSiteScrollReveal();
     });
 } else {
     initSiteHeaderScrollState();
     initHomeBusinessAccordion();
+    scheduleSiteScrollReveal();
 }
 
 const ADMIN_BASE = "/_Admin/";
-const AI_PROVIDERS_API = "/_api/v2/ai/providers";
-const AVAILABLE_DOMAINS_API = "/_api/v2/Domain/Available";
-const CREATE_SITE_API = "/_api/v2/Site/Create";
+const AI_PROVIDERS_API = "/api/ai-models";
 const STARTER_PROMPT_QUERY = "prompt";
 const STARTER_PROVIDER_QUERY = "provider";
 const STARTER_MODEL_QUERY = "model";
-const STARTER_SITE_CREATED_QUERY = "starterSiteCreated";
 const MODEL_PREFERENCE_KEY = "kooboo_ai_chat_model_preference";
 const MODEL_VALUE_SEP = "|";
 
 const PROMPT_GENERATOR_STRINGS = {
     noModelsAvailable: "No models available",
     loadModelsFailed: "Failed to load models",
-    creatingSite: "Creating...",
-    createSiteFailed: "Failed to create the site. Please try again.",
     placeholderPrefix: "What kind of website do you need? Try this: ",
     placeholderPrompts: [
         "help me generate a coffee website with online ordering...",
@@ -214,22 +463,6 @@ function getAdminBase() {
     return ADMIN_BASE;
 }
 
-function getKoobooBaseUrl() {
-    const adminBase = trimTrailingSlash(getAdminBase());
-    return adminBase.replace(/\/_Admin$/i, "") || "/";
-}
-
-function buildKoobooApiUrl(path, params) {
-    const baseUrl = new URL(`${trimTrailingSlash(getKoobooBaseUrl())}/`, window.location.origin);
-    const url = new URL(String(path).replace(/^\/+/, ""), baseUrl);
-    Object.entries(params || {}).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-            url.searchParams.set(key, String(value));
-        }
-    });
-    return url.href;
-}
-
 function getCookieValue(name) {
     const prefix = `${name}=`;
     return (
@@ -239,114 +472,6 @@ function getCookieValue(name) {
             .find((part) => part.startsWith(prefix))
             ?.slice(prefix.length) ?? ""
     );
-}
-
-function isKoobooLoggedIn() {
-    return Boolean(getCookieValue("jwt_token"));
-}
-
-function requestKoobooApi(path, { method = "GET", params } = {}) {
-    const accessToken = getCookieValue("jwt_token");
-    if (!accessToken) throw new Error("Kooboo access token is missing");
-
-    const url = buildKoobooApiUrl(path, params);
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open(method, url, true);
-        xhr.setRequestHeader("Accept", "application/json");
-        xhr.setRequestHeader("Authorization", `Bearer ${accessToken}`);
-
-        xhr.onload = () => {
-            const responseText = xhr.responseText;
-            let data = null;
-            if (responseText) {
-                try {
-                    data = JSON.parse(responseText);
-                } catch {
-                    data = responseText;
-                }
-            }
-
-            if (xhr.status >= 200 && xhr.status < 300) {
-                resolve(data);
-                return;
-            }
-
-            const message = Array.isArray(data)
-                ? data.filter(Boolean).join("; ")
-                : typeof data === "string"
-                  ? data
-                  : `Kooboo API request failed: ${xhr.status}`;
-            const error = new Error(
-                message || `Kooboo API request failed: ${xhr.status}`
-            );
-            error.status = xhr.status;
-            reject(error);
-        };
-
-        xhr.onerror = () => {
-            const error = new Error("Kooboo API network request failed");
-            error.status = xhr.status;
-            reject(error);
-        };
-
-        xhr.send(null);
-    });
-}
-
-function formatSiteTimestamp(date = new Date()) {
-    const pad = (value) => String(value).padStart(2, "0");
-    return [
-        pad(date.getFullYear() % 100),
-        pad(date.getMonth() + 1),
-        pad(date.getDate()),
-        pad(date.getHours()),
-        pad(date.getMinutes()),
-        pad(date.getSeconds()),
-    ].join("");
-}
-
-function buildRandomSiteName() {
-    const stamp = formatSiteTimestamp();
-    const suffix = Math.random().toString(36).slice(2, 6);
-    return `ai_site_${stamp}_${suffix}`;
-}
-
-function buildStarterSiteParams(root) {
-    const rootDomain = root?.domainName ?? root?.DomainName;
-    const sudDomainUseDash =
-        root?.sudDomainUseDash ?? root?.SudDomainUseDash ?? false;
-    if (!rootDomain) throw new Error("No available domain");
-
-    const siteName = buildRandomSiteName();
-    return {
-        subDomain: siteName,
-        rootDomain,
-        siteName,
-        sudDomainUseDash,
-        siteType: "p",
-    };
-}
-
-async function createStarterSite() {
-    const domains = await requestKoobooApi(AVAILABLE_DOMAINS_API);
-    const root = Array.isArray(domains) ? domains[0] : null;
-    const siteParams = buildStarterSiteParams(root);
-    const site = await requestKoobooApi(CREATE_SITE_API, {
-        method: "POST",
-        params: siteParams,
-    });
-    const siteId =
-        (typeof site === "string" ? site : null) ??
-        site?.id ??
-        site?.Id ??
-        site?.ID ??
-        site?.siteId ??
-        site?.SiteId ??
-        site?.model?.id ??
-        site?.Model?.Id;
-    if (!siteId) throw new Error("Site creation returned no site id");
-    return siteId;
 }
 
 function readPromptFromGenerator(root) {
@@ -468,13 +593,11 @@ function populateModelSelect(select, providers, preferred) {
     return Boolean(selectedValue);
 }
 
-function buildAiChatUrl(siteId, handoff, accessToken) {
+function buildAiChatStartUrl(handoff, accessToken) {
     const url = new URL(
-        `${trimTrailingSlash(getAdminBase())}/ai-chat/overview`,
+        `${trimTrailingSlash(getAdminBase())}/ai-chat/start`,
         window.location.origin
     );
-    url.searchParams.set("SiteId", siteId);
-    url.searchParams.set(STARTER_SITE_CREATED_QUERY, "1");
     if (handoff.prompt) url.searchParams.set(STARTER_PROMPT_QUERY, handoff.prompt);
     if (handoff.provider) {
         url.searchParams.set(STARTER_PROVIDER_QUERY, handoff.provider);
@@ -482,43 +605,10 @@ function buildAiChatUrl(siteId, handoff, accessToken) {
     if (handoff.model) url.searchParams.set(STARTER_MODEL_QUERY, handoff.model);
     if (accessToken) url.searchParams.set("access_token", accessToken);
     url.searchParams.set("lang", "en");
-    return url.href;
+    return url;
 }
 
-function buildLoginUrl() {
-    const params = new URLSearchParams();
-    params.set("returnurl", "/");
-    params.set("lang", "en");
-    return `${getAdminBase()}/login?${params.toString()}`;
-}
-
-function setPromptGeneratorsBusy(busy) {
-    document.querySelectorAll(".prompt-generator").forEach((root) => {
-        const button = root.querySelector(".prompt-generator__btn");
-        const select = root.querySelector(".prompt-generator__model-select");
-        if (!button) return;
-
-        if (!button.dataset.idleLabel) {
-            button.dataset.idleLabel = button.textContent?.trim() || "Generate now";
-        }
-        button.disabled = busy || !select?.value;
-        button.setAttribute("aria-busy", busy ? "true" : "false");
-        button.textContent = busy
-            ? promptGeneratorText("creatingSite")
-            : button.dataset.idleLabel;
-    });
-}
-
-function showPromptGeneratorError(root, message = "") {
-    const status = root.querySelector(".prompt-generator__status");
-    if (!status) return;
-    status.textContent = message;
-    status.hidden = !message;
-}
-
-let sharedStarterSitePromise = null;
-
-async function navigateToGenerate(root) {
+function navigateToGenerate(root) {
     const prompt = readPromptFromGenerator(root);
     const modelSelection = readModelFromGenerator(root);
 
@@ -540,31 +630,9 @@ async function navigateToGenerate(root) {
 
     saveModelPreference(handoff.provider, handoff.model);
 
-    if (!isKoobooLoggedIn()) {
-        window.location.href = buildLoginUrl();
-        return;
-    }
-
-    if (sharedStarterSitePromise) return sharedStarterSitePromise;
-
-    showPromptGeneratorError(root);
-    setPromptGeneratorsBusy(true);
-    sharedStarterSitePromise = createStarterSite();
-
-    try {
-        const siteId = await sharedStarterSitePromise;
-        const accessToken = getCookieValue("jwt_token");
-        window.location.href = buildAiChatUrl(siteId, handoff, accessToken);
-    } catch (error) {
-        console.error("[prompt-generator] create site failed:", error);
-        showPromptGeneratorError(
-            root,
-            promptGeneratorText("createSiteFailed")
-        );
-        setPromptGeneratorsBusy(false);
-    } finally {
-        sharedStarterSitePromise = null;
-    }
+    const accessToken = getCookieValue("jwt_token");
+    const startUrl = buildAiChatStartUrl(handoff, accessToken);
+    window.location.href = startUrl.href;
 }
 
 let sharedAiProvidersPromise = null;
@@ -609,13 +677,32 @@ async function initPromptGenerator(root) {
         button.disabled = true;
     }
 
-    button.addEventListener("click", () => void navigateToGenerate(root));
+    button.addEventListener("click", () => navigateToGenerate(root));
 }
 
 function initPromptGenerators() {
     document.querySelectorAll(".prompt-generator").forEach((root) => {
         void initPromptGenerator(root);
     });
+}
+
+function schedulePromptGenerators() {
+    const roots = Array.from(document.querySelectorAll(".prompt-generator"));
+    if (!roots.length) return;
+
+    let initialized = false;
+    const initialize = () => {
+        if (initialized) return;
+        initialized = true;
+        roots.forEach((root) => void initPromptGenerator(root));
+    };
+
+    roots.forEach((root) => {
+        root.addEventListener("pointerdown", initialize, { once: true, passive: true });
+        root.addEventListener("focusin", initialize, { once: true });
+    });
+
+    window.setTimeout(initialize, 2500);
 }
 
 function initScrollToPromptLinks() {
@@ -709,6 +796,13 @@ function initPromptTypingPlaceholder(textarea) {
     };
 
     const tick = () => {
+        if (userEdited || textarea.value) return;
+
+        if (document.hidden) {
+            window.setTimeout(tick, 500);
+            return;
+        }
+
         const currentPrompt = prompts[promptIndex];
 
         if (!isDeleting && charIndex < currentPrompt.length) {
@@ -747,11 +841,19 @@ function initPromptTypingPlaceholder(textarea) {
 }
 
 function initPromptTypingPlaceholders() {
-    document
-        .querySelectorAll(
-            ".home-hero .prompt-generator__input, .home-start-building .prompt-generator__input"
-        )
-        .forEach((textarea) => initPromptTypingPlaceholder(textarea));
+    const startTyping = () => {
+        document
+            .querySelectorAll(".home-hero .prompt-generator__input")
+            .forEach((textarea) => initPromptTypingPlaceholder(textarea));
+    };
+
+    const scheduleTyping = () => window.setTimeout(startTyping, 700);
+
+    if (document.readyState === "complete") {
+        scheduleTyping();
+    } else {
+        window.addEventListener("load", scheduleTyping, { once: true });
+    }
 }
 
 function initHomeStartBuildingEntrance() {
@@ -782,13 +884,78 @@ function initHomePromptEffects() {
 }
 
 function initPromptGeneratorFeatures() {
-    initPromptGenerators();
+    schedulePromptGenerators();
     initScrollToPromptLinks();
     initHomePromptEffects();
 }
 
+function initTemplateGallery() {
+    document.querySelectorAll("[data-template-admin-path]").forEach((link) => {
+        const path = link.dataset.templateAdminPath;
+        if (!path) return;
+        link.href = `${trimTrailingSlash(getAdminBase())}${path}`;
+    });
+}
+
+function initDownloadPage() {
+    const copyText = async (value) => {
+        if (navigator.clipboard?.writeText) {
+            try {
+                await navigator.clipboard.writeText(value);
+                return;
+            } catch {
+                // Fall back for non-secure or clipboard-restricted contexts.
+            }
+        }
+
+        const textarea = document.createElement("textarea");
+        textarea.value = value;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        textarea.style.pointerEvents = "none";
+        document.body.appendChild(textarea);
+        textarea.select();
+        const copied = document.execCommand("copy");
+        textarea.remove();
+        if (!copied) throw new Error("Copy command is unavailable");
+    };
+
+    document.querySelectorAll("[data-download-page]").forEach((page) => {
+        page.querySelectorAll("[data-copy-command]").forEach((button) => {
+            let resetTimer;
+
+            button.addEventListener("click", async () => {
+                const code = button.closest(".download-command")?.querySelector("code");
+                const value = code?.innerText.trim();
+                if (!value) return;
+
+                try {
+                    await copyText(value);
+                    window.clearTimeout(resetTimer);
+                    button.classList.add("is-copied");
+                    button.setAttribute("aria-label", "Copied");
+                    resetTimer = window.setTimeout(() => {
+                        button.classList.remove("is-copied");
+                        button.setAttribute("aria-label", "Copy Linux install command");
+                    }, 2000);
+                } catch (error) {
+                    console.error("[download] copy command failed:", error);
+                }
+            });
+        });
+    });
+}
+
+function initSitePageFeatures() {
+    initTemplateGallery();
+    initDownloadPage();
+}
+
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initPromptGeneratorFeatures);
+    document.addEventListener("DOMContentLoaded", initSitePageFeatures);
 } else {
     initPromptGeneratorFeatures();
+    initSitePageFeatures();
 }

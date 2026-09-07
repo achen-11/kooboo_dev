@@ -1,0 +1,119 @@
+<script env="server" type="module">
+    import {
+        resolveAdminBaseFromToken,
+        resolveStartNowUrl,
+        userDisplayFromToken,
+    } from "./utils.admin-url-from-token";
+
+    const loginReturnUrl = "/";
+    const accessToken = k.account.getAccessToken();
+    const isLoggedIn = k.account.isLogin || Boolean(accessToken);
+    const showLogin = !isLoggedIn;
+    const resolvedAdminBaseUrl =
+        resolveAdminBaseFromToken(accessToken) || "/_Admin";
+    const adminBaseUrl = resolvedAdminBaseUrl.replace(/\/+$/, "") || "/_Admin";
+    const langParam = "lang=en";
+    const loginUrl = "/_Admin/login?lang=en"
+    const startNowUrl = resolveStartNowUrl(accessToken, isLoggedIn);
+    let consoleUrl = adminBaseUrl + "/?" + langParam;
+    let logoutUrl =
+        "/_api/v2/user/logout?returnUrl=" +
+        encodeURIComponent(loginReturnUrl) +
+        "&" +
+        langParam;
+
+    let userDisplayName = "";
+    let userInitials = "";
+
+    if (isLoggedIn) {
+        const user = k.account.user.current;
+        if (user) {
+            const fullName = (
+                (user.firstName || "") +
+                " " +
+                (user.lastName || "")
+            ).trim();
+            userDisplayName = fullName || user.userName || user.email || "";
+            userInitials = (userDisplayName || "?").substring(0, 2).toUpperCase();
+        } else if (accessToken) {
+            const tokenUser = userDisplayFromToken(accessToken);
+            userDisplayName = tokenUser.displayName;
+            userInitials = tokenUser.initials;
+        }
+    }
+
+    export {
+        loginUrl,
+        consoleUrl,
+        logoutUrl,
+        startNowUrl,
+        isLoggedIn,
+        showLogin,
+        userDisplayName,
+        userInitials,
+    };
+</script>
+
+<header class="site-header">
+    <div class="site-header__inner">
+        <details class="site-header__mobile-menu">
+            <summary class="site-header__menu-button" aria-label="Open navigation menu">
+                <span class="site-header__menu-icon" aria-hidden="true"></span>
+            </summary>
+            <nav class="site-header__mobile-panel" aria-label="Mobile navigation">
+                <a class="site-header__mobile-link" href="/" k-label="menu.home">Home</a>
+                <a class="site-header__mobile-link" href="/innovation" k-label="menu.innovation">Innovation</a>
+                <a class="site-header__mobile-link" href="/templates">Market</a>
+                <a class="site-header__mobile-link" href="/pricing" k-label="menu.pricing">Price</a>
+                <a class="site-header__mobile-link" href="/download">Download</a>
+                <a class="site-header__mobile-link" href="https://docs.kooboo.com" target="_blank" rel="noopener" k-label="menu.docs">Doc</a>
+                <!-- <a k-if="showLogin" class="site-header__mobile-link" href="/_Admin/start?returnurl=/&amp;lang=en" k-attribute="href loginUrl" k-label="SignIn">Login</a> -->
+                <div k-if="isLoggedIn" class="site-header__mobile-user">
+                    <div class="site-header__mobile-user-meta">
+                        <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
+                        <span class="site-header__mobile-user-name" k-content="userDisplayName">User</span>
+                    </div>
+                    <a class="site-header__mobile-link" href="/_Admin/?lang=en" k-attribute="href consoleUrl" k-label="Console">Console</a>
+                    <form class="site-header__logout-form" action="/_api/v2/user/logout?returnUrl=%2F&amp;lang=en" k-attribute="action logoutUrl" method="post">
+                        <button class="site-header__mobile-link site-header__mobile-link--muted site-header__mobile-logout-button" type="submit" k-label="SignOut">Logout</button>
+                    </form>
+                </div>
+                <a class="site-header__mobile-claim" href="/_Admin/start?returnurl=/&amp;lang=en" k-attribute="href startNowUrl" k-label="Start now">Start now</a>
+            </nav>
+        </details>
+
+        <a class="site-header__logo" href="/" aria-label="Kooboo home">
+            <img src="/kooboo-logo.svg" alt="Kooboo" width="97" height="20">
+        </a>
+
+        <nav class="site-header__nav" aria-label="Primary navigation">
+            <a class="site-header__link" href="/" k-label="menu.home">Home</a>
+            <a class="site-header__link" href="/innovation" k-label="menu.innovation">Innovation</a>
+            <a class="site-header__link" href="/templates">Marketplace</a>
+            <a class="site-header__link" href="/pricing" k-label="menu.pricing">Price</a>
+            <a class="site-header__link" href="/download">Download</a>
+            <a class="site-header__link" href="https://docs.kooboo.com" target="_blank" rel="noopener" k-label="menu.docs">Doc</a>
+        </nav>
+
+        <div class="site-header__actions">
+            <!-- <a k-if="showLogin" class="site-header__secondary-action" href="/_Admin/login?lang=en" k-attribute="href loginUrl" k-label="SignIn">Login</a> -->
+            <details k-if="isLoggedIn" class="site-header__user-menu">
+                <summary class="site-header__user-trigger" aria-label="Account menu">
+                    <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
+                    <span class="site-header__user-name" k-content="userDisplayName">User</span>
+                    <span class="site-header__user-chevron" aria-hidden="true"></span>
+                </summary>
+                <div class="site-header__user-dropdown" role="menu">
+                    <a class="site-header__user-dropdown-link" href="/_Admin/?lang=en" k-attribute="href consoleUrl" role="menuitem" k-label="Console">Console</a>
+                    <form class="site-header__logout-form" action="/_api/v2/user/logout?returnUrl=%2F&amp;lang=en" k-attribute="action logoutUrl" method="post" role="none">
+                        <button class="site-header__user-dropdown-link site-header__user-dropdown-link--muted site-header__logout-button" type="submit" role="menuitem" k-label="SignOut">Logout</button>
+                    </form>
+                </div>
+            </details>
+            <a class="site-header__primary-action" href="/_Admin/start?returnurl=/&amp;lang=en" k-attribute="href startNowUrl">
+                <span k-label="Start now">Start now</span>
+                <span class="site-header__primary-icon" aria-hidden="true"></span>
+            </a>
+        </div>
+    </div>
+</header>

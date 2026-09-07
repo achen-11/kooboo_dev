@@ -1,0 +1,16 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M24 12L11 20M24 12L37 20M11 20L13 35M37 20L35 35M13 35H35" stroke="#6BA6C7" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="24" cy="12" r="7" fill="url(#relation-center)"/>
+  <circle cx="11" cy="20" r="5" fill="#85DCEB"/>
+  <circle cx="37" cy="20" r="5" fill="#FFB84D"/>
+  <circle cx="13" cy="35" r="5" fill="#55C8BA"/>
+  <circle cx="35" cy="35" r="5" fill="#668EC4"/>
+  <path d="M20.5 12C22.4 9.6 25.6 9.6 27.5 12C25.6 14.4 22.4 14.4 20.5 12Z" fill="#EAF8FF"/>
+  <circle cx="24" cy="12" r="1.5" fill="#173654"/>
+  <defs>
+    <linearGradient id="relation-center" x1="24" y1="5" x2="24" y2="19" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#517EA4"/>
+      <stop offset="1" stop-color="#102740"/>
+    </linearGradient>
+  </defs>
+</svg>

@@ -40,6 +40,18 @@ export function resolveAdminBaseFromToken(token: string) {
   const origin = serverOriginFromRedirect(domain);
   return origin ? `${origin}/_Admin/` : "";
 }
+export function resolveStartNowUrl(token: string, isLoggedIn: boolean, returnUrl: string, lang = "en") {
+  const resolvedAdminBaseUrl = resolveAdminBaseFromToken(token) || "/_Admin";
+  const adminBaseUrl = trimTrailingSlash(resolvedAdminBaseUrl) || "/_Admin";
+  const langParam = `lang=${encodeURIComponent(lang)}`;
+  if (isLoggedIn) {
+    return `${adminBaseUrl}/?${langParam}`;
+  }
+  if (returnUrl) {
+    return `${adminBaseUrl}/login?returnurl=${encodeURIComponent(returnUrl)}&${langParam}`;
+  }
+  return `${adminBaseUrl}/login?${langParam}`;
+}
 export function userDisplayFromToken(token: string) {
   const payload = parseJwtPayloadResult(token);
   if (!payload) {
