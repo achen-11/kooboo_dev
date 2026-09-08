@@ -3001,7 +3001,7 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
         background-color: var(--color-white);
         background-image: url("/site/download/download-mobile-background.webp");
         background-position: center top;
-        background-size: 100% auto;
+        background-size: cover;
         background-repeat: no-repeat;
     }
 
