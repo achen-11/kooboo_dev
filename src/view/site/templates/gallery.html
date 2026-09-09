@@ -37,13 +37,11 @@
             );
         }
 
-        if (k.request.get("category")) {
-            k.page.setTitle(`${activeCategory.Name} Templates | Kooboo Marketplace`);
-            k.page.setNameMeta(
-                "description",
-                `Browse ${activeCategory.Name} website templates in Kooboo Marketplace. Preview designs, choose a template, and launch your site with one click.`
-            );
-        }
+        k.page.setTitle(`${activeCategory.Name} Templates | Kooboo Marketplace`);
+        k.page.setNameMeta(
+            "description",
+            `Browse ${activeCategory.Name} website templates in Kooboo Marketplace. Preview designs, choose a template, and launch your site with one click.`
+        );
     }
 
     export {
@@ -70,7 +68,7 @@
             <article class="template-card" k-for="item in templateItems" repeat-self="true">
                 <div class="template-card__media">
                     <img src="/site/templates/template-night-voyage.png?format=webp" alt="Night Voyage template preview" width="640" height="360" loading="lazy" decoding="async" k-attribute="src item.PreviewImage; alt item.AltText">
-                    <a class="template-card__action" href="/_Admin/templates?lang=en" target="_blank" data-template-admin-path="/templates?lang=en" k-attribute="href item.AdminHref; data-template-admin-path item.AdminPath" k-label="Use this template">Use this template</a>
+                    <a class="template-card__action" href="/_Admin/templates" target="_blank" data-template-admin-path="/templates" k-attribute="href item.AdminHref; data-template-admin-path item.AdminPath" k-label="Use this template">Use this template</a>
                 </div>
                 <h2 k-content="item.Name">Night Voyage</h2>
             </article>

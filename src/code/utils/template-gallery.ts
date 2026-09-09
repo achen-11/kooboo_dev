@@ -21,8 +21,8 @@ export function withWebpFormat(previewImage: string): string {
 export function buildTemplateAdminPath(templateId: string) {
   const trimmed = String(templateId || "").trim();
   const adminPath = trimmed
-    ? `/template/detail?templateId=${encodeURIComponent(trimmed)}&lang=en`
-    : "/templates?lang=en";
+    ? `/template/detail?templateId=${encodeURIComponent(trimmed)}`
+    : "/templates";
 
   return {
     AdminPath: adminPath,
