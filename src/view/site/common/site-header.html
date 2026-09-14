@@ -1,7 +1,6 @@
 <script env="server" type="module">
     import {
         resolveAdminBaseFromToken,
-        resolveStartNowUrl,
         userDisplayFromToken,
     } from "./utils.admin-url-from-token";
 
@@ -13,7 +12,6 @@
         resolveAdminBaseFromToken(accessToken) || "/_Admin";
     const adminBaseUrl = resolvedAdminBaseUrl.replace(/\/+$/, "") || "/_Admin";
     const loginUrl = "/_Admin/login"
-    const startNowUrl = resolveStartNowUrl();
     let consoleUrl = adminBaseUrl + "/";
     let logoutUrl =
         "/_api/v2/user/logout?returnUrl=" +
@@ -43,7 +41,6 @@
         loginUrl,
         consoleUrl,
         logoutUrl,
-        startNowUrl,
         isLoggedIn,
         showLogin,
         userDisplayName,
@@ -75,7 +72,7 @@
                         <button class="site-header__mobile-link site-header__mobile-link--muted site-header__mobile-logout-button" type="submit" k-label="SignOut">Logout</button>
                     </form>
                 </div>
-                <a class="site-header__mobile-claim" href="/_Admin/login" data-login-required k-attribute="href startNowUrl" k-label="Start now">Start now</a>
+                <a class="site-header__mobile-claim" href="/_Admin/" k-label="Start now">Start now</a>
             </nav>
         </details>
 
@@ -107,7 +104,7 @@
                     </form>
                 </div>
             </details>
-            <a class="site-header__primary-action" href="/_Admin/login" data-login-required k-attribute="href startNowUrl">
+            <a class="site-header__primary-action" href="/_Admin/">
                 <span k-label="Start now">Start now</span>
                 <span class="site-header__primary-icon" aria-hidden="true"></span>
             </a>
