@@ -1752,6 +1752,7 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
 
 .home-performance__stage {
     position: relative;
+    width: 100%;
     min-height: 520px;
     aspect-ratio: 1352 / 598;
     overflow: hidden;
@@ -2884,6 +2885,7 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
 
     .home-performance__stage {
         min-height: 0;
+        aspect-ratio: auto;
         padding: 54px 32px;
     }
 
