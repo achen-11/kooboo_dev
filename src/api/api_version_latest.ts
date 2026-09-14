@@ -23,7 +23,7 @@ function getByPlatform(platform: string) {
   var files = k.file.folderFiles("/").sort((a, b) => b.lastModified - a.lastModified);
   const entity = k.content.Package.find(`Platform == '${platform}'`);
   if (!entity) {
-    k.response.statusCode(404);
+    k.response.statusCode(400);
     return {
       error: "Not found"
     };
