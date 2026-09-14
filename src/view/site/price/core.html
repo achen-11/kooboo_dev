@@ -8,6 +8,54 @@
 
 	const startNowUrl = resolveStartNowUrl();
 
+	const pricePageJsonLd = k.state.get("pageJsonLd");
+	if (pricePageJsonLd) {
+		const text = value => k.utils.dom.getText(String(value == null ? "" : value)).replace(/\s+/g, " ").trim();
+		const plans = k.state.get("pricingPlans") || [];
+		const faqs = k.state.get("faqItems") || [];
+		const period = text(k.site.labels.getValue("/year") || "/year");
+		const planItems = plans.map((plan, index) => {
+			const price = text(plan.Price);
+			return {
+				"@type": "ListItem",
+				position: index + 1,
+				item: {
+					"@type": "Service",
+					name: text(plan.Title),
+					description: [
+						text(plan.Description),
+						price ? price + " " + period : "",
+						...(plan.Items || []).map(text),
+					].filter(Boolean).join(" "),
+				},
+			};
+		});
+		const questions = faqs.map(faq => ({
+			"@type": "Question",
+			name: text(faq.Title),
+			acceptedAnswer: {
+				"@type": "Answer",
+				text: text(faq.Description),
+			},
+		})).filter(question => question.name && question.acceptedAnswer.text);
+
+		pricePageJsonLd.headline = text(k.site.labels.getValue("Pricing") || "Pricing");
+		pricePageJsonLd.mainEntity = {
+			"@type": "ItemList",
+			"@id": pricePageJsonLd.url + "#pricing-plans",
+			name: pricePageJsonLd.headline,
+			numberOfItems: planItems.length,
+			itemListElement: planItems,
+		};
+		pricePageJsonLd.hasPart = questions.length ? [{
+			"@type": "FAQPage",
+			"@id": pricePageJsonLd.url + "#price-faq-title",
+			name: "FAQ",
+			mainEntity: questions,
+		}] : [];
+		k.state.set("pageJsonLd", pricePageJsonLd);
+	}
+
 	export { startNowUrl };
 </script>
 

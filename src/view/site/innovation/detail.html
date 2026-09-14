@@ -1,17 +1,60 @@
-<k-data>
-    <let as="slug" from="slug"></let>
-    <query as="coreDetail" source="content" resource="KoobooCore" action="item" id="slug" export=""></query>
-</k-data>
-
 <script env="server">
-    const article = k.state.get("coreDetail");
-    const articleTitle = article?.Title?.trim();
-    const articleDescription = article?.Description?.replace(/\s+/g, " ").trim();
-    if (articleTitle) {
-        k.page.setTitle(`${articleTitle} | Kooboo`);
+    const articleSlug = String(k.request.get("slug") || "").trim();
+    const article = articleSlug
+        ? k.content.KoobooCore.all().find((item) => item.slug === articleSlug)
+        : null;
+    if (!article) {
+        k.response.notFound();
+        k.response.stop();
     }
-    if (articleDescription) {
-        k.page.setNameMeta("description", articleDescription);
+    if (article) {
+        k.state.set("coreDetail", article);
+        const articleTitle = article?.Title?.trim();
+        const articleDescription = article?.Description?.replace(/\s+/g, " ").trim();
+        const articlePageJsonLd = k.state.get("pageJsonLd");
+        articlePageJsonLd.headline = articleTitle || articlePageJsonLd.name;
+        articlePageJsonLd.mainEntity = {
+            "@type": "Article",
+            "@id": articlePageJsonLd.url + "#article",
+        };
+        if (articleTitle) {
+            k.page.setTitle(`${articleTitle} | Kooboo`);
+            articlePageJsonLd.name = `${articleTitle} | Kooboo`;
+        }
+        if (articleDescription) {
+            k.page.setNameMeta("description", articleDescription);
+            articlePageJsonLd.description = articleDescription;
+        }
+        k.state.set("pageJsonLd", articlePageJsonLd);
+        const articleBodySource = String(article.Body || "");
+        let articleAngleMarker = "__kooboo_jsonld_angle__";
+        while (articleBodySource.includes(articleAngleMarker)) {
+            articleAngleMarker += "_";
+        }
+        const articleAngles = [];
+        // Preserve escaped HTML examples before getText removes actual markup.
+        const protectedArticleBody = articleBodySource.replace(/&(?:lt|gt|#0*60|#0*62|#x0*3c|#x0*3e);/gi, value => {
+            articleAngles.push(/^&(?:lt|#0*60|#x0*3c);$/i.test(value) ? "<" : ">");
+            return articleAngleMarker + (articleAngles.length - 1) + "__";
+        });
+        const articleBodyText = k.utils.dom.getText(protectedArticleBody)
+            .replace(new RegExp(articleAngleMarker + "(\\d+)__", "g"), (_, index) => articleAngles[Number(index)])
+            .replace(/\s+/g, " ").trim();
+        const articleJsonLd = {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "@id": articlePageJsonLd.url + "#article",
+            url: articlePageJsonLd.url,
+            headline: articleTitle || "",
+            description: articleDescription || "",
+            articleBody: articleBodyText,
+            inLanguage: articlePageJsonLd.language,
+            mainEntityOfPage: { "@type": "WebPage", "@id": articlePageJsonLd.url },
+            publisher: { "@type": "Organization", "@id": k.site.info.makeAbsUrl("/") + "#organization" },
+        };
+        k.state.set("articleJsonLd", articleJsonLd);
+        // Escape less-than signs so code examples cannot terminate the JSON-LD script.
+        k.state.set("articleJsonLdScript", JSON.stringify(articleJsonLd).replace(/</g, "\\u003c"));
     }
 </script>
 
@@ -35,3 +78,5 @@
         </div>
     </div>
 </section>
+
+<script type="application/ld+json" k-if="articleJsonLd.headline" k-content="articleJsonLdScript"></script>

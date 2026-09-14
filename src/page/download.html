@@ -2,13 +2,75 @@
 <layout id="main">
     <placeholder id="Main">
         <script env="server">
-            k.page.setTitle("Download Kooboo Community Version | Kooboo");
-            k.page.setNameMeta(
-                "description",
-                "Download Kooboo Community Version for Windows, macOS, or Linux. Run the web development platform on your own computer or server, free of charge."
-            );
+            var pageJsonLdUrl = k.site.info.makeAbsUrl(k.request.url.split(/[?#]/)[0]);
+            var pageJsonLd = {
+                name: "Download Kooboo Community Version | Kooboo",
+                description: "Download Kooboo Community Version for Windows, macOS, or Linux. Run the web development platform on your own computer or server, free of charge.",
+                url: pageJsonLdUrl,
+                websiteId: k.site.info.makeAbsUrl("/") + "#website",
+                language: k.request.culture || "en",
+                softwareId: pageJsonLdUrl + "#software",
+            };
+            k.page.setTitle(pageJsonLd.name);
+            k.page.setNameMeta("description", pageJsonLd.description);
+            k.state.set("pageJsonLd", pageJsonLd);
         </script>
         <view id="site/download/core"></view>
         <script type="module" src="/download.js"></script>
+
+        <script env="server">
+            var downloadPageJsonLd = k.state.get("pageJsonLd");
+            var windowsDownloadJsonLd = k.state.get("downloadJsonLd") || { url: "", version: "" };
+            var downloadSource = k.site.views.get("site.download.core")?.body || "";
+            var downloadHeading = downloadSource.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
+            downloadPageJsonLd.headline = k.utils.dom.getText(downloadHeading?.[1] || "").replace(/\s+/g, " ").trim() || downloadPageJsonLd.name;
+            var downloadUrls = windowsDownloadJsonLd.url ? [windowsDownloadJsonLd.url] : [];
+            downloadPageJsonLd.hasPart = (downloadSource.match(/<article\b[^>]*>[\s\S]*?<\/article>/gi) || []).map((card, index) => {
+                if (index === 0) {
+                    card = card.replace(/(<span\b[^>]*k-content="version"[^>]*>)[\s\S]*?(<\/span>)/i, (_, start, end) => start + windowsDownloadJsonLd.version + end);
+                }
+                var heading = card.match(/<h2\b[^>]*>([\s\S]*?)<\/h2>/i);
+                var text = k.utils.dom.getText(card).replace(/\s+/g, " ").trim();
+                var archive = card.match(/href="(https:\/\/[^"\s]+\.zip)"/i);
+                if (archive) {
+                    downloadUrls.push(archive[1]);
+                }
+                return {
+                    "@type": "WebPageElement",
+                    name: k.utils.dom.getText(heading?.[1] || "").trim(),
+                    text,
+                };
+            });
+            downloadPageJsonLd.downloadUrls = downloadUrls;
+            k.state.set("pageJsonLd", downloadPageJsonLd);
+        </script>
+        <k-json-ld>
+            <type name="WebPage">
+                <property name="@id" value="pageJsonLd.url"></property>
+                <property name="url" value="pageJsonLd.url"></property>
+                <property name="name" value="pageJsonLd.name"></property>
+                <property name="headline" value="pageJsonLd.headline"></property>
+                <property name="hasPart" value="pageJsonLd.hasPart"></property>
+                <property name="description" value="pageJsonLd.description"></property>
+                <property name="inLanguage" value="pageJsonLd.language"></property>
+                <map as="isPartOf">
+                    <type name="WebSite">
+                        <property name="@id" value="pageJsonLd.websiteId"></property>
+                    </type>
+                </map>
+                <map as="mainEntity">
+                    <type name="SoftwareApplication">
+                        <property name="@id" value="pageJsonLd.softwareId"></property>
+                        <property name="name" value="'Kooboo Community Version'"></property>
+                        <property name="description" value="'Free to download and run on your own computer or server, without limitations.'"></property>
+                        <property name="url" value="pageJsonLd.url"></property>
+                        <property name="applicationCategory" value="'DeveloperApplication'"></property>
+                        <property name="operatingSystem" value="'Windows, macOS, Linux'"></property>
+                        <property name="isAccessibleForFree" value="true"></property>
+                        <property name="downloadUrl" value="pageJsonLd.downloadUrls"></property>
+                    </type>
+                </map>
+            </type>
+        </k-json-ld>
     </placeholder>
 </layout>

@@ -2,6 +2,17 @@
 </script>
 <layout id="main">
     <placeholder id="Main">
+        <script env="server">
+            var pageJsonLdUrl = k.site.info.makeAbsUrl(k.request.url.split(/[?#]/)[0]);
+            var pageJsonLd = {
+                name: "Website Templates Marketplace | Kooboo",
+                description: "Browse Kooboo's website template marketplace for business sites, e-commerce stores, applications, and tools. Choose a template and launch with one click.",
+                url: pageJsonLdUrl,
+                websiteId: k.site.info.makeAbsUrl("/") + "#website",
+                language: k.request.culture || "en",
+            };
+            k.state.set("pageJsonLd", pageJsonLd);
+        </script>
         <!-- <script env="server">
             k.page.setTitle("Website Templates Marketplace | Kooboo");
             k.page.setNameMeta(
@@ -10,5 +21,22 @@
             );
         </script> -->
         <view id="site.templates.gallery"></view>
+
+        <k-json-ld>
+            <type name="CollectionPage">
+                <property name="@id" value="pageJsonLd.url"></property>
+                <property name="url" value="pageJsonLd.url"></property>
+                <property name="name" value="pageJsonLd.name"></property>
+                <property name="headline" value="pageJsonLd.headline"></property>
+                <property name="description" value="pageJsonLd.description"></property>
+                <property name="inLanguage" value="pageJsonLd.language"></property>
+                <property name="mainEntity" value="pageJsonLd.mainEntity"></property>
+                <map as="isPartOf">
+                    <type name="WebSite">
+                        <property name="@id" value="pageJsonLd.websiteId"></property>
+                    </type>
+                </map>
+            </type>
+        </k-json-ld>
     </placeholder>
 </layout>

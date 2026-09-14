@@ -2,6 +2,36 @@
     <query as="koobooCore" source="content" resource="KoobooCore" action="list" export=""></query>
 </k-data>
 
+<script env="server">
+    const innovationPageJsonLd = k.state.get("pageJsonLd");
+    const innovationItems = k.state.get("koobooCore") || [];
+    innovationPageJsonLd.headline = k.site.labels.getValue("Innovation.Title") || "The Core of kooboo";
+    innovationPageJsonLd.description = k.site.labels.getValue("Innovation.Description") || "We didn’t build another CMS wrapper.We rebuilt the web stack from the kernel, Native binaries, zero dependencies, and extreme machine efficiency";
+    innovationPageJsonLd.mainEntity = {
+        "@type": "ItemList",
+        "@id": innovationPageJsonLd.url + "#capabilities",
+        name: innovationPageJsonLd.headline,
+        numberOfItems: innovationItems.length,
+        itemListElement: innovationItems.map((item, index) => {
+            const articleUrl = k.site.info.makeAbsUrl("/articles/" + item.slug);
+            return {
+                "@type": "ListItem",
+                position: index + 1,
+                item: {
+                    "@type": "Article",
+                    "@id": articleUrl + "#article",
+                    url: articleUrl,
+                    headline: item.Title,
+                    name: item.Title,
+                    description: item.Description,
+                },
+            };
+        }),
+    };
+    k.page.setNameMeta("description", innovationPageJsonLd.description);
+    k.state.set("pageJsonLd", innovationPageJsonLd);
+</script>
+
 <link rel="preload" as="image" href="/site/home-innovation-hero-background.webp" fetchpriority="high">
 
 <section class="innovation-page bg-[var(--color-white)]" aria-labelledby="innovation-title">

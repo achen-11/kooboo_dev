@@ -2,11 +2,17 @@
 <layout id="main">
     <placeholder id="Main">
         <script env="server">
-            k.page.setTitle("Build a real website in Minutes | Kooboo");
-            k.page.setNameMeta(
-                "description",
-                "Build a production-ready website with Kooboo's AI website builder. Customize your design, connect a domain, and choose free hosting or self-hosting."
-            );
+            var pageJsonLdUrl = k.site.info.makeAbsUrl(k.request.url.split(/[?#]/)[0]);
+            var pageJsonLd = {
+                name: "Build a real website in Minutes | Kooboo",
+                description: "Build a production-ready website with Kooboo's AI website builder. Customize your design, connect a domain, and choose free hosting or self-hosting.",
+                url: pageJsonLdUrl,
+                websiteId: k.site.info.makeAbsUrl("/") + "#website",
+                language: k.request.culture || "en",
+            };
+            k.page.setTitle(pageJsonLd.name);
+            k.page.setNameMeta("description", pageJsonLd.description);
+            k.state.set("pageJsonLd", pageJsonLd);
         </script>
         <view id="site/home/hero"></view>
         <view id="site/home/publish-banner"></view>
@@ -16,5 +22,83 @@
         <view id="site/home/performance-banner"></view>
         <view id="site/home/start-building-banner"></view>
         <script type="module" src="/home.js"></script>
+
+        <script env="server">
+            var homePageJsonLd = k.state.get("pageJsonLd");
+            var homeHero = k.state.get("hero") || {};
+            var homeStart = k.state.get("startBuilding") || {};
+            function homeJsonLdText(value) {
+                return k.utils.dom.getText(String(value || "")).replace(/\s+/g, " ").trim();
+            }
+            homePageJsonLd.headline = homeJsonLdText(homeHero.Title) || homePageJsonLd.name;
+            homePageJsonLd.description = homeJsonLdText(homeHero.Description) || homePageJsonLd.description;
+            var homeSections = [
+                {
+                    id: "home-publish-banner-title",
+                    name: k.site.labels.getValue("prompt") || "prompt --> build --> publish",
+                    items: k.state.get("publishBanner") || [],
+                    titlesOnly: true,
+                },
+                {
+                    id: "home-productivity-title",
+                    name: k.site.labels.getValue("One underlying architecture, three productivity limits") || "One underlying architecture, three productivity limits",
+                    items: k.state.get("productivityBanner") || [],
+                },
+                {
+                    id: "home-business-title",
+                    name: k.site.labels.getValue("It doesn't just build your site&mdash;it runs your business") || "It doesn't just build your site—it runs your business",
+                    items: ["aiGeneratedBanner", "aiControlsBanner", "growthBanner", "protectionBanner"].map(key => k.state.get(key)).filter(Boolean),
+                },
+                {
+                    id: "home-production-title",
+                    name: (k.site.labels.getValue("Not a Demo.") || "Not a Demo.") + " " + (k.site.labels.getValue("Real Production System") || "Real Production System"),
+                    items: (k.state.get("productionBanner") || []).slice(0, 3),
+                },
+                {
+                    id: "home-performance-title",
+                    name: k.site.labels.getValue("Extreme Performance Architecture") || "Extreme Performance Architecture",
+                    items: k.state.get("performanceBanner") || [],
+                },
+                {
+                    id: "home-start-building-title",
+                    name: homeStart.Title || "Start Building Now !",
+                    items: [homeStart],
+                },
+            ];
+            homePageJsonLd.hasPart = homeSections.map(section => ({
+                "@type": "WebPageElement",
+                "@id": homePageJsonLd.url + "#" + section.id,
+                name: homeJsonLdText(section.name),
+                text: section.items.map(item => homeJsonLdText(item.Title) + (section.titlesOnly ? "" : " " + homeJsonLdText(item.Description))).join(" ").trim(),
+            })).filter(section => section.text);
+            homePageJsonLd.mainEntity = {
+                "@type": "WebApplication",
+                "@id": homePageJsonLd.url + "#application",
+                name: "Kooboo",
+                url: homePageJsonLd.url,
+                description: homePageJsonLd.description,
+                applicationCategory: "DeveloperApplication",
+                featureList: homeSections.slice(1, 5).map(section => section.items.map(item => homeJsonLdText(item.Title) + " " + homeJsonLdText(item.Description)).join(" ").trim()).filter(Boolean),
+            };
+            k.page.setNameMeta("description", homePageJsonLd.description);
+            k.state.set("pageJsonLd", homePageJsonLd);
+        </script>
+        <k-json-ld>
+            <type name="WebPage">
+                <property name="@id" value="pageJsonLd.url"></property>
+                <property name="url" value="pageJsonLd.url"></property>
+                <property name="name" value="pageJsonLd.name"></property>
+                <property name="headline" value="pageJsonLd.headline"></property>
+                <property name="description" value="pageJsonLd.description"></property>
+                <property name="inLanguage" value="pageJsonLd.language"></property>
+                <property name="mainEntity" value="pageJsonLd.mainEntity"></property>
+                <property name="hasPart" value="pageJsonLd.hasPart"></property>
+                <map as="isPartOf">
+                    <type name="WebSite">
+                        <property name="@id" value="pageJsonLd.websiteId"></property>
+                    </type>
+                </map>
+            </type>
+        </k-json-ld>
     </placeholder>
 </layout>

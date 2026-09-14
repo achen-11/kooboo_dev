@@ -2,12 +2,36 @@
 <layout id="main">
   <placeholder id="Main">
     <script env="server">
-      k.page.setTitle("Pricing | Kooboo");
-      k.page.setNameMeta(
-        "description",
-        "Compare Kooboo website builder and hosting plans, review included features, and find answers to pricing questions before choosing a plan."
-      );
+      var pageJsonLdUrl = k.site.info.makeAbsUrl(k.request.url.split(/[?#]/)[0]);
+      var pageJsonLd = {
+        name: "Pricing | Kooboo",
+        description: "Compare Kooboo website builder and hosting plans, review included features, and find answers to pricing questions before choosing a plan.",
+        url: pageJsonLdUrl,
+        websiteId: k.site.info.makeAbsUrl("/") + "#website",
+        language: k.request.culture || "en",
+      };
+      k.page.setTitle(pageJsonLd.name);
+      k.page.setNameMeta("description", pageJsonLd.description);
+      k.state.set("pageJsonLd", pageJsonLd);
     </script>
     <view id="site/price/core"></view>
+
+    <k-json-ld>
+      <type name="WebPage">
+        <property name="@id" value="pageJsonLd.url"></property>
+        <property name="url" value="pageJsonLd.url"></property>
+        <property name="name" value="pageJsonLd.name"></property>
+        <property name="description" value="pageJsonLd.description"></property>
+        <property name="headline" value="pageJsonLd.headline"></property>
+        <property name="inLanguage" value="pageJsonLd.language"></property>
+        <property name="mainEntity" value="pageJsonLd.mainEntity"></property>
+        <property name="hasPart" value="pageJsonLd.hasPart"></property>
+        <map as="isPartOf">
+          <type name="WebSite">
+            <property name="@id" value="pageJsonLd.websiteId"></property>
+          </type>
+        </map>
+      </type>
+    </k-json-ld>
   </placeholder>
 </layout>

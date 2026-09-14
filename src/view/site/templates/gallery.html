@@ -37,12 +37,33 @@
             );
         }
 
-        k.page.setTitle(`${activeCategory.Name} Templates | Kooboo Marketplace`);
-        k.page.setNameMeta(
-            "description",
-            `Browse ${activeCategory.Name} website templates in Kooboo Marketplace. Preview designs, choose a template, and launch your site with one click.`
-        );
+        const categoryPageJsonLd = k.state.get("pageJsonLd");
+        categoryPageJsonLd.name = `${activeCategory.Name} Templates | Kooboo Marketplace`;
+        categoryPageJsonLd.description = `Browse ${activeCategory.Name} website templates in Kooboo Marketplace. Preview designs, choose a template, and launch your site with one click.`;
+        k.page.setTitle(categoryPageJsonLd.name);
+        k.page.setNameMeta("description", categoryPageJsonLd.description);
+        k.state.set("pageJsonLd", categoryPageJsonLd);
     }
+
+    const templatePageJsonLd = k.state.get("pageJsonLd");
+    templatePageJsonLd.headline = activeCategory?.PageHeading || templatePageJsonLd.name;
+    templatePageJsonLd.mainEntity = {
+        "@type": "ItemList",
+        "@id": templatePageJsonLd.url + "#templates",
+        name: templatePageJsonLd.headline,
+        numberOfItems: templateItems.length,
+        itemListElement: templateItems.map((item, index) => {
+            const template = { "@type": "CreativeWork", name: item.Name };
+            if (item.PreviewImage) {
+                template.image = k.site.info.makeAbsUrl(item.PreviewImage);
+            }
+            if (item.TemplateId) {
+                template.identifier = item.TemplateId;
+            }
+            return { "@type": "ListItem", position: index + 1, item: template };
+        }),
+    };
+    k.state.set("pageJsonLd", templatePageJsonLd);
 
     export {
         templateCategories,

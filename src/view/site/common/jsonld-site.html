@@ -1,0 +1,30 @@
+<script env="server">
+    var siteJsonLd = {
+        url: k.site.info.makeAbsUrl("/"),
+        websiteId: k.site.info.makeAbsUrl("/") + "#website",
+        organizationId: k.site.info.makeAbsUrl("/") + "#organization",
+        legalName: k.site.labels.getValue("companyname") || "Yardi Technology Limited",
+        logo: k.site.info.makeAbsUrl("/kooboo-logo.svg"),
+    };
+    k.state.set("siteJsonLd", siteJsonLd);
+</script>
+
+<k-json-ld>
+    <type name="Organization">
+        <property name="@id" value="siteJsonLd.organizationId"></property>
+        <property name="name" value="'Kooboo'"></property>
+        <property name="legalName" value="siteJsonLd.legalName"></property>
+        <property name="url" value="siteJsonLd.url"></property>
+        <property name="logo" value="siteJsonLd.logo"></property>
+    </type>
+    <type name="WebSite">
+        <property name="@id" value="siteJsonLd.websiteId"></property>
+        <property name="name" value="'Kooboo'"></property>
+        <property name="url" value="siteJsonLd.url"></property>
+        <map as="publisher">
+            <type name="Organization">
+                <property name="@id" value="siteJsonLd.organizationId"></property>
+            </type>
+        </map>
+    </type>
+</k-json-ld>
