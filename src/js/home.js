@@ -721,7 +721,21 @@ function initHomePromptEffects() {
     initHomeStartBuildingEntrance();
 }
 
+function initAiChatStartLinks() {
+    document.querySelectorAll("[data-ai-chat-start]").forEach((link) => {
+        const updateHref = () => {
+            const root = document.querySelector(".home-hero .prompt-generator");
+            const modelSelection = root ? readModelFromGenerator(root) : null;
+            link.href = buildAiChatStartUrl(modelSelection || {}, getCookieValue("jwt_token")).href;
+        };
+        updateHref();
+        link.addEventListener("click", updateHref);
+        link.addEventListener("contextmenu", updateHref);
+    });
+}
+
 function initPromptGeneratorFeatures() {
+    initAiChatStartLinks();
     schedulePromptGenerators();
     initScrollToPromptLinks();
     initHomePromptEffects();
