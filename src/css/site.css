@@ -277,13 +277,17 @@ body:has(.download-page) {
     line-height: 1.4;
 }
 
-.download-card p {
+.download-card__summary {
     width: min(200px, 100%);
     min-height: 54px;
     margin: 24px 0 0;
     color: var(--color-muted);
     font-size: 13px;
     line-height: 1.38;
+}
+
+.download-card__summary p {
+    margin: 0;
 }
 
 .download-card__version {
@@ -834,6 +838,42 @@ body:has(.home-hero) .site-header__user-trigger {
     border-radius: 8px;
     font-size: 14px;
     line-height: 1;
+}
+
+.site-header__language-link,
+.site-header__mobile-language-link {
+    display: inline-flex;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-white);
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.site-header__language-link img,
+.site-header__mobile-language-link img {
+    display: block;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+}
+
+.site-header__language-link:hover,
+.site-header__language-link:focus-visible,
+.site-header__mobile-language-link:hover,
+.site-header__mobile-language-link:focus-visible {
+    border-color: var(--color-border-hover);
+    box-shadow: 0 0 0 4px rgba(17, 26, 74, 0.06);
+}
+
+.site-header__mobile-language-link {
+    width: 44px;
+    height: 44px;
+    margin: 8px 12px;
 }
 
 .site-header__secondary-action {
@@ -2732,6 +2772,7 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
         justify-self: end;
     }
 
+    .site-header__language-link,
     .site-header__user-menu {
         display: none;
     }

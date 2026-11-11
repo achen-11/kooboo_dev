@@ -1,67 +1,80 @@
+<script env="server">
+	const downloadPlatforms = {
+		"windows-x64-portable": { icon: "windows.svg", order: 0 },
+		"macos": { icon: "macos.svg", order: 1 },
+		"microsoft-store": { icon: "microsoft-store.svg", order: 2 },
+		"linux-x64": { icon: "linux.svg", order: 3 },
+	};
+	const downloadText = value => k.utils.dom.getText(String(value || "")).replace(/\s+/g, " ").trim();
+	const downloadItems = k.content.Downloads.all().map(item => {
+		const slug = String(item.slug || "").toLowerCase();
+		const platform = downloadPlatforms[slug];
+		const version = String(item.FileUrl || "").match(/Kooboo-(?:win-portable-)?(\d+(?:\.\d+)+)/i);
+		return {
+			...item,
+			Icon: platform ? "/site/download/" + platform.icon : "",
+			Order: platform ? platform.order : 4,
+			IsLinux: slug === "linux-x64",
+			IsStore: slug === "microsoft-store",
+			Version: version ? "V" + version[1] : "",
+		};
+	}).sort((a, b) => (a.sequence || 0) - (b.sequence || 0) || a.Order - b.Order);
+	const linuxDownloads = downloadItems.filter(item => item.IsLinux).map(item => {
+		const summary = String(item.Summary || "");
+		const command = summary.match(/<code\b[^>]*>([\s\S]*?)<\/code>/i);
+		return {
+			...item,
+			Description: downloadText(summary.replace(/<code\b[^>]*>[\s\S]*?<\/code>/gi, "")),
+			// Correct known typos in the existing Content without changing stored data.
+			Command: downloadText(command ? command[1] : "")
+				.replace(/\bcurl-fsSL\b/g, "curl -fsSL")
+				.replace("httos://www.kooboo.com/install/sh", "https://www.kooboo.com/install.sh"),
+		};
+	});
+	k.state.set("downloadCards", downloadItems.filter(item => !item.IsLinux));
+	k.state.set("linuxDownloads", linuxDownloads);
+
+	const downloadPageJsonLd = k.state.get("pageJsonLd");
+	if (downloadPageJsonLd) {
+		downloadPageJsonLd.headline = k.site.labels.getValue("Download_Kooboo_Community_Version") || "Download Kooboo Community Version";
+		downloadPageJsonLd.hasPart = downloadItems.filter(item => !item.IsLinux).concat(linuxDownloads).map(item => ({
+			"@type": "WebPageElement",
+			name: downloadText(item.Title),
+			text: [downloadText(item.Title), item.IsLinux ? item.Description : downloadText(item.Summary), item.Version, item.IsLinux ? item.Command : downloadText(item.LinkText)].filter(Boolean).join(" "),
+		}));
+		downloadPageJsonLd.downloadUrls = downloadItems.filter(item => item.FileUrl && !item.IsStore).map(item => k.site.info.makeAbsUrl(item.FileUrl));
+		k.state.set("pageJsonLd", downloadPageJsonLd);
+	}
+</script>
+
 <section class="download-page" aria-labelledby="download-page-title" data-download-page="">
 	<div class="download-page__inner">
-		<h1 id="download-page-title">Download Kooboo Community Version</h1>
-		<p style="text-align: center;" class="pt-2 text-[var(--color-muted);] text-[14px]">
+		<h1 id="download-page-title" k-label="Download_Kooboo_Community_Version">Download Kooboo Community Version</h1>
+		<p style="text-align: center;" class="pt-2 text-[var(--color-muted);] text-[14px]" k-label="Free_to_download_and_run_on_your_own_computer_or_server,_without_limitations.">
 			Free to download and run on your own computer or server, without limitations.
 		</p>
 
 		<div class="download-panel">
 
-			<script env="server">
-				let files = k.file.folderFiles("/").sort((a, b) => b.lastModified - a.lastModified)
-				
-				
-				let file = files.find(f => f.fullName.includes("Kooboo-win-portable"))
-				
-				var download_url = `https://www.kooboo.com/__kb/kfile/${file.name}`
-				var version = file.name.replace("Kooboo-win-portable-", "").replace(".zip", "")
-				
-			</script>
-
-			<article class="download-card">
+			<article class="download-card" k-for="item in downloadCards" repeat-self="true">
 				<div class="download-card__heading">
-					<img src="/site/download/windows.svg" alt="" width="48" height="48" aria-hidden="true">
-					<h2>Windows x64 Portable</h2>
+					<img k-if="item.Icon" k-attribute="src item.Icon" alt="" width="48" height="48" aria-hidden="true">
+					<h2 k-content="item.Title"></h2>
 				</div>
-				<p>Portable application, download, unzip and double click on Kooboo.exe to run</p>
-				<span class="download-card__version" k-content="version"></span>
-
-				<span class="download-card__version">Temporarily unsigned<br> May show a warning</span>
-
-				 <br>
-
-				<a class="download-card__button" k-attribute="href download_url">Download</a>
+				<div class="download-card__summary" k-html="item.Summary"></div>
+				<span k-if="item.Version" class="download-card__version" k-content="item.Version"></span>
+				<a k-if="item.FileUrl" class="download-card__button" k-attribute="href item.FileUrl; target item.IsStore ? '_blank' : '_self'" rel="noopener" k-content="item.LinkText"></a>
 			</article>
 
-			<article class="download-card">
-				<div class="download-card__heading">
-					<img src="/site/download/macos.svg" alt="" width="48" height="48" aria-hidden="true">
-					<h2>MacOS</h2>
-				</div>
-				<p>Download and Click to run, <br>now with ARM support</p>
-				<span class="download-card__version">V3.0</span>
-				<a class="download-card__button" href="https://www.kooboo.com/__kb/kfile/Kooboo-3.0-osx.zip">Download</a>
-			</article>
-
-			<article class="download-card">
-				<div class="download-card__heading">
-					<img src="/site/download/microsoft-store.svg" alt="" width="48" height="48" aria-hidden="true">
-					<h2>Microsoft Store</h2>
-				</div>
-				<p>Windows user may search Kooboo OS on Microsoft Store and install from there</p>
-				<span class="download-card__version">Microsoft Store</span>
-				<a class="download-card__button" href="https://apps.microsoft.com/detail/9n4rlvdrwqt6" target="_blank" rel="noopener">Go to install</a>
-			</article>
-
-			<article class="download-linux">
+			<article class="download-linux" k-for="item in linuxDownloads" repeat-self="true">
 				<div class="download-linux__heading">
-					<img src="/site/download/linux.svg" alt="" width="48" height="48" aria-hidden="true">
-					<h2>Linux x64</h2>
+					<img k-attribute="src item.Icon" alt="" width="48" height="48" aria-hidden="true">
+					<h2 k-content="item.Title"></h2>
 				</div>
 				<div class="download-linux__content">
-					<p>Use wget to install or update:</p>
-					<div class="download-command">
-						<code>sudo /bin/bash -c "$(curl -fsSL https://www.kooboo.com/install.sh)"</code>
+					<p k-content="item.Description"></p>
+					<div k-if="item.Command" class="download-command">
+						<code k-content="item.Command"></code>
 						<button type="button" data-copy-command="" aria-label="Copy Linux install command" aria-live="polite">
 							<span class="download-command__copy-label">Copied</span>
 							<span class="download-command__copy-icon" aria-hidden="true"></span>

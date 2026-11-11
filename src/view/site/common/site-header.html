@@ -8,6 +8,19 @@
     const accessToken = k.account.getAccessToken();
     const isLoggedIn = k.account.isLogin || Boolean(accessToken);
     const showLogin = !isLoggedIn;
+    const languageUrls = k.site.multilingual.currentURLs();
+    const activeLanguage = languageUrls.find(language => language.isActive);
+    const switchLanguage = languageUrls.find(language => !language.isActive && language.URL);
+    const hasSwitchLanguage = Boolean(switchLanguage);
+    const currentLanguageKey = String(
+        (activeLanguage && (activeLanguage.key || activeLanguage.Key)) ||
+        k.site.multilingual.currentCulture || "en"
+    ).toLowerCase();
+    const currentCultureFlagKey =
+        currentLanguageKey === "chinese" || /^zh(?:-|$)/.test(currentLanguageKey)
+            ? "Chinese"
+            : "English";
+    const switchLanguageUrl = switchLanguage ? switchLanguage.URL : "";
     const resolvedAdminBaseUrl =
         resolveAdminBaseFromToken(accessToken) || "/_Admin";
     const adminBaseUrl = resolvedAdminBaseUrl.replace(/\/+$/, "") || "/_Admin";
@@ -45,6 +58,9 @@
         showLogin,
         userDisplayName,
         userInitials,
+        hasSwitchLanguage,
+        currentCultureFlagKey,
+        switchLanguageUrl,
     };
 </script>
 
@@ -61,6 +77,9 @@
                 <a class="site-header__mobile-link" href="/pricing" k-label="menu.pricing">Price</a>
                 <a class="site-header__mobile-link" href="/download">Download</a>
                 <a class="site-header__mobile-link" href="https://docs.kooboo.com" target="_blank" rel="noopener" k-label="menu.docs">Doc</a>
+                <a k-if="hasSwitchLanguage" class="site-header__mobile-language-link" k-attribute="href switchLanguageUrl" aria-label="Switch language" title="Switch language">
+                    <img src="/images/English.svg" k-attribute="src /images/{currentCultureFlagKey}.svg" alt="" width="22" height="22">
+                </a>
                 <!-- <a k-if="showLogin" class="site-header__mobile-link" href="/_Admin/start?returnurl=/" k-attribute="href loginUrl" k-label="SignIn">Login</a> -->
                 <div k-if="isLoggedIn" class="site-header__mobile-user">
                     <div class="site-header__mobile-user-meta">
@@ -83,13 +102,16 @@
         <nav class="site-header__nav" aria-label="Primary navigation">
             <a class="site-header__link" href="/" k-label="menu.home">Home</a>
             <a class="site-header__link" href="/innovation" k-label="menu.innovation">Innovation</a>
-            <a class="site-header__link" href="/templates">Marketplace</a>
+            <a class="site-header__link" href="/templates" k-label="Marketplace">Marketplace</a>
             <a class="site-header__link" href="/pricing" k-label="menu.pricing">Price</a>
-            <a class="site-header__link" href="/download">Download</a>
-            <a class="site-header__link" href="https://docs.kooboo.com" target="_blank" rel="noopener" k-label="menu.docs">Doc</a>
+            <a class="site-header__link" href="/download" k-label="Download">Download</a>
+            <a class="site-header__link" env="server" :href="`https://docs.kooboo.com`" target="_blank" rel="noopener" k-label="menu.docs">Doc</a>
         </nav>
 
         <div class="site-header__actions">
+            <a k-if="hasSwitchLanguage" class="site-header__language-link" k-attribute="href switchLanguageUrl" aria-label="Switch language" title="Switch language">
+                <img src="/images/English.svg" k-attribute="src /images/{currentCultureFlagKey}.svg" alt="" width="22" height="22">
+            </a>
             <!-- <a k-if="showLogin" class="site-header__secondary-action" href="/_Admin/login" k-attribute="href loginUrl" k-label="SignIn">Login</a> -->
             <details k-if="isLoggedIn" class="site-header__user-menu">
                 <summary class="site-header__user-trigger" aria-label="Account menu">

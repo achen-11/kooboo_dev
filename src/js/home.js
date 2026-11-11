@@ -299,18 +299,41 @@ const MODEL_PREFERENCE_KEY = "kooboo_ai_chat_model_preference";
 const MODEL_VALUE_SEP = "|";
 
 const PROMPT_GENERATOR_STRINGS = {
-    noModelsAvailable: "No models available",
-    loadModelsFailed: "Failed to load models",
-    placeholderPrefix: "What kind of website do you need? Try this: ",
-    placeholderPrompts: [
-        "help me generate a coffee website with online ordering...",
-        "build a SaaS dashboard for finance teams...",
-        "create a portfolio for a UI designer...",
-    ],
+    zh: {
+        noModelsAvailable: "暂无可用模型",
+        loadModelsFailed: "模型加载失败",
+        placeholderPrefix: "描述您的网站，例如：",
+        placeholderPrompts: [
+            "支持在线点单的咖啡店网站",
+            "面向财务团队的 SaaS 仪表盘",
+            "UI 设计师的作品集网站",
+        ],
+    },
+    en: {
+        noModelsAvailable: "No models available",
+        loadModelsFailed: "Failed to load models",
+        placeholderPrefix: "Describe your website, e.g., ",
+        placeholderPrompts: [
+            "A coffee shop site with online ordering",
+            "A SaaS dashboard for finance teams",
+            "A portfolio site for a UI designer",
+        ],
+    },
 };
 
-function promptGeneratorText(key) {
-    return PROMPT_GENERATOR_STRINGS[key];
+function detectPromptGeneratorLang(element) {
+    const rawLang = (
+        element?.closest?.("[lang]")?.getAttribute("lang") ||
+        document.documentElement.lang ||
+        "en"
+    ).toLowerCase();
+    return rawLang === "chinese" || /^zh(?:-|$)/.test(rawLang) ? "zh" : "en";
+}
+
+function promptGeneratorText(key, element) {
+    const lang = detectPromptGeneratorLang(element);
+    const strings = PROMPT_GENERATOR_STRINGS[lang] || PROMPT_GENERATOR_STRINGS.en;
+    return strings[key] ?? PROMPT_GENERATOR_STRINGS.en[key];
 }
 
 function readPromptFromGenerator(root) {
@@ -389,7 +412,7 @@ function populateModelSelect(select, providers, preferred) {
     if (!providers.length) {
         const option = document.createElement("option");
         option.value = "";
-        option.textContent = promptGeneratorText("noModelsAvailable");
+        option.textContent = promptGeneratorText("noModelsAvailable", select);
         select.appendChild(option);
         select.disabled = true;
         return false;
@@ -509,7 +532,7 @@ async function initPromptGenerator(root) {
         select.replaceChildren();
         const option = document.createElement("option");
         option.value = "";
-        option.textContent = promptGeneratorText("loadModelsFailed");
+        option.textContent = promptGeneratorText("loadModelsFailed", root);
         select.appendChild(option);
         select.disabled = true;
         button.disabled = true;
@@ -606,15 +629,18 @@ function initPromptTypingPlaceholder(textarea) {
 
     const promptDataset = root?.dataset || {};
     const localizedPrompts = [
-        promptDataset.placeholderPrompt1,
-        promptDataset.placeholderPrompt2,
-        promptDataset.placeholderPrompt3,
+        root?.getAttribute("data-placeholder-prompt-1") || promptDataset.placeholderPrompt1,
+        root?.getAttribute("data-placeholder-prompt-2") || promptDataset.placeholderPrompt2,
+        root?.getAttribute("data-placeholder-prompt-3") || promptDataset.placeholderPrompt3,
     ].filter(Boolean);
     const prompts = localizedPrompts.length
         ? localizedPrompts
-        : promptGeneratorText("placeholderPrompts");
+        : promptGeneratorText("placeholderPrompts", root);
     const originalPlaceholder = textarea.getAttribute("placeholder") || "";
-    const localizedPrefix = promptDataset.placeholderPrefix || promptGeneratorText("placeholderPrefix");
+    const localizedPrefix =
+        root?.getAttribute("data-placeholder-prefix") ||
+        promptDataset.placeholderPrefix ||
+        promptGeneratorText("placeholderPrefix", root);
     const prefix = localizedPrefix || (originalPlaceholder.includes("Try this:")
         ? `${originalPlaceholder.split("Try this:")[0]}Try this: `
         : "");
