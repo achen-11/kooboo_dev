@@ -29,6 +29,25 @@ pnpm dev
 npm run dev
 ```
 
+### 拉取与类型声明脱敏
+
+拉取远程站点后，自动将 `kooboo.d.ts` 注释示例中的 AWS Access Key ID 和 Secret Access Key 替换为占位符：
+
+```bash
+npm run pull
+
+# 仅拉取类型声明并脱敏
+npm run pull:types
+```
+
+如果已经手动执行了 `kb pull`，在暂存文件前运行：
+
+```bash
+npm run sanitize:types
+```
+
+清理命令可重复执行，只修改本地类型声明中的示例值。远程生成源仍包含这些值，直接执行 `kb pull` 后需要再次清理。
+
 ## 项目结构
 
 ```bash

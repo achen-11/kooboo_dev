@@ -6,6 +6,9 @@
     "typescript": "^5.8.3"
   },
   "scripts": {
-    "dev": "kb sync"
+    "dev": "kb sync",
+    "sanitize:types": "node scripts/sanitize-kooboo-types.mjs",
+    "pull": "kb pull && npm run sanitize:types",
+    "pull:types": "kb pull type && npm run sanitize:types"
   }
 }

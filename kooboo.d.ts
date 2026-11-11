@@ -287,6 +287,7 @@ k.state.setCurrent("key", obj);
     search: Kooboo.Sites.DataSources.Search;
     menus: Kooboo.Sites.Scripting.KMenus;
     multilingual: Kooboo.Sites.Scripting.Multilingual;
+    job: KScript.Sites.JobRepository;
     list(): Kooboo.Sites.Scripting.ScriptModel.SiteSummaryViewModel[];
     isDomainExists(name: string): boolean;
     isNameExists(SiteName: string): boolean;
@@ -2115,6 +2116,7 @@ declare namespace KScript.AI {
     app: KAIApp;
     vectorization: KAIVectorization;
     callFunction(name: string, arguments: Record<string, any>): any;
+    readSiteMilestones(): string;
     getModels(): Kooboo.Sites.AI.AIProviderViewModel[];
   }
 
@@ -2377,6 +2379,8 @@ declare namespace Kooboo.Sites.Scripting.Global.SiteItem {
     xCopy(sourceSiteNameOrId: string, siteName: string, fullDomain: string, published: boolean): Kooboo.Sites.ViewModel.SitePackageResult;
     /** Fast-copy a whole website folder from current website, then create independent site configuration and binding for the copy. */
     xCopy(newSiteName: string, fullDomain: string, published: boolean): Kooboo.Sites.ViewModel.SitePackageResult;
+    /** Fast-copy a whole website folder from current website, then create independent site configuration and binding for the copy, and place it in the named site folder. The folder is created when it does not exist. */
+    xCopy(newSiteName: string, fullDomain: string, published: boolean, folderName: string): Kooboo.Sites.ViewModel.SitePackageResult;
   }
 
   interface KSitePublish {
@@ -2524,7 +2528,7 @@ var token= k.account.generateToken("username",60*60*24); //expire in 1 day
     /** Office Operations.
             eg:excel */
     office: KScript.Office;
-    sitemap: Kooboo.Data.Sitemap.KSitemap;
+    sitemap: Kooboo.Sites.Sitemap.KSitemap;
     screenShot: Kooboo.Sites.Scripting.Global.WebUtility.ScreenShot;
     inlineHtml: Kooboo.Sites.Scripting.Global.WebUtility.KInlineHTML;
     image: Kooboo.Sites.Scripting.Global.WebUtility.KImageUtility;
@@ -2556,8 +2560,8 @@ k.sleep(1000);  // 1s
 
   interface KSandbox {
     current?: string;
-    /** Content types to copy. Available values: Layout, View, Style, Script, Image, File, Menu, HtmlBlock, Label, Form, ContentFolder, ContentType, ContentCategory, TextContent, Code, OpenApi, Page. */
-    create(sandboxName: string): boolean;
+    /** Creates a sandbox site and returns it, including its id and preview url. */
+    create(sandboxName: string): SandBoxSite;
     delete(sandboxName: string): boolean;
     findSite(sandBoxName: string): Kooboo.Data.Models.WebSite;
     list(): SandBoxSite[];
@@ -2626,6 +2630,8 @@ const connection= k.net.webSocket.get('user_1');
     isOfOrganization(OrganizationName: string): boolean;
     changeOrganization(OrganizationName: string): Kooboo.Data.Models.User;
     get(userName: string): Kooboo.Data.Models.User;
+    /** Generate a locally signed test account token for username@orgname using the current organization. For testing only. */
+    generateTestUserToken(username: string): string;
     exists(UserName: string): boolean;
     emailExists(email: string): boolean;
     existEmail(email: string): boolean;
@@ -2808,6 +2814,8 @@ k.clientJS.setVariable("myname", obj);
     id: any;
     siteName: string;
     creationDate: Date;
+    /** Complete access URL of the sandbox site. */
+    previewUrl?: string;
   }
 
   interface RequestUrlResult {
@@ -4905,16 +4913,20 @@ declare namespace Kooboo.Sites.AI {
     chatModels: ChatModel[];
     embeddingModels: EmbeddingModel[];
     customApiKey: string;
+    hasCustomApiKey: boolean;
     customEndpoint: string;
+    customModels: CustomModelConfig[];
     enable: boolean;
   }
 
   interface ChatModel {
     name: string;
     inputPrice: number;
+    cachedInputPrice?: number;
     outputPrice: number;
     maxInputTokens: number;
     maxOutTokens: number;
+    experienceTokens: number;
   }
 
   interface EmbeddingModel {
@@ -4923,6 +4935,12 @@ declare namespace Kooboo.Sites.AI {
     maxTokenLength: number;
     defaultDimensions: number;
     availableDimensionsList: number[];
+  }
+
+  interface CustomModelConfig {
+    name: string;
+    maxInputTokens: number;
+    maxOutTokens: number;
   }
 
 }
@@ -4936,7 +4954,7 @@ declare namespace Kooboo.Lib.GeoLocation {
 
 }
 declare namespace Kooboo.Sites.Models {
-  interface Page extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, IDomObject, Kooboo.Data.Interface.ITextObject, Kooboo.Data.Interface.IScriptable, Kooboo.IndexedDB.Serializer.IDatabaseObject, DomObject {
+  interface Page extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.ITextObject, IDomObject, Kooboo.Data.Interface.IScriptable, Kooboo.IndexedDB.Serializer.IDatabaseObject, DomObject {
     headers: HtmlHeader;
     id: any;
     layoutName: string;
@@ -5020,11 +5038,11 @@ declare namespace Kooboo.Sites.Models {
 
   type PageType = 'Normal' | 'Layout' | 'RichText' | 'Designer';
 
-  interface IDomObject extends Kooboo.Data.Interface.ITextObject, Kooboo.Data.Interface.ISiteObject {
+  interface IDomObject extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ITextObject {
     dom: Kooboo.Dom.Document;
   }
 
-  interface DomObject extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, IDomObject, Kooboo.Data.Interface.ITextObject, CoreObject {
+  interface DomObject extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.ITextObject, IDomObject, CoreObject {
     body: string;
     name: string;
     dom: Kooboo.Dom.Document;
@@ -5051,7 +5069,7 @@ declare namespace Kooboo.Sites.Models {
     clone(): any;
   }
 
-  interface View extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, IDomObject, Kooboo.Data.Interface.ITextObject, Kooboo.Data.Interface.IExtensionable, Kooboo.Data.Interface.IScriptable, Kooboo.IndexedDB.Serializer.IDatabaseObject, DomObject {
+  interface View extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.ITextObject, IDomObject, Kooboo.Data.Interface.IExtensionable, Kooboo.Data.Interface.IScriptable, Kooboo.IndexedDB.Serializer.IDatabaseObject, DomObject {
     id: any;
     name: string;
     moduleId: any;
@@ -5085,7 +5103,7 @@ declare namespace Kooboo.Sites.Models {
     clone(): any;
   }
 
-  interface Layout extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, IDomObject, Kooboo.Data.Interface.ITextObject, Kooboo.Data.Interface.IExtensionable, Kooboo.IndexedDB.Serializer.IDatabaseObject, DomObject {
+  interface Layout extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.ITextObject, IDomObject, Kooboo.Data.Interface.IExtensionable, Kooboo.IndexedDB.Serializer.IDatabaseObject, DomObject {
     id: any;
     name: string;
     extension: string;
@@ -5105,7 +5123,7 @@ declare namespace Kooboo.Sites.Models {
     clone(): any;
   }
 
-  interface Script extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.IEmbeddable, Kooboo.Data.Interface.ITextObject, Kooboo.Data.Interface.IExtensionable, Kooboo.IndexedDB.Serializer.IDatabaseObject, CoreObject {
+  interface Script extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.ITextObject, Kooboo.Data.Interface.IEmbeddable, Kooboo.Data.Interface.IExtensionable, Kooboo.IndexedDB.Serializer.IDatabaseObject, CoreObject {
     id: any;
     name: string;
     engine: string;
@@ -5135,7 +5153,7 @@ declare namespace Kooboo.Sites.Models {
     clone(): any;
   }
 
-  interface Style extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.IEmbeddable, Kooboo.Data.Interface.ITextObject, Kooboo.Data.Interface.IExtensionable, Kooboo.IndexedDB.Serializer.IDatabaseObject, CoreObject {
+  interface Style extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.ITextObject, Kooboo.Data.Interface.IEmbeddable, Kooboo.Data.Interface.IExtensionable, Kooboo.IndexedDB.Serializer.IDatabaseObject, CoreObject {
     id: any;
     name: string;
     engine: string;
@@ -5166,7 +5184,7 @@ declare namespace Kooboo.Sites.Models {
     clone(): any;
   }
 
-  interface Image extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.IBinaryFile, Kooboo.Data.Interface.IExtensionable, Kooboo.IndexedDB.Serializer.IDatabaseObject, CoreObject {
+  interface Image extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.IExtensionable, Kooboo.Data.Interface.IBinaryFile, Kooboo.IndexedDB.Serializer.IDatabaseObject, CoreObject {
     id: any;
     name: string;
     alt: string;
@@ -5195,7 +5213,7 @@ declare namespace Kooboo.Sites.Models {
     clone(): any;
   }
 
-  interface CmsFile extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.IBinaryFile, Kooboo.Data.Interface.IExtensionable, Kooboo.IndexedDB.Serializer.IDatabaseObject, CoreObject {
+  interface CmsFile extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.IExtensionable, Kooboo.Data.Interface.IBinaryFile, Kooboo.IndexedDB.Serializer.IDatabaseObject, CoreObject {
     id: any;
     extension: string;
     contentBytes: number[];
@@ -5223,6 +5241,29 @@ declare namespace Kooboo.Sites.Models {
     lastModifyTick: number;
     id: any;
     name: string;
+    clone(): any;
+  }
+
+  interface SiteJob extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.IndexedDB.Serializer.IDatabaseObject, CoreObject {
+    id: any;
+    startTime: Date;
+    active: boolean;
+    finish: boolean;
+    repeat: boolean;
+    frequence: Kooboo.IndexedDB.Schedule.RepeatFrequence;
+    frequenceUnit: number;
+    code: string;
+    online: boolean;
+    version: number;
+    constType: number;
+    creationDate: Date;
+    lastModified: Date;
+    lastModifyTick: number;
+    name: string;
+    getSize(): number;
+    writeTo(buffer: any): number;
+    getIndexValue(fieldHash: number): any;
+    setValues(values: any): void;
     clone(): any;
   }
 
@@ -5379,7 +5420,7 @@ declare namespace Kooboo.Sites.Models {
     clone(): any;
   }
 
-  interface Form extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.IEmbeddable, Kooboo.Data.Interface.ITextObject, Kooboo.IndexedDB.Serializer.IDatabaseObject, CoreObject {
+  interface Form extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.ITextObject, Kooboo.Data.Interface.IEmbeddable, Kooboo.IndexedDB.Serializer.IDatabaseObject, CoreObject {
     body: string;
     engine: string;
     style: string;
@@ -5571,11 +5612,72 @@ declare namespace Kooboo.Sites.Models {
     userId: any;
     role: Kooboo.Sites.Authorization.EnumUserRole;
     siteRole: string;
+    applicationRole: string;
     visibleAdvancedMenus: string;
     constType: number;
     creationDate: Date;
     lastModified: Date;
     lastModifyTick: number;
+    name: string;
+    getSize(): number;
+    writeTo(buffer: any): number;
+    getIndexValue(fieldHash: number): any;
+    setValues(values: any): void;
+    clone(): any;
+  }
+
+  interface ApplicationRole extends Kooboo.Data.Interface.ISiteObject, Kooboo.IndexedDB.Serializer.IDatabaseObject, SiteObject {
+    displayName: string;
+    organizationRoleNames: any;
+    permissions: any;
+    constType: number;
+    creationDate: Date;
+    lastModified: Date;
+    lastModifyTick: number;
+    id: any;
+    name: string;
+    getSize(): number;
+    writeTo(buffer: any): number;
+    getIndexValue(fieldHash: number): any;
+    setValues(values: any): void;
+    clone(): any;
+  }
+
+  interface DatabasePolicy extends Kooboo.Data.Interface.ISiteObject, Kooboo.IndexedDB.Serializer.IDatabaseObject, SiteObject {
+    table: string;
+    roleNames: any;
+    action: string;
+    fields: any;
+    conditions: DatabasePolicyCondition[];
+    isEnabled: boolean;
+    remark: string;
+    userId: string;
+    constType: number;
+    creationDate: Date;
+    lastModified: Date;
+    lastModifyTick: number;
+    id: any;
+    name: string;
+    getSize(): number;
+    writeTo(buffer: any): number;
+    getIndexValue(fieldHash: number): any;
+    setValues(values: any): void;
+    clone(): any;
+  }
+
+  interface PermissionDefinition extends Kooboo.Data.Interface.ISiteObject, Kooboo.IndexedDB.Serializer.IDatabaseObject, SiteObject {
+    code: string;
+    displayName: string;
+    group: string;
+    screenId: string;
+    source: string;
+    description: string;
+    order: number;
+    constType: number;
+    creationDate: Date;
+    lastModified: Date;
+    lastModifyTick: number;
+    id: any;
     name: string;
     getSize(): number;
     writeTo(buffer: any): number;
@@ -5738,29 +5840,6 @@ declare namespace Kooboo.Sites.Models {
     clone(): any;
   }
 
-  interface SiteJob extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.IndexedDB.Serializer.IDatabaseObject, CoreObject {
-    id: any;
-    startTime: Date;
-    active: boolean;
-    finish: boolean;
-    repeat: boolean;
-    frequence: Kooboo.IndexedDB.Schedule.RepeatFrequence;
-    frequenceUnit: number;
-    code: string;
-    online: boolean;
-    version: number;
-    constType: number;
-    creationDate: Date;
-    lastModified: Date;
-    lastModifyTick: number;
-    name: string;
-    getSize(): number;
-    writeTo(buffer: any): number;
-    getIndexValue(fieldHash: number): any;
-    setValues(values: any): void;
-    clone(): any;
-  }
-
   interface UserOptions extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.IndexedDB.Serializer.IDatabaseObject, CoreObject {
     id: any;
     display: string;
@@ -5840,6 +5919,19 @@ declare namespace Kooboo.Sites.Models {
     getIndexValue(fieldHash: number): any;
   }
 
+  interface DatabasePolicyCondition extends Kooboo.IndexedDB.Serializer.IDatabaseObject {
+    joinPath: DatabaseJoinStep[];
+    field: string;
+    operator: string;
+    valueType: string;
+    values: string[];
+    dynamicSource: string;
+    getSize(): number;
+    writeTo(buffer: any): number;
+    getIndexValue(fieldHash: number): any;
+    setValues(values: any): void;
+  }
+
   type RuleType = 'StyleRule' | 'MediaRule' | 'ImportRule' | 'FontFaceRule';
 
   type MatcherType = 'None' | 'Any' | 'Condition';
@@ -5865,6 +5957,19 @@ declare namespace Kooboo.Sites.Models {
     writeTo(buffer: any): number;
     setValues(values: any): void;
     getIndexValue(fieldHash: number): any;
+  }
+
+  interface DatabaseJoinStep extends Kooboo.IndexedDB.Serializer.IDatabaseObject {
+    fromField: string;
+    toTable: string;
+    toField: string;
+    conditionField: string;
+    conditionOperator: string;
+    conditionValue: string;
+    getSize(): number;
+    writeTo(buffer: any): number;
+    getIndexValue(fieldHash: number): any;
+    setValues(values: any): void;
   }
 
 }
@@ -6102,6 +6207,7 @@ declare namespace Kooboo.Sites.ViewModel {
     tableNameHash: number;
     tableName: string;
     actionType: string;
+    isAI: boolean;
     hasVideo: boolean;
   }
 
@@ -6111,6 +6217,7 @@ declare namespace Kooboo.Sites.ViewModel {
     userId: any;
     userName: string;
     actionType: string;
+    isAI: boolean;
     hasVideo: boolean;
   }
 
@@ -6301,8 +6408,13 @@ declare namespace Kooboo.Sites.Scripting.Global.EventTask {
 
 }
 declare namespace Kooboo.Sites.Scripting.Global.Sqlite {
-  interface SqliteDatabase extends Kooboo.Sites.Scripting.Interfaces.IRelationalDatabase, KScript.IDatabase {
+  interface SqliteDatabase extends KScript.IDatabase, Kooboo.Sites.Scripting.Interfaces.IRelationalDatabase {
     getTables(): string[];
+    /** Attach another site's sqlite database as an alias, then query the current site and the attached site in one statement. The attached site must belong to the current organization.
+k.DB.sqlite.attach("siteNameOrId", "alias");
+// unqualified tables belong to the current site, alias.tables belong to the attached site
+const rows = k.DB.sqlite.query("SELECT u.name, o.name FROM user AS u LEFT JOIN alias.user AS o ON u.id = o.id"); */
+    attach(siteNameOrId: string, alias?: string): SqliteDatabase;
     getTable(name: string): KScript.ITable;
     query(sql: string): KScript.IDynamicTableObject[];
     query<T>(sql: string): T;
@@ -6370,14 +6482,15 @@ Result:
 
   declare interface ReadSpanAction extends Function {
     target?: any;
+    hasSingleTarget: boolean;
     method: any;
     invoke(span: any): void;
     beginInvoke(span: any, callback: any, object: any): any;
     endInvoke(result: any): void;
-    getObjectData(info: any, context: any): void;
     getInvocationList(): any[];
     clone(): any;
     dynamicInvoke(args: any[]): any;
+    getObjectData(info: any, context: any): void;
   }
 
 declare namespace Kooboo.Data.Models {
@@ -6448,9 +6561,11 @@ declare namespace Kooboo.Data.Models {
     enableVisitorLog: boolean;
     enableImageLog: boolean;
     enableSqlLog: boolean;
+    enableAIApplicationRuntimeLog: boolean;
     enableCleanupReferencesOnDelete: boolean;
     enableSitePath: boolean;
     enableFullTextSearch: boolean;
+    enableContentFolderIndex: boolean;
     enableMultilingual: boolean;
     enableConstraintFixOnSave: boolean;
     enableCORS: boolean;
@@ -6481,6 +6596,7 @@ declare namespace Kooboo.Data.Models {
     customSettings: any;
     forceSSL: boolean;
     siteType: Kooboo.Data.Definition.WebsiteType;
+    defaultApplicationRole: string;
     whiteListPath: string[];
     specialPath: string[];
     includePath: boolean;
@@ -6495,7 +6611,7 @@ declare namespace Kooboo.Data.Models {
     pwa: Kooboo.Data.Pwa.PwaSettings;
     aI: Kooboo.Data.Models.AI.AISettings;
     codeLogSettings: Kooboo.Data.Logging.CodeLogSettings;
-    sitemapSettings: Kooboo.Data.Sitemap.SitemapSettings;
+    sitemapSettings: SitemapSettings;
     unocssSettings: Kooboo.Data.Unocss.UnocssSettings;
     canonicalURLSetting: CanonicalURLSetting;
     navigationFlowSetting: NavigationFlowSetting;
@@ -6567,6 +6683,13 @@ declare namespace Kooboo.Data.Models {
   }
 
   type SiteStatus = 'Published' | 'Development' | 'Auditing' | 'Forbidden' | 'Hidden';
+
+  interface SitemapSettings {
+    enable: boolean;
+    path: string;
+    autoGenerate: boolean;
+    code: string;
+  }
 
   interface CanonicalURLSetting {
     enable: boolean;
@@ -6745,6 +6868,7 @@ declare namespace Kooboo.Data.Models {
   }
 
   interface StepGroup {
+    id: string;
     nodeId: number;
     name: string;
     type: StepItemType;
@@ -6811,6 +6935,9 @@ declare namespace Kooboo.Data.Models {
   }
 
   interface VisitorLogItem extends Kooboo.IndexedDB.Serializer.IDatabaseObject {
+    name: string;
+    value: string;
+    statusCode: number;
     detail: string;
     startTime: Date;
     endTime: Date;
@@ -6889,6 +7016,11 @@ declare namespace Kooboo.Data.Models {
   }
 
   interface CustomTheme {
+    primaryColor: string;
+    backgroundColor: string;
+    textColor: string;
+    buttonColor: string;
+    buttonTextColor: string;
   }
 
   interface CookieDescription {
@@ -6987,6 +7119,7 @@ declare namespace Kooboo.Data.ViewModel {
   }
 
   interface DepartmentUser extends Kooboo.Data.IGolbalObject, Kooboo.IndexedDB.Serializer.IDatabaseObject, Kooboo.Data.Models.User {
+    isTestUser: boolean;
     departmentId: any;
     isManager: boolean;
     function: string;
@@ -7093,9 +7226,14 @@ declare namespace KScript.Payment.Model {
   interface UserCreditCard {
     chargeNewCard(model: ChargeNewCardModel, isStaging?: boolean): Kooboo.Data.Models.CreditCard.CreditCardPaymentResult;
     charge(model: ChargeModel, isStaging?: boolean): Kooboo.Data.Models.CreditCard.CreditCardPaymentResult;
+    createCheckoutSession(amount: number, currency: string, returnUrl: string, cancelUrl: string, isStaging?: boolean): Kooboo.Data.Models.CreditCard.CheckoutSessionResult;
+    /** Returns the Stripe publishable key for initializing Elements. */
+    publishableKey(isStaging?: boolean): string;
+    /** Returns a SetupIntent client secret for binding a card to the authenticated user with Stripe Elements. Does not charge the card. */
+    createSetupIntent(isStaging?: boolean): string;
     list(isStaging?: boolean): Kooboo.Data.Models.Market.CCPaymentMethod[];
     delete(paymentMethodId: string, isStaging?: boolean): void;
-    checkStatus(paymentIntentId: string, isStaging?: boolean): boolean;
+    checkStatus(paymentId: string, isStaging?: boolean): boolean;
   }
 
   interface Ideal {
@@ -7988,6 +8126,14 @@ k.site.views.add(view);
     getByLog(LogId: number): Kooboo.Data.Interface.ISiteObject;
   }
 
+  interface JobRepository {
+    list(): Kooboo.Sites.Models.SiteJob[];
+    get(nameOrId: string): Kooboo.Sites.Models.SiteJob;
+    add(job: Kooboo.Sites.Models.SiteJob): void;
+    update(job: Kooboo.Sites.Models.SiteJob): void;
+    delete(nameOrId: string): void;
+  }
+
   interface UserModel {
     userName: string;
     firstName: string;
@@ -8450,7 +8596,7 @@ declare namespace Kooboo.Sites.Scripting.Global.DB {
 
 }
 declare namespace Kooboo.Sites.Scripting.Global.Mysql {
-  interface MysqlDatabase extends Kooboo.Sites.Scripting.Interfaces.IRelationalDatabase, KScript.IDatabase {
+  interface MysqlDatabase extends KScript.IDatabase, Kooboo.Sites.Scripting.Interfaces.IRelationalDatabase {
     getTables(): string[];
     getTable(name: string): KScript.ITable;
     query(sql: string): KScript.IDynamicTableObject[];
@@ -8504,7 +8650,7 @@ Result:
 
 }
 declare namespace Kooboo.Sites.Scripting.Global.SqlServer {
-  interface SqlServerDatabase extends Kooboo.Sites.Scripting.Interfaces.IRelationalDatabase, KScript.IDatabase {
+  interface SqlServerDatabase extends KScript.IDatabase, Kooboo.Sites.Scripting.Interfaces.IRelationalDatabase {
     getTables(): string[];
     getTable(name: string): KScript.ITable;
     query(sql: string): KScript.IDynamicTableObject[];
@@ -8686,28 +8832,50 @@ declare namespace Kooboo.Sites.Scripting.Global.WebUtility {
 
   interface ScreenShot {
     context: Kooboo.Data.Context.RenderContext;
-    /** Take screenshot of one url and return binary array. The Url must be accessible from internet because it is taken from remote.  */
+    /** Take screenshot of one url and return binary array. On local Kooboo, renders via local headless browser; on online server, renders via screenshot service. */
     take(absoluteUrl: string): number[];
-    /** Take screenshot of one url and return binary array. The Url must be accessible from internet because it is taken from remote.  */
+    /** Take screenshot of one url and return binary array. On local Kooboo, renders via local headless browser; on online server, renders via screenshot service. */
     take(absoluteUrl: string, width: number, height: number): number[];
-    /** Take screenshot of one url and return binary array. The Url must be accessible from internet because it is taken from remote.  */
+    /** Take screenshot of one url and return binary array. On local Kooboo, renders via local headless browser; on online server, renders via screenshot service. */
     take(absoluteUrl: string, width: number, height: number, fullPage: boolean): number[];
-    /** Take screenshot of one url and return binary array. The Url must be accessible from internet because it is taken from remote.  */
+    /** Take screenshot of one url and return binary array. On local Kooboo, renders via local headless browser; on online server, renders via screenshot service. */
+    take(absoluteUrl: string, width: number, height: number, fullPage: boolean, delaySeconds: number): number[];
+    /** Take screenshot of one url and return binary array. On local Kooboo, renders via local headless browser; on online server, renders via screenshot service. */
     take(absoluteUrl: string, width: number, height: number, scaleWidth: number, scaleHeight: number, fullPage: boolean): number[];
-    /** Take screenshot of local url, that is not accessible from internet.  */
+    /** Take screenshot of one url and return binary array. On local Kooboo, renders via local headless browser; on online server, renders via screenshot service. */
+    take(absoluteUrl: string, width: number, height: number, scaleWidth: number, scaleHeight: number, fullPage: boolean, delaySeconds: number): number[];
+    /** Take screenshot of one url and return Base64 string. */
+    takeBase64(absoluteUrl: string): string;
+    /** Take screenshot of one url and return Base64 string. */
+    takeBase64(absoluteUrl: string, width: number, height: number, fullPage?: boolean, delaySeconds?: number): string;
+    /** Take screenshot of one url and return Base64 string. */
+    takeBase64(absoluteUrl: string, width: number, height: number, scaleWidth: number, scaleHeight: number, fullPage?: boolean, delaySeconds?: number): string;
+    /** Take screenshot of local relative url. On local Kooboo, renders live site url via headless browser; on online server, renders inlined HTML. */
     takeLocalPageUrl(LocalPageRelitiveUrl: string, width: number, height: number, fullPage: boolean): number[];
-    /** Take screenshot of local url, that is not accessible from internet.  */
+    /** Take screenshot of local relative url. On local Kooboo, renders live site url via headless browser; on online server, renders inlined HTML. */
+    takeLocalPageUrl(LocalPageRelitiveUrl: string, width: number, height: number, scaleWidth: number, scaleHeight: number, fullPage: boolean, delaySeconds?: number): number[];
+    /** Take screenshot of local relative url. On local Kooboo, renders live site url via headless browser; on online server, renders inlined HTML. */
     takeLocalPageUrl(LocalPageRelitiveUrl: string): number[];
-    /** Take screenshot of local url, that is not accessible from internet.  */
+    /** Take screenshot of local relative url and return Base64 string. */
+    takeLocalPageUrlBase64(LocalPageRelitiveUrl: string, width?: number, height?: number, scaleWidth?: number, scaleHeight?: number, fullPage?: boolean, delaySeconds?: number): string;
+    /** Take screenshot of site page by name. On local Kooboo, renders live site url via headless browser; on online server, renders inlined HTML. */
     takePage(PageName: string, width: number, height: number, fullPage: boolean): number[];
-    /** Take screenshot of local url, that is not accessible from internet.  */
+    /** Take screenshot of site page by name. On local Kooboo, renders live site url via headless browser; on online server, renders inlined HTML. */
+    takePage(PageName: string, width: number, height: number, scaleWidth: number, scaleHeight: number, fullPage: boolean, delaySeconds?: number): number[];
+    /** Take screenshot of site page by name. On local Kooboo, renders live site url via headless browser; on online server, renders inlined HTML. */
     takePage(PageName: string): number[];
+    /** Take screenshot of site page by name and return Base64 string. */
+    takePageBase64(PageName: string, width?: number, height?: number, scaleWidth?: number, scaleHeight?: number, fullPage?: boolean, delaySeconds?: number): string;
     /** Take screenshot from HTML code and return binary array. */
     takeFromHTML(HTMLCode: string, width: number, height: number, fullPage: boolean): number[];
     /** Take screenshot from HTML code and return binary array. */
     takeFromHTML(HTMLCode: string, width: number, height: number, scaleWidth: number, scaleHeight: number, fullPage: boolean): number[];
     /** Take screenshot from HTML code and return binary array. */
+    takeFromHTML(HTMLCode: string, width: number, height: number, scaleWidth: number, scaleHeight: number, fullPage: boolean, delaySeconds: number): number[];
+    /** Take screenshot from HTML code and return binary array. */
     takeFromHTML(HTMLCode: string): number[];
+    /** Take screenshot from HTML code and return Base64 string. */
+    takeFromHTMLBase64(HTMLCode: string, width?: number, height?: number, scaleWidth?: number, scaleHeight?: number, fullPage?: boolean, delaySeconds?: number): string;
   }
 
   interface KInlineHTML {
@@ -8804,6 +8972,26 @@ const capacity = k.utils.puppeteer.getTaskCapacity();
  */
     getTaskCapacity(): TaskCapacityInfo;
     screenshot(url: string, savePath: string, options?: ScreenshotOptions): void;
+    /** ```ts
+const title = k.utils.puppeteer.evaluate('https://www.example.com', 'document.title');
+```
+ */
+    evaluate(url: string, script: string, options?: EvaluateOptions): string;
+    /** ```ts
+const text = k.utils.puppeteer.evaluateHtml('<html><body>hi</body></html>', 'document.body.innerText');
+```
+ */
+    evaluateHtml(html: string, script: string, options?: EvaluateOptions): string;
+    /** ```ts
+const info = k.utils.puppeteer.evaluatePage('home', '({ title: document.title, links: document.links.length })');
+```
+ */
+    evaluatePage(pageName: string, script: string, options?: EvaluateOptions): string;
+    /** ```ts
+const title = k.utils.puppeteer.evaluateLocalPageUrl('/about', 'document.title');
+```
+ */
+    evaluateLocalPageUrl(relativeUrl: string, script: string, options?: EvaluateOptions): string;
   }
 
   interface FullLHRObj {
@@ -8856,6 +9044,14 @@ const capacity = k.utils.puppeteer.getTaskCapacity();
     width: number;
     height: number;
     fullPage: boolean;
+  }
+
+  interface EvaluateOptions {
+    width: number;
+    height: number;
+    timeoutSeconds: number;
+    delaySeconds: number;
+    waitSelector: string;
   }
 
   interface ReportSummary {
@@ -8932,16 +9128,9 @@ k.sms.aliSMS.send("your_ali_template_code", "+8115312345678", "code", "12345");
   }
 
 }
-declare namespace Kooboo.Data.Sitemap {
+declare namespace Kooboo.Sites.Sitemap {
   interface KSitemap {
     create(): Sitemap;
-  }
-
-  interface SitemapSettings {
-    enable: boolean;
-    path: string;
-    autoGenerate: boolean;
-    code: string;
   }
 
   interface Sitemap {
@@ -9189,7 +9378,7 @@ k.response.write(msg.html);
 declare namespace Kooboo.Sites.Scripting.Global.Mail.Amazonses {
   interface Amazonses {
     /** ```ts
-var mail = k.mail.amazonses.createEmail({accessKeyId: '[REDACTED_ACCESS_KEY_ID]' ,secretAccessKey: '[REDACTED_SECRET_ACCESS_KEY]',region:'EUCentral1'});
+var mail = k.mail.amazonses.createEmail({accessKeyId:'<YOUR_AWS_ACCESS_KEY_ID>' ,secretAccessKey:'<YOUR_AWS_SECRET_ACCESS_KEY>',region:'EUCentral1'});
 var from = 'me@gmail.com';
 var to = ['to-someone@gmail.com','to-someone2@gmail.com'];
 var subject = 'my subject';
@@ -9211,7 +9400,7 @@ k.response.json(res);
 
   interface AwsEmail {
     /** ```ts
-var mail = k.mail.amazonses.createEmail({accessKeyId: '[REDACTED_ACCESS_KEY_ID]' ,secretAccessKey: '[REDACTED_SECRET_ACCESS_KEY]',region:'EUCentral1'});
+var mail = k.mail.amazonses.createEmail({accessKeyId:'<YOUR_AWS_ACCESS_KEY_ID>' ,secretAccessKey:'<YOUR_AWS_SECRET_ACCESS_KEY>',region:'EUCentral1'});
 var from = 'me@gmail.com';
 var to = ['to-someone@gmail.com','to-someone2@gmail.com'];
 var subject = 'my subject';
@@ -9239,7 +9428,7 @@ var pdfHtml = `<!DOCTYPE html>
 </html>`;
 var pdf = k.utils.converter.htmlToPdf('fileName.pdf', pdfHtml);
 msg.addAttachment('test.pdf', pdf.zipEntries[0].binary);
-var mail = k.mail.amazonses.createEmail({ accessKeyId: '[REDACTED_ACCESS_KEY_ID]', secretAccessKey: '[REDACTED_SECRET_ACCESS_KEY]', region: 'EUCentral1' });
+var mail = k.mail.amazonses.createEmail({ accessKeyId: '<YOUR_AWS_ACCESS_KEY_ID>', secretAccessKey: '<YOUR_AWS_SECRET_ACCESS_KEY>', region: 'EUCentral1' });
 mail.SendRaw(msg);
 ```
  */
@@ -9556,6 +9745,7 @@ declare namespace Kooboo.Sites.Scripting.Global.Models {
 
   interface UserModel {
     departments: DepartmentModel[];
+    tenants: TenantModel[];
     organizations: OrganizationModel[];
     userName: string;
     firstName: string;
@@ -9564,6 +9754,7 @@ declare namespace Kooboo.Sites.Scripting.Global.Models {
     phone: string;
     language: string;
     currentOrgId: string;
+    applicationRole: ApplicationRoleModel;
     isAdmin: boolean;
     id: any;
     changePassword(oldpassword: string, newPassword: string): boolean;
@@ -9577,10 +9768,12 @@ declare namespace Kooboo.Sites.Scripting.Global.Models {
     serverLevel: number;
     currency: string;
     isPartner: boolean;
+    tenants: TenantModel[];
     departments: DepartmentModel[];
     users: UserModel[];
     organizationUsers: UserModel[];
-    addDepartment(name: string, displayName: string): void;
+    addTenant(name: string, parentTenantId?: string): void;
+    addDepartment(name: string, displayName: string, tenantId?: string): void;
     addOrUpdateOrganizationUser(name: string, password: string, isAdmin: boolean): Kooboo.Data.Models.User;
     deleteOrganizationUser(name: string): boolean;
     getOrganizationUser(name: string): Kooboo.Data.Models.User;
@@ -9604,14 +9797,32 @@ declare namespace Kooboo.Sites.Scripting.Global.Models {
   }
 
   interface DepartmentModel {
-    id: any;
+    id: string;
     name: string;
     display: string;
+    tenantId: string;
     users: Kooboo.Data.ViewModel.DepartmentUser[];
     addUser(userName: string, isManager: boolean, userFunction: string): void;
+    addTestUser(userName: string, isManager: boolean, userFunction: string): void;
     deleteUser(userName: string): void;
     delete(): void;
-    update(displayName: string, parentDepartment: string): void;
+    update(displayName: string, parentDepartment: string, tenantId?: string): void;
+  }
+
+  interface TenantModel {
+    id: string;
+    orgId: string;
+    name: string;
+    parentTenantId: string;
+    update(name: string, parentTenantId?: string): void;
+    delete(): void;
+  }
+
+  interface ApplicationRoleModel {
+    name: string;
+    displayName: string;
+    permissions: any;
+    organizationRoleNames: string[];
   }
 
 }
@@ -9842,7 +10053,7 @@ declare namespace Kooboo.Sites.Payment.Methods.Stripe {
     checkStatus(requestId: string): any;
   }
 
-  interface StripeCheckoutSetting extends Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISiteSetting, Kooboo.Data.Interface.ISettingDescription, StripeSetting {
+  interface StripeCheckoutSetting extends Kooboo.Data.Interface.ISiteSetting, Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISettingDescription, StripeSetting {
     name: string;
     paymentMethods: string;
     secretKey: string;
@@ -9851,7 +10062,7 @@ declare namespace Kooboo.Sites.Payment.Methods.Stripe {
     getAlert(renderContext: Kooboo.Data.Context.RenderContext): string;
   }
 
-  interface StripeSetting extends Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISiteSetting, Kooboo.Data.Interface.ISettingDescription {
+  interface StripeSetting extends Kooboo.Data.Interface.ISiteSetting, Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISettingDescription {
     name: string;
     secretKey: string;
     webhookSigningSecret: string;
@@ -10049,7 +10260,7 @@ k.response.redirect(charge.nextAction.redirectUrl)
     checkStatus(requestId: string): any;
   }
 
-  interface PaypalSetting extends Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISiteSetting, Kooboo.Data.Interface.ISettingDescription {
+  interface PaypalSetting extends Kooboo.Data.Interface.ISiteSetting, Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISettingDescription {
     paypalUrl: string;
     useSandBox: boolean;
     clientId: string;
@@ -10059,7 +10270,7 @@ k.response.redirect(charge.nextAction.redirectUrl)
     getAlert(renderContext: Kooboo.Data.Context.RenderContext): string;
   }
 
-  interface PaypalFormSetting extends Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISiteSetting, Kooboo.Data.Interface.ISettingDescription {
+  interface PaypalFormSetting extends Kooboo.Data.Interface.ISiteSetting, Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISettingDescription {
     paypalUrl: string;
     iPNUrl: string;
     emailAddress: string;
@@ -10070,7 +10281,7 @@ k.response.redirect(charge.nextAction.redirectUrl)
     getAlert(renderContext: Kooboo.Data.Context.RenderContext): string;
   }
 
-  interface PaynlSetting extends Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISiteSetting, Kooboo.Data.Interface.ISettingDescription {
+  interface PaynlSetting extends Kooboo.Data.Interface.ISiteSetting, Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISettingDescription {
     paynlUrl: string;
     testMode: boolean;
     salesLocationCode: string;
@@ -10082,7 +10293,7 @@ k.response.redirect(charge.nextAction.redirectUrl)
     getAlert(renderContext: Kooboo.Data.Context.RenderContext): string;
   }
 
-  interface SquareSetting extends Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISiteSetting, Kooboo.Data.Interface.ISettingDescription {
+  interface SquareSetting extends Kooboo.Data.Interface.ISiteSetting, Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISettingDescription {
     name: string;
     useSandBox: boolean;
     applicationId: string;
@@ -10180,7 +10391,7 @@ const result = k.payment.wechatH5.charge({
     checkStatus(requestId: string): any;
   }
 
-  interface WeChatV3Setting extends Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISiteSetting, Kooboo.Data.Interface.ISettingDescription {
+  interface WeChatV3Setting extends Kooboo.Data.Interface.ISiteSetting, Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISettingDescription {
     name: string;
     group: string;
     appId: string;
@@ -10272,7 +10483,7 @@ const res = k.payment.alipayApp.charge({
     checkStatus(requestId: string): any;
   }
 
-  interface AlipaySetting extends Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISiteSetting, Kooboo.Data.Interface.ISettingDescription {
+  interface AlipaySetting extends Kooboo.Data.Interface.ISiteSetting, Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISettingDescription {
     name: string;
     group: string;
     useSandBox: boolean;
@@ -10356,7 +10567,7 @@ if(result.nextAction?.redirectUrl){
     callbackCodeName: string;
   }
 
-  interface MoneyBoxsSetting extends Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISiteSetting, Kooboo.Data.Interface.ISettingDescription {
+  interface MoneyBoxsSetting extends Kooboo.Data.Interface.ISiteSetting, Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISettingDescription {
     name: string;
     group: string;
     baseUrl: string;
@@ -10678,386 +10889,13 @@ declare namespace Kooboo.Sites.Render {
 }
 declare namespace Kooboo.Dom {
   interface Document extends Node {
-    baseURI: string;
-    baseTag: Element;
-    isQuirksMode: boolean;
-    body: Element;
-    head: Element;
-    links: HTMLCollection;
-    images: HTMLCollection;
-    forms: HTMLCollection;
-    nodeName: string;
-    nodeValue: string;
-    textContent: string;
-    parentNode: Node;
-    parentElement: Element;
-    itemIndex: number;
-    innerHtml: string;
-    outerHtml: string;
-    getBaseUrl(): string;
-    setQuirksMode(): void;
-    getElementsByTagName(tagName: string): HTMLCollection;
-    getElementsByTagNameNS(namespace: string, localName: string): HTMLCollection;
-    getElementsByClassName(classnames: string): HTMLCollection;
-    getElementsByCSSSelector(CSSSelector: string): HTMLCollection;
-    select(CSSSelector: string): HTMLCollection;
-    getElementById(id: string): Element;
-    getElementByIndex(TokenIndex: number, IsStartIndex?: boolean): Element;
-    getElementByAttribute(AttributeName: string): HTMLCollection;
-    getElementByAttributeValue(AttributeName: string, AttributeValue: string): HTMLCollection;
-    createElement(localName: string): Element;
-    createElementNS(namespace: string, qualifiedName: string): Element;
-    createDocumentFragment(): DocumentFragment;
-    createTextNode(data: string): Text;
-    createNodeIterator(root: Node, whatToShow: enumWhatToShow, filter: NodeFilter): NodeIterator;
-    createComment(data: string): Comment;
-    createProcessingInstruction(target: string, data: string): ProcessingInstruction;
-    importNode(node: Node, deepcopy: boolean): Node;
-    adoptNode(node: Node): Node;
-    createEvent(interface: string): Event;
-    createRange(): Range;
-    createTreeWalker(root: Node, whatToShow: enumWhatToShow, filter: NodeFilter): TreeWalker;
-    parseStyleSheet(): void;
-    applyStyleSheet(mediadeviceinfo: string): void;
-    applyStyleSheet(): void;
-    applyCssRules(rulelist: Kooboo.Dom.CSS.CSSRuleList, mediadeviceInfo: string): void;
-    applyCssText(cssText: string): void;
-    dispose(): void;
-    hasChildNodes(): boolean;
-    firstChild(): Node;
-    lastChild(): Node;
-    previousSibling(): Node;
-    nextSibling(): Node;
-    isEqualNode(node: Node): boolean;
-    contains(other: Node): boolean;
-    compareDocumentPoistion(other: Node): enumNodeComparePosition;
-    normalize(): void;
-    cloneNode(deepcopy: boolean): Node;
-    insertBefore(node: Node, child: Node): Node;
-    appendChild(node: Node): Node;
-    replaceChild(node: Node, child: Node): Node;
-    removeChild(child: Node): Node;
-    getNodePath(includeSelf: boolean): Node[];
-  }
-
-  interface HTMLCollection {
-    item: Element[];
-    length: number;
-    add(element: Element): void;
-    merge(collection: HTMLCollection): void;
-  }
-
-  interface Element extends Node {
-    id: string;
-    className: string;
-    classList: DOMTokenList;
-    attributes: Attr[];
-    rawComputedStyle: Kooboo.Dom.CSS.CSSStyleDeclaration;
-    styleRules: Kooboo.Dom.CSS.CSSStyleRule[];
-    nodeName: string;
-    nodeValue: string;
-    textContent: string;
-    parentNode: Node;
-    parentElement: Element;
-    itemIndex: number;
-    innerHtml: string;
-    outerHtml: string;
-    getAttribute(name: string): string;
-    getAttributeNS(namespace: string, localName: string): string;
-    setAttribute(name: string, value: string): void;
-    setAttributeNS(namespace: string, name: string, value: string): void;
-    removeAttribute(name: string): void;
-    removeAttributeNS(namespace: string, localName: string): void;
-    hasAttribute(name: string): boolean;
-    hasAttributeNS(namespace: string, localName: string): boolean;
-    matches(selectors: string): boolean;
-    matches(selectorlist: Kooboo.Dom.CSS.simpleSelector[]): boolean;
-    getOneElementByTagName(tagname: string): Element;
-    getElementsByTagName(tagName: string): HTMLCollection;
-    getElementsByTagNames(tagNames: string[]): HTMLCollection;
-    getElementsById(id: string): Element;
-    getElementsByAttribute(AttributeName: string): HTMLCollection;
-    getElementByIndex(TokenIndex: number, IsStartIndex?: boolean): Element;
-    getElementsByAttributeValues(AttributeName: string, AttributeValue: string): HTMLCollection;
-    getElementsByTagNameNS(namespace: string, localName: string): HTMLCollection;
-    getElementsByClassName(classNames: string): HTMLCollection;
-    isEqualNode(node: Node): boolean;
-    select(CSSSelector: string): HTMLCollection;
-    select(selectorList: Kooboo.Dom.CSS.simpleSelector[]): HTMLCollection;
-    dispose(): void;
-    hasChildNodes(): boolean;
-    firstChild(): Node;
-    lastChild(): Node;
-    previousSibling(): Node;
-    nextSibling(): Node;
-    contains(other: Node): boolean;
-    compareDocumentPoistion(other: Node): enumNodeComparePosition;
-    normalize(): void;
-    cloneNode(deepcopy: boolean): Node;
-    insertBefore(node: Node, child: Node): Node;
-    appendChild(node: Node): Node;
-    replaceChild(node: Node, child: Node): Node;
-    removeChild(child: Node): Node;
-    getNodePath(includeSelf: boolean): Node[];
-  }
-
-  interface DocumentFragment extends Node {
-    nodeName: string;
-    nodeValue: string;
-    textContent: string;
-    parentNode: Node;
-    parentElement: Element;
-    itemIndex: number;
-    innerHtml: string;
-    outerHtml: string;
-    hasChildNodes(): boolean;
-    firstChild(): Node;
-    lastChild(): Node;
-    previousSibling(): Node;
-    nextSibling(): Node;
-    isEqualNode(node: Node): boolean;
-    contains(other: Node): boolean;
-    compareDocumentPoistion(other: Node): enumNodeComparePosition;
-    normalize(): void;
-    cloneNode(deepcopy: boolean): Node;
-    insertBefore(node: Node, child: Node): Node;
-    appendChild(node: Node): Node;
-    replaceChild(node: Node, child: Node): Node;
-    removeChild(child: Node): Node;
-    getNodePath(includeSelf: boolean): Node[];
-    dispose(): void;
-  }
-
-  interface Text extends CharacterData {
-    data: string;
-    nodeName: string;
-    nodeValue: string;
-    textContent: string;
-    parentNode: Node;
-    parentElement: Element;
-    itemIndex: number;
-    innerHtml: string;
-    outerHtml: string;
-    splitText(offset: number): Text;
-    wholeText(): string;
-    substringData(offset: number, count: number): string;
-    appendData(data: string): void;
-    appendData(chr: string): void;
-    insertData(offset: number, data: string): void;
-    deleteData(offset: number, count: number): void;
-    replaceData(offset: number, count: number, data: string): void;
-    hasChildNodes(): boolean;
-    firstChild(): Node;
-    lastChild(): Node;
-    previousSibling(): Node;
-    nextSibling(): Node;
-    isEqualNode(node: Node): boolean;
-    contains(other: Node): boolean;
-    compareDocumentPoistion(other: Node): enumNodeComparePosition;
-    normalize(): void;
-    cloneNode(deepcopy: boolean): Node;
-    insertBefore(node: Node, child: Node): Node;
-    appendChild(node: Node): Node;
-    replaceChild(node: Node, child: Node): Node;
-    removeChild(child: Node): Node;
-    getNodePath(includeSelf: boolean): Node[];
-    dispose(): void;
   }
 
   interface Node {
-    nodeName: string;
-    nodeValue: string;
-    textContent: string;
-    parentNode: Node;
-    parentElement: Element;
-    itemIndex: number;
-    innerHtml: string;
-    outerHtml: string;
-    hasChildNodes(): boolean;
-    firstChild(): Node;
-    lastChild(): Node;
-    previousSibling(): Node;
-    nextSibling(): Node;
-    isEqualNode(node: Node): boolean;
-    contains(other: Node): boolean;
-    compareDocumentPoistion(other: Node): enumNodeComparePosition;
-    normalize(): void;
-    cloneNode(deepcopy: boolean): Node;
-    insertBefore(node: Node, child: Node): Node;
-    appendChild(node: Node): Node;
-    replaceChild(node: Node, child: Node): Node;
-    removeChild(child: Node): Node;
-    getNodePath(includeSelf: boolean): Node[];
-    dispose(): void;
   }
 
-  type enumWhatToShow = 'ELEMENT' | 'ATTRIBUTE' | 'TEXT' | 'CDATA_SECTION' | 'ENTITY_REFERENCE' | 'ENTITY' | 'PROCESSING_INSTRUCTION' | 'COMMENT' | 'DOCUMENT' | 'DOCUMENT_TYPE' | 'DOCUMENT_FRAGMENT' | 'NOTATION' | 'All';
-
-  interface NodeFilter {
-    acceptNode(node: Node): enumNodeFilterAcceptNode;
+  interface Element extends Node {
   }
-
-  interface NodeIterator {
-    root: Node;
-    allowChildAsRoot: boolean;
-    referenceNode: Node;
-    pointerBeforeReferenceNode: boolean;
-    whatToShow: enumWhatToShow;
-    filter: NodeFilter;
-    filterNode(node: Node): enumNodeFilterAcceptNode;
-    nextNode(): Node;
-    previousNode(): Node;
-    detach(): void;
-    following(): Node;
-    nextSibling(node: Node): Node;
-    proceeding(): Node;
-  }
-
-  interface Comment extends CharacterData {
-    data: string;
-    nodeName: string;
-    nodeValue: string;
-    textContent: string;
-    parentNode: Node;
-    parentElement: Element;
-    itemIndex: number;
-    innerHtml: string;
-    outerHtml: string;
-    substringData(offset: number, count: number): string;
-    appendData(data: string): void;
-    appendData(chr: string): void;
-    insertData(offset: number, data: string): void;
-    deleteData(offset: number, count: number): void;
-    replaceData(offset: number, count: number, data: string): void;
-    hasChildNodes(): boolean;
-    firstChild(): Node;
-    lastChild(): Node;
-    previousSibling(): Node;
-    nextSibling(): Node;
-    isEqualNode(node: Node): boolean;
-    contains(other: Node): boolean;
-    compareDocumentPoistion(other: Node): enumNodeComparePosition;
-    normalize(): void;
-    cloneNode(deepcopy: boolean): Node;
-    insertBefore(node: Node, child: Node): Node;
-    appendChild(node: Node): Node;
-    replaceChild(node: Node, child: Node): Node;
-    removeChild(child: Node): Node;
-    getNodePath(includeSelf: boolean): Node[];
-    dispose(): void;
-  }
-
-  interface ProcessingInstruction extends CharacterData {
-    data: string;
-    nodeName: string;
-    nodeValue: string;
-    textContent: string;
-    parentNode: Node;
-    parentElement: Element;
-    itemIndex: number;
-    innerHtml: string;
-    outerHtml: string;
-    substringData(offset: number, count: number): string;
-    appendData(data: string): void;
-    appendData(chr: string): void;
-    insertData(offset: number, data: string): void;
-    deleteData(offset: number, count: number): void;
-    replaceData(offset: number, count: number, data: string): void;
-    hasChildNodes(): boolean;
-    firstChild(): Node;
-    lastChild(): Node;
-    previousSibling(): Node;
-    nextSibling(): Node;
-    isEqualNode(node: Node): boolean;
-    contains(other: Node): boolean;
-    compareDocumentPoistion(other: Node): enumNodeComparePosition;
-    normalize(): void;
-    cloneNode(deepcopy: boolean): Node;
-    insertBefore(node: Node, child: Node): Node;
-    appendChild(node: Node): Node;
-    replaceChild(node: Node, child: Node): Node;
-    removeChild(child: Node): Node;
-    getNodePath(includeSelf: boolean): Node[];
-    dispose(): void;
-  }
-
-  interface Event {
-  }
-
-  interface Range {
-  }
-
-  interface TreeWalker {
-    root: Node;
-    filterNode(node: Node): enumNodeFilterAcceptNode;
-    parentNode(): Node;
-    firstChild(): Node;
-    firstChild(node: Node): Node;
-    lastChild(node: Node): Node;
-    lastChild(): Node;
-    traverseChildren(type: TraverseType, currentnode: Node): Node;
-    previousSibling(node: Node): Node;
-    previousSibling(): Node;
-    nextSibling(node: Node): Node;
-    nextSibling(): Node;
-    traverseSibling(type: TraverseType, currentnode: Node): Node;
-    previousNode(): Node;
-    previousNode(currentnode: Node): Node;
-    nextNode(): Node;
-    nextNode(currentnode: Node): Node;
-  }
-
-  type enumNodeComparePosition = 'DOCUMENT_POSITION_DISCONNECTED' | 'DOCUMENT_POSITION_PRECEDING' | 'DOCUMENT_POSITION_FOLLOWING' | 'DOCUMENT_POSITION_CONTAINS' | 'DOCUMENT_POSITION_CONTAINED_BY' | 'DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC' | 'DOCUMENT_POSITION_SAME_NODE';
-
-  interface DOMTokenList {
-    length: number;
-    contains(token: string): boolean;
-    add(tokens: string[]): void;
-    remove(tokens: string[]): void;
-    toggle(token: string): boolean;
-    toggle(token: string, force: boolean): boolean;
-  }
-
-  interface Attr {
-  }
-
-  interface CharacterData extends Node {
-    data: string;
-    nodeName: string;
-    nodeValue: string;
-    textContent: string;
-    parentNode: Node;
-    parentElement: Element;
-    itemIndex: number;
-    innerHtml: string;
-    outerHtml: string;
-    substringData(offset: number, count: number): string;
-    appendData(data: string): void;
-    appendData(chr: string): void;
-    insertData(offset: number, data: string): void;
-    deleteData(offset: number, count: number): void;
-    replaceData(offset: number, count: number, data: string): void;
-    hasChildNodes(): boolean;
-    firstChild(): Node;
-    lastChild(): Node;
-    previousSibling(): Node;
-    nextSibling(): Node;
-    isEqualNode(node: Node): boolean;
-    contains(other: Node): boolean;
-    compareDocumentPoistion(other: Node): enumNodeComparePosition;
-    normalize(): void;
-    cloneNode(deepcopy: boolean): Node;
-    insertBefore(node: Node, child: Node): Node;
-    appendChild(node: Node): Node;
-    replaceChild(node: Node, child: Node): Node;
-    removeChild(child: Node): Node;
-    getNodePath(includeSelf: boolean): Node[];
-    dispose(): void;
-  }
-
-  type enumNodeFilterAcceptNode = 'FILTER_ACCEPT' | 'FILTER_REJECT' | 'FILTER_SKIP';
-
-  type TraverseType = 'First' | 'Last' | 'Previous' | 'Next';
 
 }
 declare namespace Kooboo.Data.Interface {
@@ -11113,7 +10951,7 @@ declare namespace Kooboo.Data.Interface {
     extension: string;
   }
 
-  interface IEmbeddable extends ITextObject, ISiteObject {
+  interface IEmbeddable extends ISiteObject, ITextObject {
     ownerObjectId: any;
     ownerConstType: number;
     isEmbedded: boolean;
@@ -11124,7 +10962,7 @@ declare namespace Kooboo.Data.Interface {
     domTagName: string;
   }
 
-  interface IBinaryFile extends IExtensionable, ISiteObject {
+  interface IBinaryFile extends ISiteObject, IExtensionable {
     contentBytes: number[];
     size: number;
   }
@@ -11372,6 +11210,7 @@ declare namespace Kooboo.Data.Context {
   }
 
   interface RenderOutputBase {
+    consumeOutput: OutputConsumer;
     beforeHeadLength: number;
     headLength: number;
     bodyLength: number;
@@ -11380,6 +11219,9 @@ declare namespace Kooboo.Data.Context {
     write(data: string): void;
     write(charSpan: any): void;
     write(data: any): void;
+    getMemory(sizeHint?: number): any;
+    getSpan(sizeHint?: number): any;
+    advance(count: number): void;
     write(data: number): void;
     writeNumberAsString(value: number): void;
     writeToNetwork(writer: any, res: any, compressType: Kooboo.Data.Server.CompressionType, ct: any): any;
@@ -11431,6 +11273,19 @@ declare namespace Kooboo.Data.Context {
     beforeHeadOffset: number;
     headOffset: number;
     bodyOffset: number;
+  }
+
+  interface OutputConsumer extends Function {
+    target?: any;
+    hasSingleTarget: boolean;
+    method: any;
+    invoke(data: any): void;
+    beginInvoke(data: any, callback: any, object: any): any;
+    endInvoke(result: any): void;
+    getInvocationList(): any[];
+    clone(): any;
+    dynamicInvoke(args: any[]): any;
+    getObjectData(info: any, context: any): void;
   }
 
   interface IFCheckResult {
@@ -11826,6 +11681,13 @@ declare namespace Kooboo.Data.Models.CreditCard {
     success: boolean;
     redirectUrl: string;
     paymentIntentId: string;
+    message: string;
+  }
+
+  interface CheckoutSessionResult {
+    success: boolean;
+    redirectUrl: string;
+    checkoutSessionId: string;
     message: string;
   }
 
@@ -12299,6 +12161,8 @@ declare namespace Kooboo.Sites.Repository {
     syncLog: Kooboo.Sites.Sync.SiteSync;
     abTestStore: Kooboo.Sites.Analytics.ABTest.AbTestStore;
     aIAppStore: Kooboo.Sites.AIBuilder.Application.AppBuilderStore;
+    aIApplicationStore: Kooboo.Sites.AI.Application.Storage.AIApplicationStore;
+    aIApplicationLogStore: Kooboo.Sites.AI.Application.Storage.AIApplicationLogStore;
     aICommerceStore: any;
     cssClassName: CssClassNameRepository;
     scriptModule: ScriptModuleRepository;
@@ -12334,6 +12198,9 @@ declare namespace Kooboo.Sites.Repository {
     paymentCustomer: Kooboo.Sites.Payment.Repository.PaymentCustomerRepository;
     downloadFailedLog: DownloadFailTrackRepository;
     siteUser: SiteUserRepository;
+    applicationRole: ApplicationRoleRepository;
+    databasePolicy: DatabasePolicyRepository;
+    permissionDefinition: PermissionDefinitionRepository;
     shopifyFolder: string;
     commerceFolder: string;
     logFolder: string;
@@ -13555,6 +13422,120 @@ declare namespace Kooboo.Sites.Repository {
     rebuild(): void;
   }
 
+  interface ApplicationRoleRepository extends ISiteRepositoryBase, Kooboo.Data.Interface.IRepository {
+    siteDb: SiteDb;
+    siteObjectType: any;
+    useCache: boolean;
+    webSite: Kooboo.Data.Models.WebSite;
+    storeName: string;
+    storeParameters: Kooboo.IndexedDB.ObjectStoreParameters;
+    store: any;
+    query: any;
+    tableScan: any;
+    initCache(): void;
+    addOrUpdate(value: Kooboo.Sites.Models.ApplicationRole, UserId: any): boolean;
+    addOrUpdate(value: Kooboo.Sites.Models.ApplicationRole): boolean;
+    delete(id: any): number;
+    delete(id: any, UserId: any): number;
+    getLatestVersion(Id: any): number;
+    get(id: any, getColumnDataOnly?: boolean): Kooboo.Sites.Models.ApplicationRole;
+    getFromCache(id: any, Clone?: boolean): Kooboo.Sites.Models.ApplicationRole;
+    syncToCache(value: Kooboo.Sites.Models.ApplicationRole, IsDelete: boolean): void;
+    get(nameorid: string): Kooboo.Sites.Models.ApplicationRole;
+    getByUrl(relativeUrl: string): Kooboo.Sites.Models.ApplicationRole;
+    getMetaByUrl(relativeUrl: string): Kooboo.Sites.Models.ApplicationRole;
+    getByNameOrId(NameOrGuid: string): Kooboo.Sites.Models.ApplicationRole;
+    parseID(NameOrGuid: string): any;
+    getUsedBy(ObjectId: any): Kooboo.Data.Models.UsedByRelation[];
+    getUsedByForCount(ObjectId: any): Kooboo.Data.Models.UsedByRelation[];
+    count(): number;
+    all(UseColumnData: boolean): Kooboo.Sites.Models.ApplicationRole[];
+    all(): Kooboo.Sites.Models.ApplicationRole[];
+    list(UseColumnData?: boolean): Kooboo.Sites.Models.ApplicationRole[];
+    isEqual(x: Kooboo.Sites.Models.ApplicationRole, y: Kooboo.Sites.Models.ApplicationRole): boolean;
+    rollBack(log: Kooboo.IndexedDB.LogEntry): void;
+    rollBack(logList: Kooboo.IndexedDB.LogEntry[]): void;
+    checkBeingUsed(SiteObject: Kooboo.Sites.Models.ApplicationRole): Kooboo.Sites.Relation.ObjectRelation[];
+    checkBeingUsed(ObjectId: any): Kooboo.Sites.Relation.ObjectRelation[];
+    rebuild(): void;
+  }
+
+  interface DatabasePolicyRepository extends ISiteRepositoryBase, Kooboo.Data.Interface.IRepository {
+    siteDb: SiteDb;
+    siteObjectType: any;
+    useCache: boolean;
+    webSite: Kooboo.Data.Models.WebSite;
+    storeName: string;
+    storeParameters: Kooboo.IndexedDB.ObjectStoreParameters;
+    store: any;
+    query: any;
+    tableScan: any;
+    initCache(): void;
+    addOrUpdate(value: Kooboo.Sites.Models.DatabasePolicy, UserId: any): boolean;
+    addOrUpdate(value: Kooboo.Sites.Models.DatabasePolicy): boolean;
+    delete(id: any): number;
+    delete(id: any, UserId: any): number;
+    getLatestVersion(Id: any): number;
+    get(id: any, getColumnDataOnly?: boolean): Kooboo.Sites.Models.DatabasePolicy;
+    getFromCache(id: any, Clone?: boolean): Kooboo.Sites.Models.DatabasePolicy;
+    syncToCache(value: Kooboo.Sites.Models.DatabasePolicy, IsDelete: boolean): void;
+    get(nameorid: string): Kooboo.Sites.Models.DatabasePolicy;
+    getByUrl(relativeUrl: string): Kooboo.Sites.Models.DatabasePolicy;
+    getMetaByUrl(relativeUrl: string): Kooboo.Sites.Models.DatabasePolicy;
+    getByNameOrId(NameOrGuid: string): Kooboo.Sites.Models.DatabasePolicy;
+    parseID(NameOrGuid: string): any;
+    getUsedBy(ObjectId: any): Kooboo.Data.Models.UsedByRelation[];
+    getUsedByForCount(ObjectId: any): Kooboo.Data.Models.UsedByRelation[];
+    count(): number;
+    all(UseColumnData: boolean): Kooboo.Sites.Models.DatabasePolicy[];
+    all(): Kooboo.Sites.Models.DatabasePolicy[];
+    list(UseColumnData?: boolean): Kooboo.Sites.Models.DatabasePolicy[];
+    isEqual(x: Kooboo.Sites.Models.DatabasePolicy, y: Kooboo.Sites.Models.DatabasePolicy): boolean;
+    rollBack(log: Kooboo.IndexedDB.LogEntry): void;
+    rollBack(logList: Kooboo.IndexedDB.LogEntry[]): void;
+    checkBeingUsed(SiteObject: Kooboo.Sites.Models.DatabasePolicy): Kooboo.Sites.Relation.ObjectRelation[];
+    checkBeingUsed(ObjectId: any): Kooboo.Sites.Relation.ObjectRelation[];
+    rebuild(): void;
+  }
+
+  interface PermissionDefinitionRepository extends ISiteRepositoryBase, Kooboo.Data.Interface.IRepository {
+    siteDb: SiteDb;
+    siteObjectType: any;
+    useCache: boolean;
+    webSite: Kooboo.Data.Models.WebSite;
+    storeName: string;
+    storeParameters: Kooboo.IndexedDB.ObjectStoreParameters;
+    store: any;
+    query: any;
+    tableScan: any;
+    initCache(): void;
+    addOrUpdate(value: Kooboo.Sites.Models.PermissionDefinition, UserId: any): boolean;
+    addOrUpdate(value: Kooboo.Sites.Models.PermissionDefinition): boolean;
+    delete(id: any): number;
+    delete(id: any, UserId: any): number;
+    getLatestVersion(Id: any): number;
+    get(id: any, getColumnDataOnly?: boolean): Kooboo.Sites.Models.PermissionDefinition;
+    getFromCache(id: any, Clone?: boolean): Kooboo.Sites.Models.PermissionDefinition;
+    syncToCache(value: Kooboo.Sites.Models.PermissionDefinition, IsDelete: boolean): void;
+    get(nameorid: string): Kooboo.Sites.Models.PermissionDefinition;
+    getByUrl(relativeUrl: string): Kooboo.Sites.Models.PermissionDefinition;
+    getMetaByUrl(relativeUrl: string): Kooboo.Sites.Models.PermissionDefinition;
+    getByNameOrId(NameOrGuid: string): Kooboo.Sites.Models.PermissionDefinition;
+    parseID(NameOrGuid: string): any;
+    getUsedBy(ObjectId: any): Kooboo.Data.Models.UsedByRelation[];
+    getUsedByForCount(ObjectId: any): Kooboo.Data.Models.UsedByRelation[];
+    count(): number;
+    all(UseColumnData: boolean): Kooboo.Sites.Models.PermissionDefinition[];
+    all(): Kooboo.Sites.Models.PermissionDefinition[];
+    list(UseColumnData?: boolean): Kooboo.Sites.Models.PermissionDefinition[];
+    isEqual(x: Kooboo.Sites.Models.PermissionDefinition, y: Kooboo.Sites.Models.PermissionDefinition): boolean;
+    rollBack(log: Kooboo.IndexedDB.LogEntry): void;
+    rollBack(logList: Kooboo.IndexedDB.LogEntry[]): void;
+    checkBeingUsed(SiteObject: Kooboo.Sites.Models.PermissionDefinition): Kooboo.Sites.Relation.ObjectRelation[];
+    checkBeingUsed(ObjectId: any): Kooboo.Sites.Relation.ObjectRelation[];
+    rebuild(): void;
+  }
+
   interface StyleRepository extends ISiteRepositoryBase, Kooboo.Data.Interface.IRepository, IEmbeddableRepository {
     storeParameters: Kooboo.IndexedDB.ObjectStoreParameters;
     siteDb: SiteDb;
@@ -14325,6 +14306,8 @@ declare namespace Kooboo.Data.Pwa {
 }
 declare namespace Kooboo.Data.Models.AI {
   interface AISettings {
+    llmsAutoGenerate: boolean;
+    allowDatabasePolicyEdit: boolean;
     mcpServer: McpServerOptions;
     vectorSearch: VectorSearchOptions;
     payPerCrawl: PayPerCrawlOptions;
@@ -14453,7 +14436,7 @@ declare namespace Kooboo.Sites.Service {
 
 }
 declare namespace Kooboo.Sites.Contents.Models {
-  interface HtmlBlock extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.IDynamic, Kooboo.Sites.Models.IDomObject, Kooboo.Data.Interface.ITextObject, Kooboo.IndexedDB.Serializer.IDatabaseObject, MultipleLanguageObject {
+  interface HtmlBlock extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.IDynamic, Kooboo.Data.Interface.ITextObject, Kooboo.Sites.Models.IDomObject, Kooboo.IndexedDB.Serializer.IDatabaseObject, MultipleLanguageObject {
     body: string;
     dom: Kooboo.Dom.Document;
     values: any;
@@ -14599,7 +14582,7 @@ declare namespace Kooboo.Sites.Contents.Models {
     clone(): any;
   }
 
-  interface TextContent extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Sites.Models.IDomObject, Kooboo.Data.Interface.ITextObject, Kooboo.IndexedDB.Serializer.IDatabaseObject, Kooboo.Sites.Models.CoreObject {
+  interface TextContent extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.ICoreObject, Kooboo.Data.Interface.ITextObject, Kooboo.Sites.Models.IDomObject, Kooboo.IndexedDB.Serializer.IDatabaseObject, Kooboo.Sites.Models.CoreObject {
     name: string;
     id: any;
     userKey: string;
@@ -14611,6 +14594,7 @@ declare namespace Kooboo.Sites.Contents.Models {
     summaryText: string;
     embedded: any;
     properties: any;
+    serializerVersion: number;
     contents: MultilingualContent[];
     dom: Kooboo.Dom.Document;
     body: string;
@@ -14644,6 +14628,7 @@ declare namespace Kooboo.Sites.Contents.Models {
     folderId: any;
     display: string;
     group: string;
+    multiple: boolean;
     getSize(): number;
     writeTo(buffer: any): number;
     getIndexValue(fieldHash: number): any;
@@ -14663,6 +14648,8 @@ declare namespace Kooboo.Sites.Contents.Models {
 
   interface MultilingualContent extends Kooboo.IndexedDB.Serializer.IDatabaseObject {
     lang: string;
+    online: boolean;
+    serializerVersion: number;
     fieldValues: any;
     getSize(): number;
     writeTo(buffer: any): number;
@@ -15968,7 +15955,7 @@ declare namespace KScript.Payment.TowCheckout {
 
 }
 declare namespace Kooboo.Sites.Payment.Methods.TwoCheckout {
-  interface TwoCheckoutSetting extends Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISiteSetting, Kooboo.Data.Interface.ISettingDescription {
+  interface TwoCheckoutSetting extends Kooboo.Data.Interface.ISiteSetting, Kooboo.Sites.Payment.IPaymentSetting, Kooboo.Data.Interface.ISettingDescription {
     name: string;
     group: string;
     baseUrl: string;
@@ -15996,71 +15983,6 @@ declare namespace KScript.Payment.Square {
     /** If this value is set, the callback code will execute after the payment is finished */
     callbackCodeName: string;
   }
-
-}
-declare namespace Kooboo.Dom.CSS {
-  interface CSSRuleList {
-    length: number;
-    item: CSSRule;
-    insertRule(rule: CSSRule, insertIndex: number): number;
-    deleteRule(deleteIndex: number): void;
-    appendRule(rule: CSSRule): void;
-  }
-
-  interface simpleSelector {
-  }
-
-  interface CSSStyleDeclaration extends CSSDeclarationBlock {
-    cssText: string;
-    generateCssText(): string;
-    getPropertyValue(propertyname: string): string;
-    getPropertyPriority(propertyname: string): boolean;
-    setProperty(propertyname: string, value: string, important: boolean): void;
-    removeProperty(propertyname: string): void;
-    setPropertyValue(propertyname: string, value: string): void;
-    setPropertyPriority(propertyname: string, important: boolean): void;
-    updateDeclaration(declaration: CSSDeclaration): void;
-    merge(styleDeclaration: CSSStyleDeclaration): void;
-    hasPartialProperty(partialPropertyName: string): boolean;
-  }
-
-  interface CSSStyleRule extends CSSRule {
-    selectors: simpleSelector[];
-    type: enumCSSRuleType;
-    cssText: string;
-    styleDeclarationText: string;
-    selectorText: string;
-  }
-
-  interface CSSRule {
-    type: enumCSSRuleType;
-    cssText: string;
-    styleDeclarationText: string;
-    selectorText: string;
-  }
-
-  interface CSSDeclaration {
-    propertyname: string;
-    value: string;
-    important: boolean;
-    caseSensitive: boolean;
-  }
-
-  interface CSSDeclarationBlock {
-    cssText: string;
-    generateCssText(): string;
-    getPropertyValue(propertyname: string): string;
-    getPropertyPriority(propertyname: string): boolean;
-    setProperty(propertyname: string, value: string, important: boolean): void;
-    removeProperty(propertyname: string): void;
-    setPropertyValue(propertyname: string, value: string): void;
-    setPropertyPriority(propertyname: string, important: boolean): void;
-    updateDeclaration(declaration: CSSDeclaration): void;
-    merge(styleDeclaration: CSSStyleDeclaration): void;
-    hasPartialProperty(partialPropertyName: string): boolean;
-  }
-
-  type enumCSSRuleType = 'reserved' | 'STYLE_RULE' | 'CHARSET_RULE' | 'IMPORT_RULE' | 'MEDIA_RULE' | 'FONT_FACE_RULE' | 'PAGE_RULE' | 'KEYFRAMES_RULE' | 'KEYFRAME_RULE' | 'MARGIN_RULE' | 'NAMESPACE_RULE' | 'COUNTER_STYLE_RULE' | 'SUPPORTS_RULE' | 'DOCUMENT_RULE' | 'FONT_FEATURE_VALUES_RULE' | 'VIEWPORT_RULE' | 'REGION_STYLE_RULE' | 'CUSTOM_MEDIA_RULE';
 
 }
 declare namespace Kooboo.Data.Context.RenderCompleted {
@@ -16240,6 +16162,7 @@ declare namespace Kooboo.IndexedDB {
   type EditType = 'Add' | 'Update' | 'Delete';
 
   interface LogEntry extends Kooboo.IndexedDB.Serializer.IDatabaseObject {
+    isAIWriteContext: boolean;
     id: number;
     storeName: string;
     storeNameHash: number;
@@ -16255,6 +16178,8 @@ declare namespace Kooboo.IndexedDB {
     timeTick: number;
     oldBlockPosition: number;
     newBlockPosition: number;
+    isAI: boolean;
+    beginAIWrite(): AIWriteScope;
     toHashGuid(bytes: number[]): any;
     getSize(): number;
     writeTo(buffer: any): number;
@@ -16302,14 +16227,24 @@ declare namespace Kooboo.IndexedDB {
     setPrimaryKeyField(expression: any, len?: number): void;
   }
 
+  interface AIWriteScope {
+    dispose(): void;
+  }
+
 }
 declare namespace Kooboo.Sites.Analytics.ABTest {
   interface AbTestStore {
     assignmentStore: DailyUserAssignmentStore;
     getStatStore(TestName: string): AbTestStatStore;
+    tryMarkMinSampleReached(testName: string, reachedAt: Date): boolean;
     hasObjectId(ObjectId: any): boolean;
     getActiveTests(objectType: number, objectId: any): Kooboo.Sites.Analytics.ABTest.Models.AbTestModel[];
+    getTestsByGoal(goalId: number): Kooboo.Sites.Analytics.ABTest.Models.AbTestModel[];
     addOrUpdate(test: Kooboo.Sites.Analytics.ABTest.Models.AbTestModel): void;
+    tryAdd(test: Kooboo.Sites.Analytics.ABTest.Models.AbTestModel): boolean;
+    updateDraft(test: Kooboo.Sites.Analytics.ABTest.Models.AbTestModel): void;
+    schedule(testName: string, startAt: Date, endAt: Date): void;
+    changeStatus(testName: string, status: Kooboo.Sites.Analytics.ABTest.Models.AbTestStatus): void;
     delete(testName: string): void;
     getAll(): Kooboo.Sites.Analytics.ABTest.Models.AbTestModel[];
     get(TestName: string): Kooboo.Sites.Analytics.ABTest.Models.AbTestModel;
@@ -16357,6 +16292,104 @@ declare namespace Kooboo.Sites.AIBuilder.Application {
     buildDomainContextInfo(): string;
     addOrUpdateFact(fact: Kooboo.Sites.AIBuilder.Application.Model.Fact): void;
     entitiesFilterByFacts(AllEntities: Kooboo.Sites.AIBuilder.Application.Model.Entity[], Facts: Kooboo.Sites.AIBuilder.Application.Model.Fact[]): Kooboo.Sites.AIBuilder.Application.Model.Entity[];
+  }
+
+}
+declare namespace Kooboo.Sites.AI.Application.Storage {
+  interface AIApplicationStore {
+    getBlueprint(): Kooboo.Sites.AI.Application.Model.Blueprint;
+    getAppPlan(): Kooboo.Sites.AI.Application.Model.AppPlan;
+    getAppDeliveryProgress(): Kooboo.Sites.AI.Application.Model.AppDeliveryProgress;
+    updateAppDeliveryProgress(update: (p1:Kooboo.Sites.AI.Application.Model.AppDeliveryProgress,)=>Kooboo.Sites.AI.Application.Model.AppDeliveryProgress): Kooboo.Sites.AI.Application.Model.AppDeliveryProgress;
+    saveBlueprint(blueprint: Kooboo.Sites.AI.Application.Model.Blueprint): void;
+    saveAppPlan(plan: Kooboo.Sites.AI.Application.Model.AppPlan): void;
+    updateAppPlan(update: (p1:Kooboo.Sites.AI.Application.Model.AppPlan,)=>Kooboo.Sites.AI.Application.Model.AppPlan): Kooboo.Sites.AI.Application.Model.AppPlan;
+    addOrUpdate(model: any): void;
+    get(id: string): any;
+    list(): any[];
+    synchronizeAcceptedFacts(userId: string): Kooboo.Sites.AI.Application.Delivery.EntityDatabaseSynchronizationResult;
+    synchronizeBusinessObjects(userId: string): Kooboo.Sites.AI.Application.Delivery.EntityDatabaseSynchronizationResult;
+    getVersion(id: string): number;
+    delete(id: string): void;
+    addOrUpdate(relation: Kooboo.Sites.AI.Application.Model.ModelRelation): void;
+    getRelation(id: any): Kooboo.Sites.AI.Application.Model.ModelRelation;
+    linkFeatureToUserStory(featureId: string, userStoryId: string): Kooboo.Sites.AI.Application.Model.ModelRelation;
+    linkGoalToActor(goalId: string, actorId: string): Kooboo.Sites.AI.Application.Model.ModelRelation;
+    linkBlueprintToModule(blueprintId: string, moduleId: string): Kooboo.Sites.AI.Application.Model.ModelRelation;
+    linkModuleToScenario(moduleId: string, scenarioId: string): Kooboo.Sites.AI.Application.Model.ModelRelation;
+    listModuleScenarios(moduleId: string): Kooboo.Sites.AI.Application.Model.Scenario[];
+    listScenarioModules(scenarioId: string): Kooboo.Sites.AI.Application.Model.Module[];
+    listGoalActors(goalId: string): Kooboo.Sites.AI.Application.Model.Actor[];
+    listActorGoals(actorId: string): Kooboo.Sites.AI.Application.Model.Goal[];
+    linkUserStoryToScenario(userStoryId: string, scenarioId: string): Kooboo.Sites.AI.Application.Model.ModelRelation;
+    linkUserStoryToFact(userStoryId: string, factId: string): Kooboo.Sites.AI.Application.Model.ModelRelation;
+    listUserStoryFacts(userStoryId: string): Kooboo.Sites.AI.Application.Model.Fact[];
+    listFactUserStories(factId: string): Kooboo.Sites.AI.Application.Model.UserStory[];
+    linkFactToBusinessObject(factId: string, businessObjectId: string): Kooboo.Sites.AI.Application.Model.ModelRelation;
+    listFactBusinessObjects(factId: string): Kooboo.Sites.AI.Application.Model.BusinessObjectDefinition[];
+    listBusinessObjectFacts(businessObjectId: string): Kooboo.Sites.AI.Application.Model.Fact[];
+    listRelationsFrom(sourceId: string, targetType?: Kooboo.Sites.AI.Application.Model.ApplicationModelType): Kooboo.Sites.AI.Application.Model.ModelRelation[];
+    listRelationsTo(targetId: string, sourceType?: Kooboo.Sites.AI.Application.Model.ApplicationModelType): Kooboo.Sites.AI.Application.Model.ModelRelation[];
+    listRelationsByType(sourceType?: Kooboo.Sites.AI.Application.Model.ApplicationModelType, targetType?: Kooboo.Sites.AI.Application.Model.ApplicationModelType): Kooboo.Sites.AI.Application.Model.ModelRelation[];
+    deleteRelation(id: any): void;
+    listVirtualAccounts(): Kooboo.Sites.AI.Application.Model.VirtualAccount[];
+    addVirtualAccount(username: string, organizationName: string, applicationRole?: string): Kooboo.Sites.AI.Application.Model.VirtualAccount;
+    updateVirtualAccountRoles(userId: any, applicationRole: string): void;
+    deleteVirtualAccount(userId: any): void;
+  }
+
+  interface AIApplicationLogStore {
+    storageFolder: string;
+    storageFilePath: string;
+    cursorFilePath: string;
+    getWormDataFilePath(month: string): string;
+    addAction(action: Kooboo.Sites.AI.Application.Model.ApplicationLog, timestamp?: Date): number;
+    addActionToMonth(action: Kooboo.Sites.AI.Application.Model.ApplicationLog, month: string): number;
+    getAction(id: number, month?: string): Kooboo.Sites.AI.Application.Model.ApplicationLog;
+    count(month?: string): number;
+    getLastWormId(month?: string): number;
+    getCursor(reportType?: string): Kooboo.Sites.AI.Application.Model.LogReadingCursorPosition;
+    saveCursor(cursor: Kooboo.Sites.AI.Application.Model.LogReadingCursorPosition): void;
+    saveCursor(reportType: string, cursor: Kooboo.Sites.AI.Application.Model.LogReadingCursorPosition): void;
+    getBusinessReport(month?: string): Kooboo.Sites.AI.Application.Model.BusinessLogReport;
+    saveBusinessReport(report: Kooboo.Sites.AI.Application.Model.BusinessLogReport): void;
+    getSoftwareReport(month?: string): Kooboo.Sites.AI.Application.Model.SoftwareLogReport;
+    saveSoftwareReport(report: Kooboo.Sites.AI.Application.Model.SoftwareLogReport): void;
+    getUiReport(month?: string): Kooboo.Sites.AI.Application.Model.UiLogReport;
+    saveUiReport(report: Kooboo.Sites.AI.Application.Model.UiLogReport): void;
+    loadDataMutationReport(month?: string): Kooboo.Sites.AI.Application.Model.DataMutationReport;
+    getDataMutationReport(month?: string): Kooboo.Sites.AI.Application.Model.DataMutationReport;
+    saveDataMutationReport(report: Kooboo.Sites.AI.Application.Model.DataMutationReport): void;
+    getAvailableWormMonths(): string[];
+    readActionsStep(month: string, afterWormId: number, maxActions?: number): Kooboo.Sites.AI.Application.Model.ApplicationLogReadBatch;
+    readActionsStep(afterWormId?: number, maxActions?: number): Kooboo.Sites.AI.Application.Model.ApplicationLogReadBatch;
+    getOrRefreshBusinessReport(month?: string, maxActions?: number): Kooboo.Sites.AI.Application.Model.BusinessLogReport;
+    getOrRefreshSoftwareReport(month?: string, maxActions?: number): Kooboo.Sites.AI.Application.Model.SoftwareLogReport;
+    getOrRefreshUiReport(month?: string, maxActions?: number): Kooboo.Sites.AI.Application.Model.UiLogReport;
+    getOrRefreshDataMutationReport(month?: string, maxActions?: number): Kooboo.Sites.AI.Application.Model.DataMutationReport;
+    readStep(maxActions?: number): Kooboo.Sites.AI.Application.Model.LogReadBatchResult;
+    refreshReports(maxActions?: number): Kooboo.Sites.AI.Application.Model.LogReadBatchResult;
+    readBusinessReportStep(report?: Kooboo.Sites.AI.Application.Model.BusinessLogReport, maxActions?: number): Kooboo.Sites.AI.Application.Model.BusinessLogReport;
+    readBusinessReportStep(afterWormId: number, maxActions: number, report?: Kooboo.Sites.AI.Application.Model.BusinessLogReport): Kooboo.Sites.AI.Application.Model.BusinessLogReport;
+    buildBusinessReport(afterWormId?: number, stepSize?: number, maxTotalActions?: number): Kooboo.Sites.AI.Application.Model.BusinessLogReport;
+    formatBusinessReport(report: Kooboo.Sites.AI.Application.Model.BusinessLogReport): string;
+    readSoftwareReportStep(report?: Kooboo.Sites.AI.Application.Model.SoftwareLogReport, maxActions?: number): Kooboo.Sites.AI.Application.Model.SoftwareLogReport;
+    readSoftwareReportStep(afterWormId: number, maxActions: number, report?: Kooboo.Sites.AI.Application.Model.SoftwareLogReport): Kooboo.Sites.AI.Application.Model.SoftwareLogReport;
+    buildSoftwareReport(afterWormId?: number, stepSize?: number, maxTotalActions?: number): Kooboo.Sites.AI.Application.Model.SoftwareLogReport;
+    formatSoftwareReport(report: Kooboo.Sites.AI.Application.Model.SoftwareLogReport): string;
+    readUiReportStep(report?: Kooboo.Sites.AI.Application.Model.UiLogReport, maxActions?: number): Kooboo.Sites.AI.Application.Model.UiLogReport;
+    readUiReportStep(afterWormId: number, maxActions: number, report?: Kooboo.Sites.AI.Application.Model.UiLogReport): Kooboo.Sites.AI.Application.Model.UiLogReport;
+    buildUiReport(afterWormId?: number, stepSize?: number, maxTotalActions?: number): Kooboo.Sites.AI.Application.Model.UiLogReport;
+    formatUiReport(report: Kooboo.Sites.AI.Application.Model.UiLogReport): string;
+    formatDataMutationReport(report: Kooboo.Sites.AI.Application.Model.DataMutationReport): string;
+    getOverview(month?: string, refresh?: boolean, maxActions?: number): Kooboo.Sites.AI.Application.Model.ApplicationLogOverviewResponse;
+    getStatus(): Kooboo.Sites.AI.Application.Model.ApplicationLogStatusResponse;
+    formatAllReports(month?: string): string;
+    queryActivityStream(month?: string, pageIndex?: number, pageSize?: number, keyword?: string, screen?: string, userId?: any, statusCode?: number, hasErrorsOnly?: boolean, hasMutationsOnly?: boolean, actorId?: string, appUserId?: string, actorType?: string, findingCategory?: string, findingTarget?: string, evidenceWormId?: number, focusWormId?: number, businessObject?: string, businessAction?: string, screenGroup?: string, uiScreen?: string, requestUrl?: string, table?: string, field?: string): Kooboo.Sites.AI.Application.Model.ApplicationLogActivityStreamResponse;
+    queryExecutionDetail(month: string, id: number): Kooboo.Sites.AI.Application.Model.ApplicationLogActivityStreamResponse;
+    close(): void;
+    getCurrentMonth(): string;
+    normalizeMonth(month: string): string;
   }
 
 }
@@ -16754,7 +16787,7 @@ declare namespace Kooboo.Lib.Utilities.UAParser {
 
 }
 declare namespace Kooboo.Sites.Scripting.Global.SiteItem.TypeDefinition {
-  interface BinaryObject extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.IBinaryFile, Kooboo.Data.Interface.IExtensionable {
+  interface BinaryObject extends Kooboo.Data.Interface.ISiteObject, Kooboo.Data.Interface.IExtensionable, Kooboo.Data.Interface.IBinaryFile {
     contentBytes: number[];
     size: number;
     extension: string;
@@ -16770,6 +16803,10 @@ declare namespace Kooboo.Sites.DataTraceAndModify {
     source: string;
     getTraceInfo(): Record<string, string>;
   }
+
+}
+declare namespace Kooboo.IndexedDB.Schedule {
+  type RepeatFrequence = 'Day' | 'Hour' | 'Minutes' | 'Week' | 'Month' | 'Second';
 
 }
 declare namespace Kooboo.Sites.Scripting.Global.Redis {
@@ -17019,7 +17056,6 @@ declare namespace Kooboo.Lib.NETMultiplePart {
 declare namespace Kooboo.Data.Config {
   interface SiteBinding {
     id: any;
-    domainId: any;
     subDomain: string;
     organizationId: any;
     webSiteId: any;
@@ -17047,6 +17083,7 @@ declare namespace Kooboo.IndexedDB.FileIO {
     length: number;
     fieldName: string;
     fileType: FileType;
+    version: number;
     toStream(): any;
     toBytes(): number[];
   }
@@ -17364,15 +17401,19 @@ declare namespace Kooboo.Sites.Analytics.ABTest.Models {
     objectDisplayName: string;
     status: AbTestStatus;
     createdAt: Date;
-    startAt: Date;
-    endAt: Date;
+    startAt?: Date;
+    endAt?: Date;
+    scheduledEndAt?: Date;
+    minSampleReachedAt?: Date;
+    pausedAt?: Date;
     userCondition: AbTestCondition;
     variants: AbVariant[];
     goalId: number;
     isRunning: boolean;
+    isRunningAt(utcNow: Date): boolean;
   }
 
-  type AbTestStatus = 'Draft' | 'Running' | 'Paused' | 'Completed';
+  type AbTestStatus = 'Draft' | 'Running' | 'Paused' | 'Completed' | 'Scheduled';
 
   interface AbTestCondition {
     script: string;
@@ -17429,7 +17470,7 @@ declare namespace Kooboo.Sites.AIBuilder.Application.Response {
   }
 
   interface FactAnalysis {
-    factId: any;
+    factId: string;
     originalFactExpression: string;
     originalSentence: string;
     shouldSplit: boolean;
@@ -17449,6 +17490,1149 @@ declare namespace Kooboo.Sites.AIBuilder.Application.ViewModel {
     factExpression: string;
     sentence: string;
     role: string;
+  }
+
+}
+declare namespace Kooboo.Sites.AI.Application.Model {
+  interface Blueprint extends IAIApplicationModel {
+    id: string;
+    name: string;
+    description: string;
+  }
+
+  interface AppPlan extends IAIApplicationModel {
+    id: string;
+    blueprintId: string;
+    settings?: PlanSettings;
+    deliverySlices: PlanDeliverySlice[];
+    screens: PlanScreen[];
+    dataContracts: PlanDataContract[];
+    services: PlanService[];
+    sourceFiles: PlanSourceFile[];
+  }
+
+  interface AppDeliveryProgress extends IAIApplicationModel {
+    id: string;
+    sourceFiles: SourceFileProgress[];
+    deliverySlices: DeliverySliceProgress[];
+  }
+
+  interface ModelRelation {
+    id: any;
+    sourceId: string;
+    targetId: string;
+    sourceType: ApplicationModelType;
+    targetType: ApplicationModelType;
+    description: string;
+    create(sourceType: ApplicationModelType, sourceId: string, targetType: ApplicationModelType, targetId: string, description?: string): ModelRelation;
+  }
+
+  interface Scenario extends IAIApplicationModel {
+    id: string;
+    name: string;
+    description: string;
+    given: string[];
+    when: string;
+    then: string[];
+    decisionOutcomes: DecisionOutcomeReference[];
+  }
+
+  interface Module extends IAIApplicationModel {
+    id: string;
+    name: string;
+    description: string;
+  }
+
+  interface Actor extends IAIApplicationModel {
+    id: string;
+    name: string;
+    description: string;
+    type: ActorType;
+    boundary: ActorBoundary;
+    /** Role track: 'global' creates one application role for an app-wide identity; 'data' keeps a semantic actor for a department/project/group-scoped identity and creates no application role. */
+    roleTrack: ActorRoleTrack;
+    permissions: ActorPermissionAssignment[];
+  }
+
+  interface Goal extends IAIApplicationModel {
+    id: string;
+    name: string;
+    description: string;
+    metrics: GoalMetric[];
+  }
+
+  interface Fact extends IAIApplicationModel {
+    id: string;
+    /** Required semantic classification: property, relationship, behavior, or event. Never omit this field or use property as a default. */
+    kind: FactKind;
+    fcoim: FcoimFactType;
+  }
+
+  interface UserStory extends IAIApplicationModel {
+    id: string;
+    title: string;
+    actorId: string;
+    need: string;
+    businessValue: string;
+  }
+
+  interface BusinessObjectDefinition extends IAIApplicationModel {
+    id: string;
+    name: string;
+    englishName: string;
+    description: string;
+    otherNames: string[];
+    dbName: string;
+    modelKind: string;
+    storage: string;
+    humanDefined: boolean;
+    sourceFactIds: string[];
+    fields: BusinessField[];
+    stateDimensions: StateDimension[];
+  }
+
+  type ApplicationModelType = 'Unknown' | 'Blueprint' | 'Goal' | 'Actor' | 'Scenario' | 'Fact' | 'Trigger' | 'UserStory' | 'Relation' | 'BusinessObject' | 'Module' | 'AppPlan' | 'BusinessRule' | 'AppDeliveryProgress' | 'Feature' | 'Permission';
+
+  interface VirtualAccount {
+    userId: any;
+    realUserName: string;
+    applicationRole: string;
+    createdAt: Date;
+  }
+
+  interface ApplicationLog extends Kooboo.IndexedDB.Serializer.IDatabaseObject, Kooboo.IndexedDB.Serializer.IWormDbGeneratedObject {
+    executionId: string;
+    parentExecutionId: string;
+    codeName: string;
+    durationMicroseconds: number;
+    errorType: string;
+    errorMessage: string;
+    id: number;
+    creationDate: Date;
+    sqlStatements: SqlStatementInfo[];
+    codeId: any;
+    isEmbedded: boolean;
+    renderContextId: any;
+    uIScreen: string;
+    uISource: string;
+    uIService: string;
+    uIRoute: string;
+    userId: any;
+    appUserId: string;
+    userLabel: string;
+    actorId: string;
+    actorName: string;
+    actorType: string;
+    initiatorUserId: string;
+    requestUrl: string;
+    httpMethod: string;
+    queryString: string;
+    contentType: string;
+    statusCode: number;
+    getKey(): number;
+    setKey(id: number): void;
+    getSize(): number;
+    writeTo(buffer: any): number;
+    setValues(values: any): void;
+    getIndexValue(fieldHash: number): any;
+  }
+
+  interface LogReadingCursorPosition {
+    month: string;
+    index: number;
+    lastWormId: number;
+  }
+
+  interface BusinessLogReport {
+    month: string;
+    firstWormId: number;
+    lastWormId: number;
+    index: number;
+    latestWormId: number;
+    stepCount: number;
+    lastStepActionCount: number;
+    lastStepMutationCount: number;
+    hasMore: boolean;
+    totalActionsScanned: number;
+    mutatingActionCount: number;
+    totalDataChanges: number;
+    totalRecordsCreated: number;
+    totalRecordsUpdated: number;
+    totalRecordsDeleted: number;
+    activeUserCount: number;
+    touchedObjectCount: number;
+    users: UserDataChangeSummary[];
+    objects: BusinessObjectChangeSummary[];
+    recordLifecycles: BusinessRecordLifecycle[];
+    coChangedObjects: BusinessCoChangePattern[];
+    fieldChangePatterns: BusinessFieldChangePattern[];
+    workflowSequences: BusinessWorkflowSequencePattern[];
+    userHandoffs: BusinessUserHandoffPattern[];
+    decisionSignals: BusinessDecisionSignal[];
+    toManagerReportText(): string;
+  }
+
+  interface SoftwareLogReport {
+    month: string;
+    firstWormId: number;
+    lastWormId: number;
+    index: number;
+    latestWormId: number;
+    stepCount: number;
+    lastStepActionCount: number;
+    lastStepStatementCount: number;
+    hasMore: boolean;
+    totalActions: number;
+    failedActions: number;
+    embeddedActions: number;
+    mutatingActions: number;
+    readOnlyActions: number;
+    repeatedQueryActions: number;
+    totalSqlStatements: number;
+    selectCount: number;
+    insertCount: number;
+    updateCount: number;
+    deleteCount: number;
+    ddlCount: number;
+    otherSqlCount: number;
+    totalDurationMicroseconds: number;
+    maxStatementDurationMicroseconds: number;
+    tables: SoftwareTableMetric[];
+    queryFieldHotspots: SoftwareQueryFieldHotspot[];
+    endpoints: SoftwareEndpointMetric[];
+    slowStatements: SlowSqlStatementEntry[];
+    findings: SoftwareDiagnosticFinding[];
+    toTechnicalReportText(): string;
+  }
+
+  interface UiLogReport {
+    month: string;
+    firstWormId: number;
+    lastWormId: number;
+    index: number;
+    latestWormId: number;
+    stepCount: number;
+    lastStepActionCount: number;
+    hasMore: boolean;
+    totalActionsScanned: number;
+    totalScreenVisits: number;
+    activeUserCount: number;
+    distinctScreenCount: number;
+    screens: UiScreenMetric[];
+    users: UiUserScreenMetric[];
+    insights: UiInteractionInsight[];
+    toUiReportText(): string;
+  }
+
+  interface DataMutationReport {
+    month: string;
+    firstWormId: number;
+    lastWormId: number;
+    index: number;
+    latestWormId: number;
+    stepCount: number;
+    lastStepActionCount: number;
+    lastStepMutationCount: number;
+    hasMore: boolean;
+    totalActionsScanned: number;
+    mutatingActionCount: number;
+    totalMutations: number;
+    totalRecordsCreated: number;
+    totalRecordsUpdated: number;
+    totalRecordsDeleted: number;
+    activeUserCount: number;
+    touchedTableCount: number;
+    touchedFieldCount: number;
+    tables: TableMutationSummary[];
+    users: UserMutationSummary[];
+    fields: FieldMutationSummary[];
+    toDataMutationReportText(): string;
+  }
+
+  interface ApplicationLogReadBatch {
+    startWormId: number;
+    firstWormId: number;
+    lastWormId: number;
+    latestWormId: number;
+    hasMore: boolean;
+    actions: ApplicationLog[];
+  }
+
+  interface LogReadBatchResult {
+    month: string;
+    firstWormId: number;
+    lastWormId: number;
+    index: number;
+    latestWormId: number;
+    actionsRead: number;
+    hasMoreInMonth: boolean;
+    hasMoreMonths: boolean;
+  }
+
+  interface ApplicationLogOverviewResponse {
+    month: string;
+    business: BusinessLogReport;
+    software: SoftwareLogReport;
+    ui: UiLogReport;
+    dataMutation: DataMutationReport;
+    cursor: LogReadingCursorPosition;
+    availableMonths: string[];
+    totalActionsInMonth: number;
+  }
+
+  interface ApplicationLogStatusResponse {
+    cursor: LogReadingCursorPosition;
+    currentMonth: string;
+    totalActionsInCurrentMonth: number;
+    availableMonths: string[];
+  }
+
+  interface ApplicationLogActivityStreamResponse {
+    month: string;
+    pageIndex: number;
+    pageSize: number;
+    totalCount: number;
+    hasMore: boolean;
+    items: ApplicationLogActivityItem[];
+  }
+
+  interface IAIApplicationModel {
+    id: string;
+  }
+
+  interface PlanSettings {
+    designSystem: PlanDesignSystem;
+    layout: PlanLayout;
+    navigation: PlanNavigationItem[];
+    permissionModel?: PlanPermissionModel;
+  }
+
+  interface PlanDeliverySlice {
+    id: string;
+    name: string;
+    goal: string;
+    featureIds: string[];
+    requiredDecisionOutcomes: DecisionOutcomeReference[];
+    scenarioIds: string[];
+    screenIds: string[];
+    serviceIds: string[];
+    sourceFileIds: string[];
+  }
+
+  interface PlanScreen {
+    id: string;
+    name: string;
+    purpose: string;
+    routePath?: string;
+    permissionId?: string;
+    scenarioIds: string[];
+    dataContractIds: string[];
+    sourceFileIds: string[];
+    blocks: PlanScreenBlock[];
+    actions: PlanScreenAction[];
+  }
+
+  interface PlanDataContract {
+    id: string;
+    name: string;
+    description: string;
+    fields: PlanDataField[];
+  }
+
+  interface PlanService {
+    id: string;
+    name: string;
+    description: string;
+    sourceFileIds: string[];
+    operations: PlanServiceOperation[];
+  }
+
+  interface PlanSourceFile {
+    id: string;
+    type: PlanSourceFileType;
+    fileName: string;
+    url?: string;
+  }
+
+  interface SourceFileProgress {
+    sourceFileId: string;
+    contentHash: string;
+  }
+
+  interface DeliverySliceProgress {
+    deliverySliceId: string;
+    runtimeCheck?: SliceCheck;
+    businessCheck?: SliceCheck;
+  }
+
+  interface EntityDatabasePlan {
+    schemaVersion: number;
+    status: DatabasePlanStatus;
+    tables: DatabaseTablePlan[];
+    relations: DatabaseRelationPlan[];
+    issues: DatabasePlanIssue[];
+  }
+
+  interface DatabaseMaterializationResult {
+    materializedTableNames: string[];
+    warnings: string[];
+  }
+
+  interface DecisionOutcomeReference {
+    businessRuleId: string;
+    outcomeId: string;
+  }
+
+  type ActorType = 'Human' | 'System';
+
+  type ActorBoundary = 'Internal' | 'External';
+
+  type ActorRoleTrack = 'Global' | 'Data';
+
+  interface ActorPermissionAssignment {
+    permissionId: string;
+    scopes: string[];
+  }
+
+  interface GoalMetric {
+    id: string;
+    name: string;
+    definition: string;
+    target: string;
+    measurementPeriod: string;
+  }
+
+  type FactKind = 'Property' | 'Relationship' | 'Behavior' | 'Event';
+
+  interface FcoimFactType {
+    preferredReading: string;
+    objectTypes: FcoimObjectType[];
+    fields: FcoimField[];
+    roles: FcoimRole[];
+    constraints: FcoimConstraint[];
+    examples: FcoimExample[];
+  }
+
+  interface BusinessField {
+    id: string;
+    objectId: string;
+    name: string;
+    englishName: string;
+    description: string;
+    otherNames: string[];
+    dbName: string;
+    valueObjectTypeId: string;
+    valueType: BusinessValueType;
+    required: boolean;
+    identifier: boolean;
+    unique: boolean;
+    computed: boolean;
+    humanDefined: boolean;
+    sourceFactIds: string[];
+    allowedValues: AllowedValue[];
+  }
+
+  interface StateDimension {
+    id: string;
+    name: string;
+    description: string;
+    initialStateId: string;
+    states: BusinessState[];
+  }
+
+  interface SqlStatementInfo extends Kooboo.IndexedDB.Serializer.IDatabaseObject {
+    executionOutcome: string;
+    errorMessage: string;
+    rowsRead: number;
+    rowsAffected: number;
+    statementIndex: number;
+    sql: string;
+    parametersJson: string;
+    durationMicroseconds: number;
+    mutations: DataMutation[];
+    operation: SqlOperation;
+    targetTable: string;
+    tables: string[];
+    fields: string[];
+    whereFields: string[];
+    orderByFields: string[];
+    fieldValues: SqlFieldValue[];
+    getSize(): number;
+    writeTo(buffer: any): number;
+    setValues(values: any): void;
+    getIndexValue(fieldHash: number): any;
+  }
+
+  interface UserDataChangeSummary {
+    userLabel: string;
+    actorName: string;
+    userId: any;
+    actionCount: number;
+    mutatingActionCount: number;
+    totalDataChanges: number;
+    insertCount: number;
+    updateCount: number;
+    deleteCount: number;
+    firstWormId: number;
+    lastWormId: number;
+    activeScreens: string[];
+    activeActions: string[];
+    objectWork: UserObjectWorkSummary[];
+  }
+
+  interface BusinessObjectChangeSummary {
+    objectName: string;
+    createdCount: number;
+    updatedCount: number;
+    deletedCount: number;
+    distinctRecordCount: number;
+    activeUserCount: number;
+    activeUsers: string[];
+    businessActions: string[];
+    stateFields: BusinessStateFieldSummary[];
+  }
+
+  interface BusinessRecordLifecycle {
+    objectName: string;
+    rowKey: string;
+    firstWormId: number;
+    lastWormId: number;
+    isCreatedInLog: boolean;
+    isDeleted: boolean;
+    stepCount: number;
+    touchedByUsers: string[];
+    currentState: BusinessFieldValue[];
+    steps: BusinessRecordStep[];
+  }
+
+  interface BusinessCoChangePattern {
+    primaryObject: string;
+    primaryChange: string;
+    secondaryObject: string;
+    coupledChange: string;
+    businessAction: string;
+    occurrenceCount: number;
+    exampleWormId: number;
+  }
+
+  interface BusinessFieldChangePattern {
+    objectName: string;
+    operation: DataMutationOperation;
+    fieldsChangedTogether: string[];
+    conditionFields: string[];
+    businessAction: string;
+    occurrenceCount: number;
+    exampleWormId: number;
+  }
+
+  interface BusinessWorkflowSequencePattern {
+    objectName: string;
+    sequenceSignature: string;
+    steps: string[];
+    recordCount: number;
+    completedOrTerminalCount: number;
+    sampleRowKeys: string[];
+  }
+
+  interface BusinessUserHandoffPattern {
+    fromUserLabel: string;
+    toUserLabel: string;
+    objectName: string;
+    fromUserId: any;
+    toUserId: any;
+    fromAction: string;
+    toAction: string;
+    stateChange: string;
+    handoffCount: number;
+    sampleRowKeys: string[];
+  }
+
+  interface BusinessDecisionSignal {
+    category: string;
+    targetObject: string;
+    title: string;
+    recommendation: string;
+    impactCount: number;
+    evidenceWormId: number;
+  }
+
+  interface SoftwareTableMetric {
+    tableName: string;
+    selectCount: number;
+    insertCount: number;
+    updateCount: number;
+    deleteCount: number;
+    totalDurationMicroseconds: number;
+    maxDurationMicroseconds: number;
+    readBeforeWriteActionCount: number;
+    joinedWithTables: string[];
+    selectedFields: string[];
+    writtenFields: string[];
+    filteredFields: string[];
+    sortedFields: string[];
+  }
+
+  interface SoftwareQueryFieldHotspot {
+    qualifiedField: string;
+    tableName: string;
+    fieldName: string;
+    whereCount: number;
+    orderByCount: number;
+    selectWhereCount: number;
+    mutationWhereCount: number;
+    coFilteredFields: string[];
+  }
+
+  interface SoftwareEndpointMetric {
+    endpointKey: string;
+    uIScreen: string;
+    uIService: string;
+    uIRoute: string;
+    httpMethod: string;
+    requestUrl: string;
+    actionCount: number;
+    failedActionCount: number;
+    mutatingActionCount: number;
+    repeatedQueryActionCount: number;
+    totalSqlStatements: number;
+    totalDurationMicroseconds: number;
+    maxActionDurationMicroseconds: number;
+    statusCodes: number[];
+    touchedTables: string[];
+  }
+
+  interface SlowSqlStatementEntry {
+    wormId: number;
+    statementIndex: number;
+    durationMicroseconds: number;
+    operation: SqlOperation;
+    tableName: string;
+    endpointKey: string;
+    sql: string;
+  }
+
+  interface SoftwareDiagnosticFinding {
+    category: string;
+    target: string;
+    recommendation: string;
+    occurrenceCount: number;
+    evidenceWormId: number;
+  }
+
+  interface UiScreenMetric {
+    screenName: string;
+    totalVisits: number;
+    distinctUserCount: number;
+    firstWormId: number;
+    lastWormId: number;
+    userVisits: UiUserVisitCount[];
+    servicesUsed: UiNamedCount[];
+    sourcesUsed: UiNamedCount[];
+    routesUsed: UiNamedCount[];
+    httpMethods: UiNamedCount[];
+    errorCount: number;
+  }
+
+  interface UiUserScreenMetric {
+    userId: any;
+    userLabel: string;
+    totalActions: number;
+    distinctScreenCount: number;
+    screenVisits: UiNamedCount[];
+    servicesUsed: UiNamedCount[];
+    firstWormId: number;
+    lastWormId: number;
+  }
+
+  interface UiInteractionInsight {
+    category: string;
+    targetScreen: string;
+    title: string;
+    description: string;
+    occurrenceCount: number;
+  }
+
+  interface TableMutationSummary {
+    tableName: string;
+    totalChanges: number;
+    insertCount: number;
+    updateCount: number;
+    deleteCount: number;
+    distinctRecordCount: number;
+    activeUserCount: number;
+    activeUsers: string[];
+    fields: TableFieldMutationSummary[];
+    sampleRowKeys: string[];
+    firstWormId: number;
+    lastWormId: number;
+  }
+
+  interface UserMutationSummary {
+    userId: any;
+    userLabel: string;
+    actorName: string;
+    appUserId: string;
+    totalChanges: number;
+    insertCount: number;
+    updateCount: number;
+    deleteCount: number;
+    touchedTableCount: number;
+    tables: UserTableMutationDetail[];
+    firstWormId: number;
+    lastWormId: number;
+  }
+
+  interface FieldMutationSummary {
+    tableName: string;
+    fieldName: string;
+    qualifiedField: string;
+    totalChanges: number;
+    insertCount: number;
+    updateCount: number;
+    activeUserCount: number;
+    changedByUsers: string[];
+    recentChanges: FieldRecentChangeEntry[];
+    topValues: FieldValueDistribution[];
+    firstWormId: number;
+    lastWormId: number;
+  }
+
+  interface ApplicationLogActivityItem {
+    renderContextId: any;
+    codeId: any;
+    executionId: string;
+    parentExecutionId: string;
+    codeName: string;
+    durationMicroseconds: number;
+    errorType: string;
+    errorMessage: string;
+    appUserId: string;
+    actorId: string;
+    actorName: string;
+    actorType: string;
+    initiatorUserId: string;
+    id: number;
+    timeUtc: Date;
+    formattedTime: string;
+    httpMethod: string;
+    requestUrl: string;
+    queryString: string;
+    contentType: string;
+    uIScreen: string;
+    uIRoute: string;
+    uIService: string;
+    uISource: string;
+    userId: any;
+    userLabel: string;
+    statusCode: number;
+    sqlCount: number;
+    totalSqlDurationMicroseconds: number;
+    maxSqlDurationMicroseconds: number;
+    touchedTables: string[];
+    mutations: string[];
+    sqlStatements: ActivitySqlSummary[];
+  }
+
+  interface PlanDesignSystem {
+    id: string;
+    name: string;
+  }
+
+  interface PlanLayout {
+    pattern: string;
+  }
+
+  interface PlanNavigationItem {
+    id: string;
+    label: string;
+    screenId?: string;
+    children: PlanNavigationItem[];
+  }
+
+  type PlanPermissionModel = 'SingleRole' | 'Rbac';
+
+  interface PlanScreenBlock {
+    id: string;
+    kind: PlanScreenBlockKind;
+    title?: string;
+    description: string;
+    dataContractId?: string;
+    fieldIds: string[];
+    actionIds: string[];
+  }
+
+  interface PlanScreenAction {
+    id: string;
+    label: string;
+    description: string;
+    scenarioIds: string[];
+    serviceOperationId?: string;
+    permissionScope?: string;
+    targetBlockId?: string;
+    targetScreenId?: string;
+    presentation?: PlanActionPresentation;
+    confirmationMessage?: string;
+  }
+
+  interface PlanDataField {
+    id: string;
+    name: string;
+    description?: string;
+    type: PlanDataFieldType;
+    required: boolean;
+    nullable: boolean;
+    objectContractId?: string;
+    sourceRefs: PlanSourceRef[];
+  }
+
+  interface PlanServiceOperation {
+    id: string;
+    name: string;
+    description: string;
+    scenarioIds: string[];
+    businessRuleIds: string[];
+    inputContractId?: string;
+    outputContractId?: string;
+    api?: PlanOperationApi;
+  }
+
+  type PlanSourceFileType = 'Script' | 'Style' | 'Api' | 'CodeBlock';
+
+  interface SliceCheck {
+    passed: boolean;
+    contentHash: string;
+  }
+
+  type DatabasePlanStatus = 'Proposed' | 'Confirmed';
+
+  interface DatabaseTablePlan {
+    entityId: string;
+    tableName: string;
+    columns: DatabaseColumnPlan[];
+    indexes: DatabaseIndexPlan[];
+    foreignKeys: DatabaseForeignKeyPlan[];
+  }
+
+  interface DatabaseRelationPlan {
+    relationId: string;
+    name: string;
+    sourceFactId: string;
+    strategy: DatabaseRelationStrategy;
+    joinTableName?: string;
+    ends: DatabaseRelationEndPlan[];
+  }
+
+  interface DatabasePlanIssue {
+    code: string;
+    itemId: string;
+    message: string;
+  }
+
+  interface FcoimObjectType {
+    id: string;
+    name: string;
+    englishName: string;
+    description: string;
+    kind: FcoimObjectTypeKind;
+    dbName: string;
+    businessObjectId?: string;
+    valueType?: BusinessValueType;
+  }
+
+  interface FcoimField {
+    id: string;
+    entityObjectTypeId: string;
+    valueObjectTypeId: string;
+    roleId: string;
+    dbName: string;
+    identifier: boolean;
+  }
+
+  interface FcoimRole {
+    id: string;
+    name: string;
+    objectTypeId: string;
+  }
+
+  interface FcoimConstraint {
+    id: string;
+    type: FcoimConstraintType;
+    roleIds: string[];
+    minFrequency?: number;
+    maxFrequency?: number;
+    description: string;
+  }
+
+  interface FcoimExample {
+    sentence: string;
+    roleValues: FcoimRoleValue[];
+  }
+
+  type BusinessValueType = 'Text' | 'Integer' | 'Decimal' | 'Boolean' | 'Date' | 'DateTime' | 'Money' | 'Enum';
+
+  interface AllowedValue {
+    id: string;
+    name: string;
+    description: string;
+  }
+
+  interface BusinessState {
+    id: string;
+    name: string;
+    description: string;
+    terminal: boolean;
+  }
+
+  interface DataMutation extends Kooboo.IndexedDB.Serializer.IDatabaseObject {
+    table: string;
+    rowKey: string;
+    operation: DataMutationOperation;
+    changes: FieldChange[];
+    getSize(): number;
+    writeTo(buffer: any): number;
+    setValues(values: any): void;
+    getIndexValue(fieldHash: number): any;
+  }
+
+  type SqlOperation = 'Unknown' | 'Select' | 'Insert' | 'Update' | 'Delete' | 'Ddl' | 'Other';
+
+  interface SqlFieldValue extends Kooboo.IndexedDB.Serializer.IDatabaseObject {
+    rowIndex: number;
+    field: string;
+    valueSql: string;
+    getSize(): number;
+    writeTo(buffer: any): number;
+    setValues(values: any): void;
+    getIndexValue(fieldHash: number): any;
+  }
+
+  interface UserObjectWorkSummary {
+    objectName: string;
+    insertCount: number;
+    updateCount: number;
+    deleteCount: number;
+    touchedRowKeys: string[];
+    changedFields: string[];
+    stateChangesApplied: BusinessFieldValueCount[];
+  }
+
+  interface BusinessStateFieldSummary {
+    fieldName: string;
+    qualifiedField: string;
+    isStateCandidate: boolean;
+    insertCount: number;
+    updateCount: number;
+    conditionalUpdateCount: number;
+    initialValuesOnCreate: BusinessValueCount[];
+    updatedValues: BusinessValueCount[];
+    currentRowDistribution: BusinessValueCount[];
+    transitions: BusinessStateTransition[];
+    numericChangeCount: number;
+    numericSum: number;
+    minNumericValue?: number;
+    maxNumericValue?: number;
+    calculationFormulas: string[];
+  }
+
+  interface BusinessFieldValue {
+    fieldName: string;
+    value: string;
+  }
+
+  interface BusinessRecordStep {
+    userLabel: string;
+    actorName: string;
+    wormId: number;
+    userId: any;
+    operation: DataMutationOperation;
+    businessAction: string;
+    fieldDeltas: BusinessFieldDelta[];
+  }
+
+  type DataMutationOperation = 'Unknown' | 'Insert' | 'Update' | 'Delete';
+
+  interface UiUserVisitCount {
+    userId: any;
+    userLabel: string;
+    visitCount: number;
+    firstWormId: number;
+    lastWormId: number;
+  }
+
+  interface UiNamedCount {
+    name: string;
+    count: number;
+  }
+
+  interface TableFieldMutationSummary {
+    fieldName: string;
+    totalChanges: number;
+    insertCount: number;
+    updateCount: number;
+    activeUserCount: number;
+    activeUsers: string[];
+    lastValue?: string;
+    lastModifiedTimeUtc?: Date;
+  }
+
+  interface UserTableMutationDetail {
+    tableName: string;
+    totalChanges: number;
+    insertCount: number;
+    updateCount: number;
+    deleteCount: number;
+    touchedRowKeys: string[];
+    changedFields: UserFieldMutationDetail[];
+  }
+
+  interface FieldRecentChangeEntry {
+    wormId: number;
+    timeUtc: Date;
+    formattedTime: string;
+    userId: any;
+    userLabel: string;
+    actorName: string;
+    rowKey: string;
+    value?: string;
+    operation: DataMutationOperation;
+  }
+
+  interface FieldValueDistribution {
+    value: string;
+    count: number;
+  }
+
+  interface ActivitySqlSummary {
+    writeEvidence: DataMutation[];
+    parameters: any;
+    executionOutcome: string;
+    errorMessage: string;
+    rowsRead: number;
+    rowsAffected: number;
+    statementIndex: number;
+    sql: string;
+    operation: string;
+    targetTable: string;
+    durationMicroseconds: number;
+  }
+
+  type PlanScreenBlockKind = 'Filter' | 'Table' | 'Form' | 'Detail' | 'Chart' | 'Custom';
+
+  type PlanActionPresentation = 'Page' | 'Drawer' | 'Modal' | 'Inline';
+
+  type PlanDataFieldType = 'Text' | 'Integer' | 'Decimal' | 'Boolean' | 'Date' | 'DateTime' | 'Object' | 'TextArray' | 'IntegerArray' | 'DecimalArray' | 'BooleanArray' | 'DateArray' | 'DateTimeArray' | 'ObjectArray';
+
+  interface PlanSourceRef {
+    type: PlanSourceRefType;
+    id: string;
+  }
+
+  interface PlanOperationApi {
+    method: string;
+    path: string;
+  }
+
+  interface DatabaseColumnPlan {
+    fieldId: string;
+    columnName: string;
+    type: DatabaseColumnType;
+    required: boolean;
+    primaryKey: boolean;
+    unique: boolean;
+    system: boolean;
+    sourceFactIds: string[];
+  }
+
+  interface DatabaseIndexPlan {
+    unique: boolean;
+    columnNames: string[];
+  }
+
+  interface DatabaseForeignKeyPlan {
+    relationId: string;
+    columnName: string;
+    referencedTableName: string;
+    referencedColumnName: string;
+  }
+
+  type DatabaseRelationStrategy = 'Unresolved' | 'ForeignKey' | 'JoinTable' | 'NotMaterialized';
+
+  interface DatabaseRelationEndPlan {
+    roleId: string;
+    entityId: string;
+    tableName: string;
+    minFrequency: number;
+    maxFrequency?: number;
+  }
+
+  type FcoimObjectTypeKind = 'Entity' | 'Value';
+
+  type FcoimConstraintType = 'Mandatory' | 'Uniqueness' | 'Frequency' | 'Subset' | 'Exclusion' | 'Equality';
+
+  interface FcoimRoleValue {
+    roleId: string;
+    value: string;
+  }
+
+  interface FieldChange extends Kooboo.IndexedDB.Serializer.IDatabaseObject {
+    field: string;
+    value?: string;
+    getSize(): number;
+    writeTo(buffer: any): number;
+    setValues(values: any): void;
+    getIndexValue(fieldHash: number): any;
+  }
+
+  interface BusinessFieldValueCount {
+    fieldName: string;
+    value: string;
+    count: number;
+  }
+
+  interface BusinessValueCount {
+    value: string;
+    count: number;
+  }
+
+  interface BusinessStateTransition {
+    objectName: string;
+    fieldName: string;
+    qualifiedField: string;
+    fromValue: string;
+    toValue: string;
+    transitionCount: number;
+    isReversalOrRework: boolean;
+    firstWormId: number;
+    lastWormId: number;
+    actorUserIds: string[];
+    businessActions: string[];
+    sampleRowKeys: string[];
+  }
+
+  interface BusinessFieldDelta {
+    fieldName: string;
+    previousValue: string;
+    newValue: string;
+  }
+
+  interface UserFieldMutationDetail {
+    fieldName: string;
+    totalChanges: number;
+    insertCount: number;
+    updateCount: number;
+    lastValue?: string;
+    lastModifiedTimeUtc?: Date;
+  }
+
+  type PlanSourceRefType = 'BusinessField' | 'StateDimension' | 'State' | 'Fact' | 'BusinessRule';
+
+  type DatabaseColumnType = 'String' | 'Integer' | 'Number' | 'DateTime' | 'Bool';
+
+}
+declare namespace Kooboo.Sites.AI.Application.Delivery {
+  interface EntityDatabaseSynchronizationResult {
+    plan: Kooboo.Sites.AI.Application.Model.EntityDatabasePlan;
+    materialization: Kooboo.Sites.AI.Application.Model.DatabaseMaterializationResult;
   }
 
 }
@@ -17609,6 +18793,7 @@ declare namespace Kooboo.Mail.Repositories.Sqlite {
     update(value: Kooboo.Mail.Message): boolean;
     updateMeta(msg: Kooboo.Mail.Message): void;
     delete(MsgId: number): void;
+    sharedInboxPage(addressId: number, beforeMessageId: number, pageSize: number): Kooboo.Mail.Message[];
     toFullMessage(metaMsgs: Kooboo.Mail.Message[]): Kooboo.Mail.Message[];
     toFullMessage(msg: Kooboo.Mail.Message): Kooboo.Mail.Message;
     byUidRange(folder: Kooboo.Mail.Imap.SelectFolder, minId: number, maxId: number): Kooboo.Mail.Message[];
@@ -17681,534 +18866,17 @@ declare namespace Kooboo.Mail.Repositories.Sqlite {
 }
 declare namespace MimeKit {
   interface MimeMessage {
-    headers: HeaderList;
-    importance: MessageImportance;
-    priority: MessagePriority;
-    xPriority: XMessagePriority;
-    sender: MailboxAddress;
-    resentSender: MailboxAddress;
-    from: InternetAddressList;
-    resentFrom: InternetAddressList;
-    replyTo: InternetAddressList;
-    resentReplyTo: InternetAddressList;
-    to: InternetAddressList;
-    resentTo: InternetAddressList;
-    cc: InternetAddressList;
-    resentCc: InternetAddressList;
-    bcc: InternetAddressList;
-    resentBcc: InternetAddressList;
-    subject: string;
-    date: any;
-    resentDate: any;
-    references: MessageIdList;
-    inReplyTo: string;
-    messageId: string;
-    resentMessageId: string;
-    mimeVersion: any;
-    body: MimeEntity;
-    textBody: string;
-    htmlBody: string;
-    bodyParts: MimeEntity[];
-    attachments: MimeEntity[];
-    getTextBody(format: MimeKit.Text.TextFormat): string;
-    getRecipients(onlyUnique?: boolean): MailboxAddress[];
-    accept(visitor: MimeVisitor): void;
-    prepare(constraint: EncodingConstraint, maxLineLength?: number): void;
-    writeTo(options: FormatOptions, stream: any, headersOnly: boolean, cancellationToken?: any): void;
-    writeToAsync(options: FormatOptions, stream: any, headersOnly: boolean, cancellationToken?: any): any;
-    writeTo(options: FormatOptions, stream: any, cancellationToken?: any): void;
-    writeToAsync(options: FormatOptions, stream: any, cancellationToken?: any): any;
-    writeTo(stream: any, headersOnly: boolean, cancellationToken?: any): void;
-    writeToAsync(stream: any, headersOnly: boolean, cancellationToken?: any): any;
-    writeTo(stream: any, cancellationToken?: any): void;
-    writeToAsync(stream: any, cancellationToken?: any): any;
-    writeTo(options: FormatOptions, fileName: string, cancellationToken?: any): void;
-    writeToAsync(options: FormatOptions, fileName: string, cancellationToken?: any): any;
-    writeTo(fileName: string, cancellationToken?: any): void;
-    writeToAsync(fileName: string, cancellationToken?: any): any;
-    sign(ctx: MimeKit.Cryptography.CryptographyContext, digestAlgo: MimeKit.Cryptography.DigestAlgorithm, cancellationToken?: any): void;
-    signAsync(ctx: MimeKit.Cryptography.CryptographyContext, digestAlgo: MimeKit.Cryptography.DigestAlgorithm, cancellationToken?: any): any;
-    sign(ctx: MimeKit.Cryptography.CryptographyContext, cancellationToken?: any): void;
-    signAsync(ctx: MimeKit.Cryptography.CryptographyContext, cancellationToken?: any): any;
-    encrypt(ctx: MimeKit.Cryptography.CryptographyContext, cancellationToken?: any): void;
-    encryptAsync(ctx: MimeKit.Cryptography.CryptographyContext, cancellationToken?: any): any;
-    signAndEncrypt(ctx: MimeKit.Cryptography.CryptographyContext, digestAlgo: MimeKit.Cryptography.DigestAlgorithm, cancellationToken?: any): void;
-    signAndEncryptAsync(ctx: MimeKit.Cryptography.CryptographyContext, digestAlgo: MimeKit.Cryptography.DigestAlgorithm, cancellationToken?: any): any;
-    signAndEncrypt(ctx: MimeKit.Cryptography.CryptographyContext, cancellationToken?: any): void;
-    signAndEncryptAsync(ctx: MimeKit.Cryptography.CryptographyContext, cancellationToken?: any): any;
-    dispose(): void;
-    load(options: ParserOptions, stream: any, persistent: boolean, cancellationToken?: any): MimeMessage;
-    loadAsync(options: ParserOptions, stream: any, persistent: boolean, cancellationToken?: any): any;
-    load(options: ParserOptions, stream: any, cancellationToken?: any): MimeMessage;
-    loadAsync(options: ParserOptions, stream: any, cancellationToken?: any): any;
-    load(stream: any, persistent: boolean, cancellationToken?: any): MimeMessage;
-    loadAsync(stream: any, persistent: boolean, cancellationToken?: any): any;
-    load(stream: any, cancellationToken?: any): MimeMessage;
-    loadAsync(stream: any, cancellationToken?: any): any;
-    load(options: ParserOptions, fileName: string, cancellationToken?: any): MimeMessage;
-    loadAsync(options: ParserOptions, fileName: string, cancellationToken?: any): any;
-    load(fileName: string, cancellationToken?: any): MimeMessage;
-    loadAsync(fileName: string, cancellationToken?: any): any;
-    createFromMailMessage(message: any): MimeMessage;
   }
 
   interface MailboxAddress extends InternetAddress {
-    idnMapping: MimeKit.Encodings.IPunycode;
-    route: DomainList;
-    address: string;
-    localPart: string;
-    domain: string;
-    isInternational: boolean;
-    encoding: any;
-    name: string;
-    clone(): InternetAddress;
-    encodeAddrspec(addrspec: string): string;
-    decodeAddrspec(addrspec: string): string;
-    getAddress(idnEncode: boolean): string;
-    tryParse(options: ParserOptions, buffer: number[], startIndex: number, length: number, mailbox: MailboxAddress): boolean;
-    tryParse(buffer: number[], startIndex: number, length: number, mailbox: MailboxAddress): boolean;
-    tryParse(options: ParserOptions, buffer: number[], startIndex: number, mailbox: MailboxAddress): boolean;
-    tryParse(buffer: number[], startIndex: number, mailbox: MailboxAddress): boolean;
-    tryParse(options: ParserOptions, buffer: number[], mailbox: MailboxAddress): boolean;
-    tryParse(buffer: number[], mailbox: MailboxAddress): boolean;
-    tryParse(options: ParserOptions, text: string, mailbox: MailboxAddress): boolean;
-    tryParse(text: string, mailbox: MailboxAddress): boolean;
-    parse(options: ParserOptions, buffer: number[], startIndex: number, length: number): MailboxAddress;
-    parse(buffer: number[], startIndex: number, length: number): MailboxAddress;
-    parse(options: ParserOptions, buffer: number[], startIndex: number): MailboxAddress;
-    parse(buffer: number[], startIndex: number): MailboxAddress;
-    parse(options: ParserOptions, buffer: number[]): MailboxAddress;
-    parse(buffer: number[]): MailboxAddress;
-    parse(options: ParserOptions, text: string): MailboxAddress;
-    parse(text: string): MailboxAddress;
-    compareTo(other: InternetAddress): number;
-  }
-
-  interface MimeVisitor {
-    visit(entity: MimeEntity): void;
-    visit(message: MimeMessage): void;
-  }
-
-  type EncodingConstraint = 'None' | 'EightBit' | 'SevenBit';
-
-  interface FormatOptions {
-    maxLineLength: number;
-    newLineFormat: NewLineFormat;
-    ensureNewLine: boolean;
-    hiddenHeaders: any;
-    international: boolean;
-    allowMixedHeaderCharsets: boolean;
-    parameterEncodingMethod: ParameterEncodingMethod;
-    alwaysQuoteParameterValues: boolean;
-    clone(): FormatOptions;
-  }
-
-  interface ParserOptions {
-    addressParserComplianceMode: RfcComplianceMode;
-    allowUnquotedCommasInAddresses: boolean;
-    allowAddressesWithoutDomain: boolean;
-    maxAddressGroupDepth: number;
-    maxMimeDepth: number;
-    parameterComplianceMode: RfcComplianceMode;
-    rfc2047ComplianceMode: RfcComplianceMode;
-    respectContentLength: boolean;
-    charsetEncoding: any;
-    clone(): ParserOptions;
-    registerMimeType(mimeType: string, type: any): void;
-  }
-
-  interface HeaderList extends Header[] {
-    item: string;
-    count: number;
-    isReadOnly: boolean;
-    add(id: HeaderId, value: string): void;
-    add(field: string, value: string): void;
-    add(id: HeaderId, encoding: any, value: string): void;
-    add(field: string, encoding: any, value: string): void;
-    contains(id: HeaderId): boolean;
-    contains(field: string): boolean;
-    indexOf(id: HeaderId): number;
-    indexOf(field: string): number;
-    insert(index: number, id: HeaderId, value: string): void;
-    insert(index: number, field: string, value: string): void;
-    insert(index: number, id: HeaderId, encoding: any, value: string): void;
-    insert(index: number, field: string, encoding: any, value: string): void;
-    lastIndexOf(id: HeaderId): number;
-    lastIndexOf(field: string): number;
-    remove(id: HeaderId): boolean;
-    remove(field: string): boolean;
-    removeAll(id: HeaderId): void;
-    removeAll(field: string): void;
-    replace(id: HeaderId, encoding: any, value: string): void;
-    replace(id: HeaderId, value: string): void;
-    replace(field: string, encoding: any, value: string): void;
-    replace(field: string, value: string): void;
-    writeTo(options: FormatOptions, stream: any, cancellationToken?: any): void;
-    writeToAsync(options: FormatOptions, stream: any, cancellationToken?: any): any;
-    writeTo(stream: any, cancellationToken?: any): void;
-    writeToAsync(stream: any, cancellationToken?: any): any;
-    add(header: Header): void;
-    clear(): void;
-    contains(header: Header): boolean;
-    copyTo(array: Header[], arrayIndex: number): void;
-    remove(header: Header): boolean;
-    replace(header: Header): void;
-    indexOf(header: Header): number;
-    insert(index: number, header: Header): void;
-    removeAt(index: number): void;
-    load(options: ParserOptions, stream: any, cancellationToken?: any): HeaderList;
-    loadAsync(options: ParserOptions, stream: any, cancellationToken?: any): any;
-    load(stream: any, cancellationToken?: any): HeaderList;
-    loadAsync(stream: any, cancellationToken?: any): any;
-    load(options: ParserOptions, fileName: string, cancellationToken?: any): HeaderList;
-    loadAsync(options: ParserOptions, fileName: string, cancellationToken?: any): any;
-    load(fileName: string, cancellationToken?: any): HeaderList;
-    loadAsync(fileName: string, cancellationToken?: any): any;
-  }
-
-  type MessageImportance = 'Low' | 'Normal' | 'High';
-
-  type MessagePriority = 'NonUrgent' | 'Normal' | 'Urgent';
-
-  type XMessagePriority = 'Highest' | 'High' | 'Normal' | 'Low' | 'Lowest';
-
-  interface InternetAddressList extends InternetAddress[] {
-    mailboxes: MailboxAddress[];
-    item: InternetAddress;
-    count: number;
-    isReadOnly: boolean;
-    indexOf(address: InternetAddress): number;
-    insert(index: number, address: InternetAddress): void;
-    removeAt(index: number): void;
-    add(address: InternetAddress): void;
-    addRange(addresses: InternetAddress[]): void;
-    clear(): void;
-    contains(address: InternetAddress): boolean;
-    copyTo(array: InternetAddress[], arrayIndex: number): void;
-    remove(address: InternetAddress): boolean;
-    compareTo(other: InternetAddressList): number;
-    tryParse(options: ParserOptions, buffer: number[], startIndex: number, length: number, addresses: InternetAddressList): boolean;
-    tryParse(buffer: number[], startIndex: number, length: number, addresses: InternetAddressList): boolean;
-    tryParse(options: ParserOptions, buffer: number[], startIndex: number, addresses: InternetAddressList): boolean;
-    tryParse(buffer: number[], startIndex: number, addresses: InternetAddressList): boolean;
-    tryParse(options: ParserOptions, buffer: number[], addresses: InternetAddressList): boolean;
-    tryParse(buffer: number[], addresses: InternetAddressList): boolean;
-    tryParse(options: ParserOptions, text: string, addresses: InternetAddressList): boolean;
-    tryParse(text: string, addresses: InternetAddressList): boolean;
-    parse(options: ParserOptions, buffer: number[], startIndex: number, length: number): InternetAddressList;
-    parse(buffer: number[], startIndex: number, length: number): InternetAddressList;
-    parse(options: ParserOptions, buffer: number[], startIndex: number): InternetAddressList;
-    parse(buffer: number[], startIndex: number): InternetAddressList;
-    parse(options: ParserOptions, buffer: number[]): InternetAddressList;
-    parse(buffer: number[]): InternetAddressList;
-    parse(options: ParserOptions, text: string): InternetAddressList;
-    parse(text: string): InternetAddressList;
-  }
-
-  interface MessageIdList extends string[] {
-    item: string;
-    count: number;
-    isReadOnly: boolean;
-    clone(): MessageIdList;
-    indexOf(messageId: string): number;
-    insert(index: number, messageId: string): void;
-    removeAt(index: number): void;
-    add(messageId: string): void;
-    addRange(items: string[]): void;
-    clear(): void;
-    contains(messageId: string): boolean;
-    copyTo(array: string[], arrayIndex: number): void;
-    remove(messageId: string): boolean;
-  }
-
-  interface MimeEntity {
-    headers: HeaderList;
-    contentDisposition: ContentDisposition;
-    contentType: ContentType;
-    contentBase: any;
-    contentLocation: any;
-    contentId: string;
-    isAttachment: boolean;
-    accept(visitor: MimeVisitor): void;
-    prepare(constraint: EncodingConstraint, maxLineLength?: number): void;
-    writeTo(options: FormatOptions, stream: any, contentOnly: boolean, cancellationToken?: any): void;
-    writeToAsync(options: FormatOptions, stream: any, contentOnly: boolean, cancellationToken?: any): any;
-    writeTo(options: FormatOptions, stream: any, cancellationToken?: any): void;
-    writeToAsync(options: FormatOptions, stream: any, cancellationToken?: any): any;
-    writeTo(stream: any, contentOnly: boolean, cancellationToken?: any): void;
-    writeToAsync(stream: any, contentOnly: boolean, cancellationToken?: any): any;
-    writeTo(stream: any, cancellationToken?: any): void;
-    writeToAsync(stream: any, cancellationToken?: any): any;
-    writeTo(options: FormatOptions, fileName: string, contentOnly: boolean, cancellationToken?: any): void;
-    writeToAsync(options: FormatOptions, fileName: string, contentOnly: boolean, cancellationToken?: any): any;
-    writeTo(options: FormatOptions, fileName: string, cancellationToken?: any): void;
-    writeToAsync(options: FormatOptions, fileName: string, cancellationToken?: any): any;
-    writeTo(fileName: string, contentOnly: boolean, cancellationToken?: any): void;
-    writeToAsync(fileName: string, contentOnly: boolean, cancellationToken?: any): any;
-    writeTo(fileName: string, cancellationToken?: any): void;
-    writeToAsync(fileName: string, cancellationToken?: any): any;
-    dispose(): void;
-    load(options: ParserOptions, stream: any, persistent: boolean, cancellationToken?: any): MimeEntity;
-    loadAsync(options: ParserOptions, stream: any, persistent: boolean, cancellationToken?: any): any;
-    load(options: ParserOptions, stream: any, cancellationToken?: any): MimeEntity;
-    loadAsync(options: ParserOptions, stream: any, cancellationToken?: any): any;
-    load(stream: any, persistent: boolean, cancellationToken?: any): MimeEntity;
-    loadAsync(stream: any, persistent: boolean, cancellationToken?: any): any;
-    load(stream: any, cancellationToken?: any): MimeEntity;
-    loadAsync(stream: any, cancellationToken?: any): any;
-    load(options: ParserOptions, fileName: string, cancellationToken?: any): MimeEntity;
-    loadAsync(options: ParserOptions, fileName: string, cancellationToken?: any): any;
-    load(fileName: string, cancellationToken?: any): MimeEntity;
-    loadAsync(fileName: string, cancellationToken?: any): any;
-    load(options: ParserOptions, contentType: ContentType, content: any, cancellationToken?: any): MimeEntity;
-    loadAsync(options: ParserOptions, contentType: ContentType, content: any, cancellationToken?: any): any;
-    load(contentType: ContentType, content: any, cancellationToken?: any): MimeEntity;
-    loadAsync(contentType: ContentType, content: any, cancellationToken?: any): any;
   }
 
   interface InternetAddress {
-    encoding: any;
-    name: string;
-    clone(): InternetAddress;
-    compareTo(other: InternetAddress): number;
-    tryParse(options: ParserOptions, buffer: number[], startIndex: number, length: number, address: InternetAddress): boolean;
-    tryParse(buffer: number[], startIndex: number, length: number, address: InternetAddress): boolean;
-    tryParse(options: ParserOptions, buffer: number[], startIndex: number, address: InternetAddress): boolean;
-    tryParse(buffer: number[], startIndex: number, address: InternetAddress): boolean;
-    tryParse(options: ParserOptions, buffer: number[], address: InternetAddress): boolean;
-    tryParse(buffer: number[], address: InternetAddress): boolean;
-    tryParse(options: ParserOptions, text: string, address: InternetAddress): boolean;
-    tryParse(text: string, address: InternetAddress): boolean;
-    parse(options: ParserOptions, buffer: number[], startIndex: number, length: number): InternetAddress;
-    parse(buffer: number[], startIndex: number, length: number): InternetAddress;
-    parse(options: ParserOptions, buffer: number[], startIndex: number): InternetAddress;
-    parse(buffer: number[], startIndex: number): InternetAddress;
-    parse(options: ParserOptions, buffer: number[]): InternetAddress;
-    parse(buffer: number[]): InternetAddress;
-    parse(options: ParserOptions, text: string): InternetAddress;
-    parse(text: string): InternetAddress;
-  }
-
-  interface MailboxAddress {
-  }
-
-  interface DomainList extends string[] {
-    item: string;
-    count: number;
-    isReadOnly: boolean;
-    indexOf(domain: string): number;
-    insert(index: number, domain: string): void;
-    removeAt(index: number): void;
-    add(domain: string): void;
-    clear(): void;
-    contains(domain: string): boolean;
-    copyTo(array: string[], arrayIndex: number): void;
-    remove(domain: string): boolean;
-    tryParse(text: string, route: DomainList): boolean;
-  }
-
-  type NewLineFormat = 'Unix' | 'Dos' | 'Mixed';
-
-  type ParameterEncodingMethod = 'Default' | 'Rfc2231' | 'Rfc2047';
-
-  interface MimePart extends MimeEntity {
-    contentDescription: string;
-    contentDuration?: number;
-    contentMd5: string;
-    contentTransferEncoding: ContentEncoding;
-    fileName: string;
-    content: IMimeContent;
-    headers: HeaderList;
-    contentDisposition: ContentDisposition;
-    contentType: ContentType;
-    contentBase: any;
-    contentLocation: any;
-    contentId: string;
-    isAttachment: boolean;
-    accept(visitor: MimeVisitor): void;
-    getBestEncoding(constraint: EncodingConstraint, cancellationToken?: any): ContentEncoding;
-    getBestEncoding(constraint: EncodingConstraint, maxLineLength: number, cancellationToken?: any): ContentEncoding;
-    computeContentMd5(): string;
-    verifyContentMd5(): boolean;
-    prepare(constraint: EncodingConstraint, maxLineLength?: number): void;
-    writeTo(options: FormatOptions, stream: any, contentOnly: boolean, cancellationToken?: any): void;
-    writeToAsync(options: FormatOptions, stream: any, contentOnly: boolean, cancellationToken?: any): any;
-    writeTo(options: FormatOptions, stream: any, cancellationToken?: any): void;
-    writeToAsync(options: FormatOptions, stream: any, cancellationToken?: any): any;
-    writeTo(stream: any, contentOnly: boolean, cancellationToken?: any): void;
-    writeToAsync(stream: any, contentOnly: boolean, cancellationToken?: any): any;
-    writeTo(stream: any, cancellationToken?: any): void;
-    writeToAsync(stream: any, cancellationToken?: any): any;
-    writeTo(options: FormatOptions, fileName: string, contentOnly: boolean, cancellationToken?: any): void;
-    writeToAsync(options: FormatOptions, fileName: string, contentOnly: boolean, cancellationToken?: any): any;
-    writeTo(options: FormatOptions, fileName: string, cancellationToken?: any): void;
-    writeToAsync(options: FormatOptions, fileName: string, cancellationToken?: any): any;
-    writeTo(fileName: string, contentOnly: boolean, cancellationToken?: any): void;
-    writeToAsync(fileName: string, contentOnly: boolean, cancellationToken?: any): any;
-    writeTo(fileName: string, cancellationToken?: any): void;
-    writeToAsync(fileName: string, cancellationToken?: any): any;
-    dispose(): void;
-  }
-
-  type RfcComplianceMode = 'Loose' | 'Strict' | 'Looser';
-
-  type HeaderId = 'AcceptLanguage' | 'AdHoc' | 'AlternateRecipient' | 'ApparentlyTo' | 'Approved' | 'ArcAuthenticationResults' | 'ArcMessageSignature' | 'ArcSeal' | 'Archive' | 'ArchivedAt' | 'Article' | 'AuthenticationResults' | 'Autocrypt' | 'AutocryptGossip' | 'AutocryptSetupMessage' | 'Autoforwarded' | 'AutoSubmitted' | 'Autosubmitted' | 'Base' | 'Bcc' | 'Body' | 'Bytes' | 'Cc' | 'Comments' | 'ContentAlternative' | 'ContentBase' | 'ContentClass' | 'ContentDescription' | 'ContentDisposition' | 'ContentDuration' | 'ContentFeatures' | 'ContentId' | 'ContentIdentifier' | 'ContentLanguage' | 'ContentLength' | 'ContentLocation' | 'ContentMd5' | 'ContentReturn' | 'ContentTransferEncoding' | 'ContentTranslationType' | 'ContentType' | 'Control' | 'Conversion' | 'ConversionWithLoss' | 'Date' | 'DateReceived' | 'DeferredDelivery' | 'DeliveryDate' | 'DiscloseRecipients' | 'DispositionNotificationOptions' | 'DispositionNotificationTo' | 'Distribution' | 'DkimSignature' | 'DomainKeySignature' | 'Encoding' | 'Encrypted' | 'Expires' | 'ExpiryDate' | 'FollowupTo' | 'From' | 'GenerateDeliveryReport' | 'Importance' | 'InjectionDate' | 'InjectionInfo' | 'InReplyTo' | 'Keywords' | 'Language' | 'LatestDeliveryTime' | 'Lines' | 'ListArchive' | 'ListHelp' | 'ListId' | 'ListOwner' | 'ListPost' | 'ListSubscribe' | 'ListUnsubscribe' | 'ListUnsubscribePost' | 'MessageId' | 'MimeVersion' | 'Newsgroups' | 'NntpPostingHost' | 'Organization' | 'OriginalFrom' | 'OriginalMessageId' | 'OriginalRecipient' | 'OriginalReturnAddress' | 'OriginalSubject' | 'Path' | 'Precedence' | 'PreventNonDeliveryReport' | 'Priority' | 'Received' | 'ReceivedSPF' | 'References' | 'RelayVersion' | 'ReplyBy' | 'ReplyTo' | 'RequireRecipientValidSince' | 'ResentBcc' | 'ResentCc' | 'ResentDate' | 'ResentFrom' | 'ResentMessageId' | 'ResentReplyTo' | 'ResentSender' | 'ResentTo' | 'ReturnPath' | 'ReturnReceiptTo' | 'SeeAlso' | 'Sender' | 'Sensitivity' | 'Solicitation' | 'Status' | 'Subject' | 'Summary' | 'Supersedes' | 'TLSRequired' | 'To' | 'UserAgent' | 'X400ContentIdentifier' | 'X400ContentReturn' | 'X400ContentType' | 'X400MTSIdentifier' | 'X400Originator' | 'X400Received' | 'X400Recipients' | 'X400Trace' | 'XMailer' | 'XMSMailPriority' | 'XPriority' | 'XStatus' | 'Unknown';
-
-  interface Header {
-    offset?: number;
-    field: string;
-    id: HeaderId;
-    rawField: number[];
-    rawValue: number[];
-    value: string;
-    clone(): Header;
-    getValue(encoding: any): string;
-    getValue(charset: string): string;
-    setValue(format: FormatOptions, encoding: any, value: string): void;
-    setValue(encoding: any, value: string): void;
-    setValue(format: FormatOptions, charset: string, value: string): void;
-    setValue(charset: string, value: string): void;
-    setRawValue(value: number[]): void;
-    unfold(text: string): string;
-    tryParse(options: ParserOptions, buffer: number[], startIndex: number, length: number, header: Header): boolean;
-    tryParse(buffer: number[], startIndex: number, length: number, header: Header): boolean;
-    tryParse(options: ParserOptions, buffer: number[], startIndex: number, header: Header): boolean;
-    tryParse(buffer: number[], startIndex: number, header: Header): boolean;
-    tryParse(options: ParserOptions, buffer: number[], header: Header): boolean;
-    tryParse(buffer: number[], header: Header): boolean;
-    tryParse(options: ParserOptions, text: string, header: Header): boolean;
-    tryParse(text: string, header: Header): boolean;
-  }
-
-  interface InternetAddressList {
-  }
-
-  interface ContentType {
-    mediaType: string;
-    mediaSubtype: string;
-    parameters: ParameterList;
-    boundary: string;
-    charset: string;
-    charsetEncoding: any;
-    format: string;
-    mimeType: string;
-    name: string;
-    clone(): ContentType;
-    isMimeType(mediaType: string, mediaSubtype: string): boolean;
-    tryParse(options: ParserOptions, buffer: number[], startIndex: number, length: number, type: ContentType): boolean;
-    tryParse(buffer: number[], startIndex: number, length: number, type: ContentType): boolean;
-    tryParse(options: ParserOptions, buffer: number[], startIndex: number, type: ContentType): boolean;
-    tryParse(buffer: number[], startIndex: number, type: ContentType): boolean;
-    tryParse(options: ParserOptions, buffer: number[], type: ContentType): boolean;
-    tryParse(buffer: number[], type: ContentType): boolean;
-    tryParse(options: ParserOptions, text: string, type: ContentType): boolean;
-    tryParse(text: string, type: ContentType): boolean;
-    parse(options: ParserOptions, buffer: number[], startIndex: number, length: number): ContentType;
-    parse(buffer: number[], startIndex: number, length: number): ContentType;
-    parse(options: ParserOptions, buffer: number[], startIndex: number): ContentType;
-    parse(buffer: number[], startIndex: number): ContentType;
-    parse(options: ParserOptions, buffer: number[]): ContentType;
-    parse(buffer: number[]): ContentType;
-    parse(options: ParserOptions, text: string): ContentType;
-    parse(text: string): ContentType;
-  }
-
-  interface ContentDisposition {
-    disposition: string;
-    isAttachment: boolean;
-    parameters: ParameterList;
-    fileName: string;
-    creationDate?: any;
-    modificationDate?: any;
-    readDate?: any;
-    size?: number;
-    clone(): ContentDisposition;
-    tryParse(options: ParserOptions, buffer: number[], startIndex: number, length: number, disposition: ContentDisposition): boolean;
-    tryParse(buffer: number[], startIndex: number, length: number, disposition: ContentDisposition): boolean;
-    tryParse(options: ParserOptions, buffer: number[], startIndex: number, disposition: ContentDisposition): boolean;
-    tryParse(buffer: number[], startIndex: number, disposition: ContentDisposition): boolean;
-    tryParse(options: ParserOptions, buffer: number[], disposition: ContentDisposition): boolean;
-    tryParse(buffer: number[], disposition: ContentDisposition): boolean;
-    tryParse(options: ParserOptions, text: string, disposition: ContentDisposition): boolean;
-    tryParse(text: string, disposition: ContentDisposition): boolean;
-    parse(options: ParserOptions, buffer: number[], startIndex: number, length: number): ContentDisposition;
-    parse(buffer: number[], startIndex: number, length: number): ContentDisposition;
-    parse(options: ParserOptions, buffer: number[], startIndex: number): ContentDisposition;
-    parse(buffer: number[], startIndex: number): ContentDisposition;
-    parse(options: ParserOptions, buffer: number[]): ContentDisposition;
-    parse(buffer: number[]): ContentDisposition;
-    parse(options: ParserOptions, text: string): ContentDisposition;
-    parse(text: string): ContentDisposition;
-  }
-
-  interface InternetAddress {
-  }
-
-  interface DomainList {
-  }
-
-  type ContentEncoding = 'Default' | 'SevenBit' | 'EightBit' | 'Binary' | 'Base64' | 'QuotedPrintable' | 'UUEncode';
-
-  interface IMimeContent {
-    encoding: ContentEncoding;
-    newLineFormat?: NewLineFormat;
-    stream: any;
-    open(): any;
-    decodeTo(stream: any, cancellationToken?: any): void;
-    decodeToAsync(stream: any, cancellationToken?: any): any;
-    writeTo(stream: any, cancellationToken?: any): void;
-    writeToAsync(stream: any, cancellationToken?: any): any;
-  }
-
-  interface Header {
-  }
-
-  interface ContentType {
-  }
-
-  interface ParameterList extends Parameter[] {
-    item: string;
-    count: number;
-    isReadOnly: boolean;
-    add(name: string, value: string): void;
-    add(encoding: any, name: string, value: string): void;
-    add(charset: string, name: string, value: string): void;
-    contains(name: string): boolean;
-    indexOf(name: string): number;
-    insert(index: number, name: string, value: string): void;
-    remove(name: string): boolean;
-    tryGetValue(name: string, param: Parameter): boolean;
-    tryGetValue(name: string, value: any): boolean;
-    add(param: Parameter): void;
-    clear(): void;
-    contains(param: Parameter): boolean;
-    copyTo(array: Parameter[], arrayIndex: number): void;
-    remove(param: Parameter): boolean;
-    indexOf(param: Parameter): number;
-    insert(index: number, param: Parameter): void;
-    removeAt(index: number): void;
-  }
-
-  interface ContentDisposition {
-  }
-
-  interface Parameter {
-  }
-
-  interface Parameter {
-    name: string;
-    encoding: any;
-    encodingMethod: ParameterEncodingMethod;
-    alwaysQuote: boolean;
-    value: string;
-    clone(): Parameter;
   }
 
 }
 declare namespace Amazon.Runtime {
   interface ResponseMetadata {
-    requestId: string;
-    metadata: Record<string, string>;
   }
 
   interface AmazonWebServiceResponse {
@@ -18252,10 +18920,6 @@ declare namespace Kooboo.Sites.Authorization {
   type EnumUserRole = 'Administrator' | 'SiteMaster' | 'Developer' | 'ContentManager';
 
 }
-declare namespace Kooboo.IndexedDB.Schedule {
-  type RepeatFrequence = 'Day' | 'Hour' | 'Minutes' | 'Week' | 'Month' | 'Second';
-
-}
 declare namespace Kooboo.Mail.Imap {
   interface SelectFolder {
     stat: Kooboo.Mail.Models.MessageStat;
@@ -18264,83 +18928,6 @@ declare namespace Kooboo.Mail.Imap {
     folder: string;
     eXPUNGE(): number[];
   }
-
-}
-declare namespace MimeKit.Text {
-  type TextFormat = 'Plain' | 'Text' | 'Flowed' | 'Html' | 'Enriched' | 'CompressedRichText' | 'RichText';
-
-}
-declare namespace MimeKit.Cryptography {
-  interface CryptographyContext {
-    prepareBeforeSigning: boolean;
-    signatureProtocol: string;
-    encryptionProtocol: string;
-    keyExchangeProtocol: string;
-    enabledEncryptionAlgorithms: EncryptionAlgorithm[];
-    enabledDigestAlgorithms: DigestAlgorithm[];
-    enable(algorithm: EncryptionAlgorithm): void;
-    disable(algorithm: EncryptionAlgorithm): void;
-    isEnabled(algorithm: EncryptionAlgorithm): boolean;
-    enable(algorithm: DigestAlgorithm): void;
-    disable(algorithm: DigestAlgorithm): void;
-    isEnabled(algorithm: DigestAlgorithm): boolean;
-    supports(protocol: string): boolean;
-    getDigestAlgorithmName(micalg: DigestAlgorithm): string;
-    getDigestAlgorithm(micalg: string): DigestAlgorithm;
-    canSign(signer: MimeKit.MailboxAddress, cancellationToken?: any): boolean;
-    canSignAsync(signer: MimeKit.MailboxAddress, cancellationToken?: any): any;
-    canEncrypt(mailbox: MimeKit.MailboxAddress, cancellationToken?: any): boolean;
-    canEncryptAsync(mailbox: MimeKit.MailboxAddress, cancellationToken?: any): any;
-    sign(signer: MimeKit.MailboxAddress, digestAlgo: DigestAlgorithm, content: any, cancellationToken?: any): MimeKit.MimePart;
-    signAsync(signer: MimeKit.MailboxAddress, digestAlgo: DigestAlgorithm, content: any, cancellationToken?: any): any;
-    verify(content: any, signatureData: any, cancellationToken?: any): DigitalSignatureCollection;
-    verifyAsync(content: any, signatureData: any, cancellationToken?: any): any;
-    encrypt(recipients: MimeKit.MailboxAddress[], content: any, cancellationToken?: any): MimeKit.MimePart;
-    encryptAsync(recipients: MimeKit.MailboxAddress[], content: any, cancellationToken?: any): any;
-    decrypt(encryptedData: any, cancellationToken?: any): MimeKit.MimeEntity;
-    decryptAsync(encryptedData: any, cancellationToken?: any): any;
-    import(stream: any, cancellationToken?: any): void;
-    importAsync(stream: any, cancellationToken?: any): any;
-    export(mailboxes: MimeKit.MailboxAddress[], cancellationToken?: any): MimeKit.MimePart;
-    exportAsync(mailboxes: MimeKit.MailboxAddress[], cancellationToken?: any): any;
-    dispose(): void;
-    create(protocol: string): CryptographyContext;
-    register(type: any): void;
-    register(factory: ()=>MimeKit.Cryptography.SecureMimeContext): void;
-    register(factory: ()=>MimeKit.Cryptography.OpenPgpContext): void;
-  }
-
-  type DigestAlgorithm = 'None' | 'MD5' | 'Sha1' | 'RipeMD160' | 'DoubleSha' | 'MD2' | 'Tiger192' | 'Haval5160' | 'Sha256' | 'Sha384' | 'Sha512' | 'Sha224' | 'MD4';
-
-  type EncryptionAlgorithm = 'Aes128' | 'Aes192' | 'Aes256' | 'Camellia128' | 'Camellia192' | 'Camellia256' | 'Cast5' | 'Des' | 'TripleDes' | 'Idea' | 'Blowfish' | 'Twofish' | 'RC240' | 'RC264' | 'RC2128' | 'Seed';
-
-  interface DigitalSignatureCollection extends IDigitalSignature[] {
-    count: number;
-    item?: IDigitalSignature;
-    contains(value: IDigitalSignature): boolean;
-    copyTo(array: IDigitalSignature[], index: number): void;
-    indexOf(value: IDigitalSignature): number;
-  }
-
-  interface IDigitalSignature {
-    signerCertificate: IDigitalCertificate;
-    publicKeyAlgorithm: PublicKeyAlgorithm;
-    digestAlgorithm: DigestAlgorithm;
-    creationDate: Date;
-    verify(): boolean;
-    verify(verifySignatureOnly: boolean): boolean;
-  }
-
-  interface IDigitalCertificate {
-    publicKeyAlgorithm: PublicKeyAlgorithm;
-    creationDate: Date;
-    expirationDate: Date;
-    fingerprint: string;
-    email: string;
-    name: string;
-  }
-
-  type PublicKeyAlgorithm = 'None' | 'RsaGeneral' | 'RsaEncrypt' | 'RsaSign' | 'ElGamalEncrypt' | 'Dsa' | 'EllipticCurve' | 'EllipticCurveDsa' | 'ElGamalGeneral' | 'DiffieHellman' | 'EdwardsCurveDsa';
 
 }
 declare namespace Kooboo.IndexedDB.BTree {
@@ -18387,17 +18974,6 @@ declare namespace Kooboo.IndexedDB.Condition.Expression {
 }
 declare namespace Kooboo.Sites.Contents.QueryPlan {
   interface ContentFieldProvider {
-  }
-
-}
-declare namespace MimeKit.Encodings {
-  interface IPunycode {
-    encode(domain: string): string;
-    encode(domain: string, index: number): string;
-    encode(domain: string, index: number, count: number): string;
-    decode(domain: string): string;
-    decode(domain: string, index: number): string;
-    decode(domain: string, index: number, count: number): string;
   }
 
 }
@@ -20403,9 +20979,6 @@ k.market.deepseek.chat_Turbo(params)
 body: 
  */
     check(body?: string): Kooboo_ApiMarket_SpamScoreResult;
-    /** 
- */
-    dump(): string;
     /** 
  */
     ping(): Kooboo_ApiMarket_BasicResult;

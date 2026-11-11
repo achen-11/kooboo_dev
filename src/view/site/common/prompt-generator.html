@@ -66,12 +66,10 @@
             <div class="prompt-generator__model gap-2 text-sm text-[#646c7d]">
                 <label class="prompt-generator__model-label" hidden="">Model setting:</label>
                 <select class="prompt-generator__model-select" aria-label="Model" disabled="">
-                    <option value=""  k-label="Loading_models...">Loading models...</option>
+                    <option value="" k-label="Loading_models...">Loading models...</option>
                 </select>
             </div>
-            <button 
-                class="inline-flex h-10 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-[50px] prompt-generator__btn px-4 py-2.5 text-sm font-medium leading-none text-[var(--color-white)]" 
-                type="button" disabled="" k-label="Generate_now">Generate now</button>
+            <button class="inline-flex h-10 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-[50px] prompt-generator__btn px-4 py-2.5 text-sm font-medium leading-none text-[var(--color-white)]" type="button" disabled="" k-label="Generate_now">Generate now</button>
         </div>
         <p class="prompt-generator__status text-xs text-[#d92d20]" role="alert" hidden=""></p>
     </div>
