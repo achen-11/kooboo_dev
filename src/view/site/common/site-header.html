@@ -1,13 +1,4 @@
 <script env="server" type="module">
-    import {
-        resolveAdminBaseFromToken,
-        userDisplayFromToken,
-    } from "./utils.admin-url-from-token";
-
-    const loginReturnUrl = "/";
-    const accessToken = k.account.getAccessToken();
-    const isLoggedIn = k.account.isLogin || Boolean(accessToken);
-    const showLogin = !isLoggedIn;
     const languageUrls = k.site.multilingual.currentURLs();
     const activeLanguage = languageUrls.find(language => language.isActive);
     const switchLanguage = languageUrls.find(language => !language.isActive && language.URL);
@@ -20,44 +11,14 @@
         currentLanguageKey === "chinese" || /^zh(?:-|$)/.test(currentLanguageKey)
             ? "Chinese"
             : "English";
-    const switchLanguageUrl = switchLanguage ? switchLanguage.URL : "";
-    const resolvedAdminBaseUrl =
-        resolveAdminBaseFromToken(accessToken) || "/_Admin";
-    const adminBaseUrl = resolvedAdminBaseUrl.replace(/\/+$/, "") || "/_Admin";
-    const loginUrl = "/_Admin/login"
-    let consoleUrl = adminBaseUrl + "/";
-    let logoutUrl =
-        "/_api/v2/user/logout?returnUrl=" +
-        encodeURIComponent(loginReturnUrl);
-
-    let userDisplayName = "";
-    let userInitials = "";
-
-    if (isLoggedIn) {
-        const user = k.account.user.current;
-        if (user) {
-            const fullName = (
-                (user.firstName || "") +
-                " " +
-                (user.lastName || "")
-            ).trim();
-            userDisplayName = fullName || user.userName || user.email || "";
-            userInitials = (userDisplayName || "?").substring(0, 2).toUpperCase();
-        } else if (accessToken) {
-            const tokenUser = userDisplayFromToken(accessToken);
-            userDisplayName = tokenUser.displayName;
-            userInitials = tokenUser.initials;
-        }
-    }
-
+    const targetLanguageUrl = switchLanguage ? switchLanguage.URL : "";
+    // Keep explicit language paths (including /en/) out of automatic href rewriting.
+    const requestHost = k.request.headers.get("Host") || k.request.host;
+    const switchLanguageUrl = targetLanguageUrl.startsWith("/") &&
+        !targetLanguageUrl.startsWith("//") && requestHost
+        ? "//" + requestHost + targetLanguageUrl
+        : targetLanguageUrl;
     export {
-        loginUrl,
-        consoleUrl,
-        logoutUrl,
-        isLoggedIn,
-        showLogin,
-        userDisplayName,
-        userInitials,
         hasSwitchLanguage,
         currentCultureFlagKey,
         switchLanguageUrl,
@@ -80,17 +41,6 @@
                 <a k-if="hasSwitchLanguage" class="site-header__mobile-language-link" k-attribute="href switchLanguageUrl" aria-label="Switch language" title="Switch language">
                     <img src="/images/English.svg" k-attribute="src /images/{currentCultureFlagKey}.svg" alt="" width="22" height="22">
                 </a>
-                <!-- <a k-if="showLogin" class="site-header__mobile-link" href="/_Admin/start?returnurl=/" k-attribute="href loginUrl" k-label="SignIn">Login</a> -->
-                <div k-if="isLoggedIn" class="site-header__mobile-user">
-                    <div class="site-header__mobile-user-meta">
-                        <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
-                        <span class="site-header__mobile-user-name" k-content="userDisplayName">User</span>
-                    </div>
-                    <a class="site-header__mobile-link" href="/_Admin/" k-attribute="href consoleUrl" k-label="Console">Console</a>
-                    <form class="site-header__logout-form" action="/_api/v2/user/logout?returnUrl=%2F" k-attribute="action logoutUrl" method="post">
-                        <button class="site-header__mobile-link site-header__mobile-link--muted site-header__mobile-logout-button" type="submit" k-label="SignOut">Logout</button>
-                    </form>
-                </div>
                 <a class="site-header__mobile-claim" href="/_Admin/" k-label="Start now">Start now</a>
             </nav>
         </details>
@@ -112,20 +62,6 @@
             <a k-if="hasSwitchLanguage" class="site-header__language-link" k-attribute="href switchLanguageUrl" aria-label="Switch language" title="Switch language">
                 <img src="/images/English.svg" k-attribute="src /images/{currentCultureFlagKey}.svg" alt="" width="22" height="22">
             </a>
-            <!-- <a k-if="showLogin" class="site-header__secondary-action" href="/_Admin/login" k-attribute="href loginUrl" k-label="SignIn">Login</a> -->
-            <details k-if="isLoggedIn" class="site-header__user-menu">
-                <summary class="site-header__user-trigger" aria-label="Account menu">
-                    <span class="site-header__user-avatar" k-content="userInitials" aria-hidden="true">AB</span>
-                    <span class="site-header__user-name" k-content="userDisplayName">User</span>
-                    <span class="site-header__user-chevron" aria-hidden="true"></span>
-                </summary>
-                <div class="site-header__user-dropdown" role="menu">
-                    <a class="site-header__user-dropdown-link" href="/_Admin/" k-attribute="href consoleUrl" role="menuitem" k-label="Console">Console</a>
-                    <form class="site-header__logout-form" action="/_api/v2/user/logout?returnUrl=%2F" k-attribute="action logoutUrl" method="post" role="none">
-                        <button class="site-header__user-dropdown-link site-header__user-dropdown-link--muted site-header__logout-button" type="submit" role="menuitem" k-label="SignOut">Logout</button>
-                    </form>
-                </div>
-            </details>
             <a class="site-header__primary-action" href="/_Admin/">
                 <span k-label="Start now">Start now</span>
                 <span class="site-header__primary-icon" aria-hidden="true"></span>

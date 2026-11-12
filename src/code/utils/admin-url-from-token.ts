@@ -46,18 +46,3 @@ export function resolveStartNowUrl(returnUrl = "") {
   }
   return "/_Admin/login";
 }
-export function userDisplayFromToken(token: string) {
-  const payload = parseJwtPayloadResult(token);
-  if (!payload) {
-    return {
-      displayName: "",
-      initials: ""
-    };
-  }
-  const fullName = `${payload.firstName || ""} ${payload.lastName || ""}`.trim();
-  const displayName = fullName || payload.userName || payload.UserName || payload.email || payload.Email || "";
-  return {
-    displayName,
-    initials: (displayName || "?").substring(0, 2).toUpperCase()
-  };
-}
