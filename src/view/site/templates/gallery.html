@@ -1,20 +1,36 @@
 <script env="server" type="module">
     import { categorySlug, categoryUrl, formatTemplateItem } from "./utils.template-gallery";
 
+    // Keep the existing English route slugs independent of translated category names.
+    const currentCulture = k.site.multilingual.currentCulture;
+    let categoryRoutes;
+    try {
+        k.request.setCulture("en");
+        categoryRoutes = k.content.TemplateCategory.all({ orderBy: "Sort" }).map(category => ({
+            id: category.id,
+            slug: categorySlug(category.Name),
+        }));
+    } finally {
+        k.request.setCulture(currentCulture);
+    }
+
     const templateCategories = k.content.TemplateCategory.all({ orderBy: "Sort" });
     templateCategories.forEach((category) => {
-        category.Slug = categorySlug(category.Name);
-        category.FilterUrl = categoryUrl(category.Name);
+        const route = categoryRoutes.find(route => route.id === category.id);
+        category.Slug = (route && route.slug) || categorySlug(category.Name) || category.id;
+        category.FilterUrl = k.site.multilingual.getUrl(categoryUrl(category.Slug));
     });
 
     const routeCategory = String(k.request.get("category") || "")
         .trim()
-        .toLowerCase() || "e-commerce"
+        .toLowerCase();
 
-    let activeCategory = templateCategories.find((category) => category.Name.toLowerCase() === routeCategory);
+    const activeCategory = routeCategory
+        ? templateCategories.find(category => category.Slug === routeCategory)
+        : templateCategories.find(category => category.Slug === "e-commerce") || templateCategories[0];
 
     if (!activeCategory && templateCategories.length) {
-        k.response.redirect(categoryUrl(templateCategories[0].Name));
+        k.response.redirect(templateCategories[0].FilterUrl);
     }
 
     let templateItems = [];
@@ -28,7 +44,7 @@
             category.AriaCurrent = category.IsActive ? "page" : "false";
         });
 
-        activeCategory.PageHeading = `${activeCategory.Name} templates`;
+        activeCategory.PageHeading = `${activeCategory.Name}${k.label("templates")}`;
 
         const categoryWithItems = k.content.TemplateCategory.get(activeCategory.id);
         if (categoryWithItems?.Templates?.length) {
@@ -81,7 +97,7 @@
         <div class="template-gallery__heading">
             <div>
                 <h1 id="template-gallery-title" k-content="activeCategory.PageHeading">Start with a template and build faster</h1>
-                <p>Choose from corporate websites, e-commerce stores, applications, and tools. Launch your website with one click.</p>
+                <p k-label="Choose_from_corporate_websites,_e-commerce_stores,_applications,_and_tools._Launch_your_website_with_one_click.">Choose from corporate websites, e-commerce stores, applications, and tools. Launch your website with one click.</p>
             </div>
         </div>
 
