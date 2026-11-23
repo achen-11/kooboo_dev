@@ -2,6 +2,41 @@
     <query as="publishBanner" source="content" resource="PublishBanner" action="list" export=""></query>
 </k-data>
 
+<script env="server">
+    var publishBannerCulture = String(
+        (k.site && k.site.multilingual && k.site.multilingual.currentCulture) ||
+        k.request.culture ||
+        "en"
+    ).trim().toLowerCase();
+    var publishBannerIsChinese =
+        publishBannerCulture === "chinese" ||
+        publishBannerCulture === "cn" ||
+        /^zh(?:-|$)/.test(publishBannerCulture);
+    var publishBannerChineseMap = {
+        "home-publish-prompt-input.webp": "home-publish-prompt-input-zh.webp",
+        "home-publish-website-skeleton.webp": "home-publish-website-skeleton-zh.webp",
+        "home-publish-domain-deploy.webp": "home-publish-domain-deploy-zh.webp",
+    };
+
+    function localizePublishBannerImage(src) {
+        if (!publishBannerIsChinese || !src) return src;
+        var raw = String(src);
+        var match = raw.match(/^([^?#]*\/)([^/?#]+)((?:[?#].*)?)$/);
+        if (!match) return raw;
+        var localizedName = publishBannerChineseMap[match[2]];
+        return localizedName ? match[1] + localizedName + match[3] : raw;
+    }
+
+    var rawPublishBanner = k.state.get("publishBanner") || [];
+    var publishBannerItems = rawPublishBanner.map(function (item) {
+        if (!item) return item;
+        var localizedImage = localizePublishBannerImage(item.Image);
+        if (localizedImage === item.Image) return item;
+        return Object.assign({}, item, { Image: localizedImage });
+    });
+    k.state.set("publishBannerItems", publishBannerItems);
+</script>
+
 <section class="home-publish-banner bg-[var(--color-white)]" aria-labelledby="home-publish-banner-title">
     <div class="home-publish-banner__container site-container flex flex-col items-center gap-10">
         <div class="w-[min(523px,100%)] text-center">
@@ -16,7 +51,7 @@
         </div>
 
         <ol class="home-publish-banner__flow" aria-label="Publish website steps">
-            <li class="publish-step flex min-w-0 flex-col" k-for="item in publishBanner" repeat-self="true">
+            <li class="publish-step flex min-w-0 flex-col" k-for="item in publishBannerItems" repeat-self="true">
                 <h3 class="publish-step__title px-4 mb-[30px] mt-0 min-h-[42px] text-[15px] font-normal leading-[1.4] tracking-normal text-[var(--color-body)]" k-content="item.Title">1、Enter the type of website you want</h3>
                 <img class="publish-step__image" k-attribute="src item.Image" width="306" height="238" alt="" aria-hidden="true" loading="lazy" decoding="async">
             </li>
