@@ -16,34 +16,48 @@ k.api.post((body: RequestModel) => {
 });
 k.api.get(getByPlatform);
 function getByPlatform(platform: string) {
+  // if (!["WinUI", "Web", "Mac", "MacArm64", "MacX64", "LinuxX64"].includes(platform)) {
+  //     throw new Error("Invalid platform");
+  // }
+
+  var files = k.file.folderFiles("/").sort((a, b) => b.lastModified - a.lastModified);
   const entity = k.content.Package.find(`Platform == '${platform}'`);
   if (!entity) {
-    k.response.statusCode(400);
+    k.response.statusCode(404);
     return {
       error: "Not found"
     };
   }
+  var url = entity.Url;
+  var version = entity.Version;
   if (platform == "WinUI") {
-    return getByUrl("https://cdn.kooboo.eu/download/kooboo-win-x64.zip", entity.ForceUpgrade === "true", entity.lastModified);
+    var file = files.find(f => f.fullName.includes("Kooboo-win-x64"));
+    url = `https://www.kooboo.com/__kb/kfile/${file.name}`;
+    version = file.name.replace("Kooboo-win-x64-", "").replace(".zip", "");
+    // https://www.kooboo.com/__kb/kfile/Kooboo-win-x64-2.1.9355.39678.zip
   }
   if (platform == "LinuxX64") {
-    return getByUrl("https://cdn.kooboo.eu/download/kooboo-linux-x64.zip", entity.ForceUpgrade === "true", entity.lastModified);
+    var file = files.find(f => f.fullName.includes("Kooboo-linux-x64"));
+    url = `https://www.kooboo.com/__kb/kfile/${file.name}`;
+    version = file.name.replace("Kooboo-linux-x64-", "").replace(".zip", "");
+    // https://www.kooboo.com/__kb/kfile/Kooboo-linux-x64-2.1.9355.41693.zip
+  }
+  if (platform == "LinuxArm64") {
+    var file = files.find(f => f.fullName.includes("Kooboo-linux-arm64"));
+    url = `https://www.kooboo.com/__kb/kfile/${file.name}`;
+    version = file.name.replace("Kooboo-linux-arm64-", "").replace(".zip", "");
+    // https://www.kooboo.com/__kb/kfile/Kooboo-linux-arm64-2.1.9355.41693.zip
   }
   if (platform == "MacArm64") {
-    return getByUrl("https://cdn.kooboo.eu/download/kooboo-osx-arm64.zip", entity.ForceUpgrade === "true", entity.lastModified);
+    var file = files.find(f => f.fullName.includes("Kooboo-osx-arm64"));
+    url = `https://www.kooboo.com/__kb/kfile/${file.name}`;
+    version = file.name.replace("Kooboo-osx-arm64-", "").replace(".zip", "");
+    // https://www.kooboo.com/__kb/kfile/Kooboo-osx-arm64-2.1.9355.40752.zip
   }
-}
-function getByUrl(url, forceUpgrade, publishDate) {
-  var cache = k.cache.get(url);
-  if (cache) return cache;
-  var result = k.net.httpClient.send(url + "?mode=filename", "get").bodyString();
-  var version = result.substring(result.lastIndexOf("-") + 1, result.lastIndexOf("."));
-  var result = {
+  return {
     version: version,
     url: url,
-    forceUpgrade: forceUpgrade,
-    publishDate: publishDate
+    forceUpgrade: entity.ForceUpgrade === "true",
+    publishDate: entity.lastModified
   };
-  k.cache.set(url, result, 5);
-  return result;
 }
