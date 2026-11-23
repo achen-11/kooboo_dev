@@ -1,15 +1,22 @@
 <!-- @k-url /innovation --> 
 <layout id="main">
   <placeholder id="Main">
-    <script env="server">
+    <script env="server" type="module">
+      import { createJsonLdPage } from "./utils.jsonld-i18n";
+
       var pageJsonLdUrl = k.site.info.makeAbsUrl(k.request.url.split(/[?#]/)[0]);
-      var pageJsonLd = {
-        name: "Meet Kooboo OS | Kooboo",
-        description: "Explore Kooboo's built-in AI, CMS, e-commerce, email marketing, and analytics, powered by a web platform designed for high performance.",
+      var pageJsonLd = createJsonLdPage({
         url: pageJsonLdUrl,
         websiteId: k.site.info.makeAbsUrl("/") + "#website",
-        language: k.request.culture || "en",
-      };
+        name: {
+          en: "Meet Kooboo OS | Kooboo",
+          zh: "了解 Kooboo OS | Kooboo",
+        },
+        description: {
+          en: "Explore Kooboo's built-in AI, CMS, e-commerce, email marketing, and analytics, powered by a web platform designed for high performance.",
+          zh: "探索 Kooboo 内置的 AI、CMS、电商、邮件营销和分析能力；这些功能由面向高性能打造的 Web 平台提供。",
+        },
+      });
       k.page.setTitle(pageJsonLd.name);
       k.page.setNameMeta("description", pageJsonLd.description);
       k.state.set("pageJsonLd", pageJsonLd);
@@ -21,10 +28,12 @@
         <property name="@id" value="pageJsonLd.url"></property>
         <property name="url" value="pageJsonLd.url"></property>
         <property name="name" value="pageJsonLd.name"></property>
+        <property name="alternateName" value="pageJsonLd.alternateName"></property>
         <property name="headline" value="pageJsonLd.headline"></property>
         <property name="description" value="pageJsonLd.description"></property>
         <property name="inLanguage" value="pageJsonLd.language"></property>
         <property name="mainEntity" value="pageJsonLd.mainEntity"></property>
+        <property name="workTranslation" value="pageJsonLd.workTranslation"></property>
         <map as="isPartOf">
           <type name="WebSite">
             <property name="@id" value="pageJsonLd.websiteId"></property>

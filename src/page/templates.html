@@ -1,15 +1,22 @@
 <!-- @k-url /templates/{category} --> 
 <layout id="main">
     <placeholder id="Main">
-        <script env="server">
+        <script env="server" type="module">
+            import { createJsonLdPage } from "./utils.jsonld-i18n";
+
             var pageJsonLdUrl = k.site.info.makeAbsUrl(k.request.url.split(/[?#]/)[0]);
-            var pageJsonLd = {
-                name: "Website Templates by Category | Kooboo",
-                description: "Explore website templates by category in Kooboo Marketplace. Preview designs, choose a template for your project, and launch your site with one click.",
+            var pageJsonLd = createJsonLdPage({
                 url: pageJsonLdUrl,
                 websiteId: k.site.info.makeAbsUrl("/") + "#website",
-                language: k.request.culture || "en",
-            };
+                name: {
+                    en: "Website Templates by Category | Kooboo",
+                    zh: "按分类浏览网站模板 | Kooboo",
+                },
+                description: {
+                    en: "Explore website templates by category in Kooboo Marketplace. Preview designs, choose a template for your project, and launch your site with one click.",
+                    zh: "在 Kooboo 模板市场中按分类浏览网站模板，预览设计、为项目选择模板，并一键发布网站。",
+                },
+            });
             k.page.setTitle(pageJsonLd.name);
             k.page.setNameMeta("description", pageJsonLd.description);
             k.state.set("pageJsonLd", pageJsonLd);
@@ -21,10 +28,12 @@
                 <property name="@id" value="pageJsonLd.url"></property>
                 <property name="url" value="pageJsonLd.url"></property>
                 <property name="name" value="pageJsonLd.name"></property>
+                <property name="alternateName" value="pageJsonLd.alternateName"></property>
                 <property name="headline" value="pageJsonLd.headline"></property>
                 <property name="description" value="pageJsonLd.description"></property>
                 <property name="inLanguage" value="pageJsonLd.language"></property>
                 <property name="mainEntity" value="pageJsonLd.mainEntity"></property>
+                <property name="workTranslation" value="pageJsonLd.workTranslation"></property>
                 <map as="isPartOf">
                     <type name="WebSite">
                         <property name="@id" value="pageJsonLd.websiteId"></property>

@@ -1,4 +1,6 @@
-<script env="server">
+<script env="server" type="module">
+	import { jsonLdContent, jsonLdLabel } from "./utils.jsonld-i18n";
+
 	const downloadPlatforms = {
 		"windows-x64-portable": { icon: "windows.svg", order: 0 },
 		"macos": { icon: "macos.svg", order: 1 },
@@ -6,6 +8,28 @@
 		"linux-x64": { icon: "linux.svg", order: 3 },
 	};
 	const downloadText = value => k.utils.dom.getText(String(value || "")).replace(/\s+/g, " ").trim();
+	const downloadChineseCopy = {
+		"windows-x64-portable": {
+			Title: "Windows x64 便携版",
+			Summary: "便携版应用，下载、解压后双击 Kooboo.exe 即可运行。",
+			LinkText: "下载",
+		},
+		"macos": {
+			Title: "macOS",
+			Summary: "下载后点击即可运行，现已支持 ARM。",
+			LinkText: "下载",
+		},
+		"microsoft-store": {
+			Title: "Microsoft Store",
+			Summary: "Windows 用户可在 Microsoft Store 搜索 Kooboo OS 并安装。",
+			LinkText: "前往安装",
+		},
+		"linux-x64": {
+			Title: "Linux x64",
+			Summary: "使用 wget 安装或更新 Kooboo。",
+			LinkText: "下载",
+		},
+	};
 	const downloadItems = k.content.Downloads.all().map(item => {
 		const slug = String(item.slug || "").toLowerCase();
 		const platform = downloadPlatforms[slug];
@@ -36,12 +60,25 @@
 
 	const downloadPageJsonLd = k.state.get("pageJsonLd");
 	if (downloadPageJsonLd) {
-		downloadPageJsonLd.headline = k.site.labels.getValue("Download_Kooboo_Community_Version") || "Download Kooboo Community Version";
-		downloadPageJsonLd.hasPart = downloadItems.filter(item => !item.IsLinux).concat(linuxDownloads).map(item => ({
-			"@type": "WebPageElement",
-			name: downloadText(item.Title),
-			text: [downloadText(item.Title), item.IsLinux ? item.Description : downloadText(item.Summary), item.Version, item.IsLinux ? item.Command : downloadText(item.LinkText)].filter(Boolean).join(" "),
-		}));
+		downloadPageJsonLd.headline = jsonLdLabel("Download_Kooboo_Community_Version", "Download Kooboo Community Version", "下载 Kooboo 社区版");
+		downloadPageJsonLd.hasPart = downloadItems.filter(item => !item.IsLinux).concat(linuxDownloads).map(item => {
+			const localized = downloadChineseCopy[String(item.slug || "").toLowerCase()] || {};
+			const title = jsonLdContent(downloadText(item.Title), downloadText(item.Title), localized.Title || "Kooboo");
+			const description = jsonLdContent(
+				item.IsLinux ? item.Description : downloadText(item.Summary),
+				item.IsLinux ? item.Description : downloadText(item.Summary),
+				localized.Summary || "下载 Kooboo 社区版。"
+			);
+			const action = item.IsLinux
+				? item.Command
+				: jsonLdContent(downloadText(item.LinkText), downloadText(item.LinkText), localized.LinkText || "下载");
+			return {
+				"@type": "WebPageElement",
+				name: title,
+				text: [title, description, item.Version, action].filter(Boolean).join(" "),
+				inLanguage: downloadPageJsonLd.language,
+			};
+		});
 		downloadPageJsonLd.downloadUrls = downloadItems.filter(item => item.FileUrl && !item.IsStore).map(item => k.site.info.makeAbsUrl(item.FileUrl));
 		k.state.set("pageJsonLd", downloadPageJsonLd);
 	}

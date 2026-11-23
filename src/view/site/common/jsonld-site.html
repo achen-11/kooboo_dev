@@ -1,10 +1,17 @@
-<script env="server">
+<script env="server" type="module">
+    import { jsonLdLanguages, jsonLdText } from "./utils.jsonld-i18n";
+
     var siteJsonLd = {
         url: k.site.info.makeAbsUrl("/"),
         websiteId: k.site.info.makeAbsUrl("/") + "#website",
         organizationId: k.site.info.makeAbsUrl("/") + "#organization",
         legalName: k.site.labels.getValue("companyname") || "Yardi Technology Limited",
         logo: k.site.info.makeAbsUrl("/kooboo-logo.svg"),
+        description: jsonLdText(
+            "Kooboo is an AI-powered web development platform for building, running, and scaling production-ready websites.",
+            "Kooboo 是一个 AI 驱动的 Web 开发平台，用于构建、运行和扩展可用于生产环境的网站。"
+        ),
+        languages: jsonLdLanguages,
     };
     k.state.set("siteJsonLd", siteJsonLd);
 </script>
@@ -16,11 +23,14 @@
         <property name="legalName" value="siteJsonLd.legalName"></property>
         <property name="url" value="siteJsonLd.url"></property>
         <property name="logo" value="siteJsonLd.logo"></property>
+        <property name="knowsLanguage" value="siteJsonLd.languages"></property>
     </type>
     <type name="WebSite">
         <property name="@id" value="siteJsonLd.websiteId"></property>
         <property name="name" value="'Kooboo'"></property>
         <property name="url" value="siteJsonLd.url"></property>
+        <property name="description" value="siteJsonLd.description"></property>
+        <property name="inLanguage" value="siteJsonLd.languages"></property>
         <map as="publisher">
             <type name="Organization">
                 <property name="@id" value="siteJsonLd.organizationId"></property>

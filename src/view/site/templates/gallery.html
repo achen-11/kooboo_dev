@@ -1,5 +1,6 @@
 <script env="server" type="module">
     import { categorySlug, categoryUrl, formatTemplateItem } from "./utils.template-gallery";
+    import { getJsonLdLanguage, jsonLdContent } from "./utils.jsonld-i18n";
 
     // Keep the existing English route slugs independent of translated category names.
     const currentCulture = k.site.multilingual.currentCulture;
@@ -44,7 +45,12 @@
             category.AriaCurrent = category.IsActive ? "page" : "false";
         });
 
-        activeCategory.PageHeading = `${activeCategory.Name}${k.label("templates")}`;
+        const categoryName = getJsonLdLanguage() === "zh-CN"
+            ? jsonLdContent(activeCategory.Name, activeCategory.Name, "网站模板")
+            : activeCategory.Name;
+        activeCategory.PageHeading = getJsonLdLanguage() === "zh-CN"
+            ? (categoryName === "网站模板" ? categoryName : `${categoryName}模板`)
+            : `${categoryName} templates`;
 
         const categoryWithItems = k.content.TemplateCategory.get(activeCategory.id);
         if (categoryWithItems?.Templates?.length) {
@@ -54,8 +60,12 @@
         }
 
         const categoryPageJsonLd = k.state.get("pageJsonLd");
-        categoryPageJsonLd.name = `${activeCategory.Name} Templates | Kooboo Marketplace`;
-        categoryPageJsonLd.description = `Browse ${activeCategory.Name} website templates in Kooboo Marketplace. Preview designs, choose a template, and launch your site with one click.`;
+        categoryPageJsonLd.name = getJsonLdLanguage() === "zh-CN"
+            ? `${categoryName} | Kooboo 模板市场`
+            : `${categoryName} Templates | Kooboo Marketplace`;
+        categoryPageJsonLd.description = getJsonLdLanguage() === "zh-CN"
+            ? `在 Kooboo 模板市场中浏览${categoryName}，预览设计并一键发布网站。`
+            : `Browse ${categoryName} website templates in Kooboo Marketplace. Preview designs, choose a template, and launch your site with one click.`;
         k.page.setTitle(categoryPageJsonLd.name);
         k.page.setNameMeta("description", categoryPageJsonLd.description);
         k.state.set("pageJsonLd", categoryPageJsonLd);
@@ -69,7 +79,11 @@
         name: templatePageJsonLd.headline,
         numberOfItems: templateItems.length,
         itemListElement: templateItems.map((item, index) => {
-            const template = { "@type": "CreativeWork", name: item.Name };
+            const template = {
+                "@type": "CreativeWork",
+                name: item.Name,
+                inLanguage: templatePageJsonLd.language,
+            };
             if (item.PreviewImage) {
                 template.image = k.site.info.makeAbsUrl(item.PreviewImage);
             }

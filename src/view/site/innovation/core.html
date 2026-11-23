@@ -2,11 +2,17 @@
     <query as="koobooCore" source="content" resource="KoobooCore" action="list" export=""></query>
 </k-data>
 
-<script env="server">
+<script env="server" type="module">
+    import { jsonLdLabel } from "./utils.jsonld-i18n";
+
     const innovationPageJsonLd = k.state.get("pageJsonLd");
     const innovationItems = k.state.get("koobooCore") || [];
-    innovationPageJsonLd.headline = k.site.labels.getValue("Innovation.Title") || "The Core of kooboo";
-    innovationPageJsonLd.description = k.site.labels.getValue("Innovation.Description") || "We didn’t build another CMS wrapper.We rebuilt the web stack from the kernel, Native binaries, zero dependencies, and extreme machine efficiency";
+    innovationPageJsonLd.headline = jsonLdLabel("Innovation.Title", "The Core of kooboo", "Kooboo 核心");
+    innovationPageJsonLd.description = jsonLdLabel(
+        "Innovation.Description",
+        "We didn’t build another CMS wrapper.We rebuilt the web stack from the kernel, Native binaries, zero dependencies, and extreme machine efficiency",
+        "我们没有再做一个 CMS 外壳，而是从内核、原生二进制、零依赖和极致机器效率出发，重新构建了 Web 技术栈。"
+    );
     innovationPageJsonLd.mainEntity = {
         "@type": "ItemList",
         "@id": innovationPageJsonLd.url + "#capabilities",
@@ -24,6 +30,7 @@
                     headline: item.Title,
                     name: item.Title,
                     description: item.Description,
+                    inLanguage: innovationPageJsonLd.language,
                 },
             };
         }),

@@ -1,16 +1,23 @@
 <!-- @k-url /privacy --> 
 <layout id="main"><placeholder id="Main">
-    <script env="server">
+    <script env="server" type="module">
+        import { createJsonLdPage, jsonLdLabel } from "./utils.jsonld-i18n";
+
         var pageJsonLdUrl = k.site.info.makeAbsUrl(k.request.url.split(/[?#]/)[0]);
-        var pageJsonLd = {
-            name: "Privacy Policy | Kooboo",
-            description: "Read Kooboo's Privacy Policy to learn how personal data and cookies are used, how information is retained, and how to request data deletion.",
+        var pageJsonLd = createJsonLdPage({
             url: pageJsonLdUrl,
             websiteId: k.site.info.makeAbsUrl("/") + "#website",
-            language: k.request.culture || "en",
-            headline: (k.site.labels.getValue("Privacy") || "Privacy Policy").replace(/\s+/g, " ").trim(),
-            text: k.utils.dom.getText(k.site.htmlBlocks.getValue("privacypolicy") || "").replace(/\s+/g, " ").trim(),
-        };
+            name: {
+                en: "Privacy Policy | Kooboo",
+                zh: "隐私政策 | Kooboo",
+            },
+            description: {
+                en: "Read Kooboo's Privacy Policy to learn how personal data and cookies are used, how information is retained, and how to request data deletion.",
+                zh: "阅读 Kooboo 隐私政策，了解我们如何使用个人数据和 Cookie、如何保留信息，以及如何申请删除数据。",
+            },
+        });
+        pageJsonLd.headline = jsonLdLabel("Privacy", "Privacy Policy", "隐私政策");
+        pageJsonLd.text = k.utils.dom.getText(k.site.htmlBlocks.getValue("privacypolicy") || "").replace(/\s+/g, " ").trim();
         k.page.setTitle(pageJsonLd.name);
         k.page.setNameMeta("description", pageJsonLd.description);
         k.state.set("pageJsonLd", pageJsonLd);
@@ -21,10 +28,12 @@
             <property name="@id" value="pageJsonLd.url"></property>
             <property name="url" value="pageJsonLd.url"></property>
             <property name="name" value="pageJsonLd.name"></property>
+            <property name="alternateName" value="pageJsonLd.alternateName"></property>
             <property name="headline" value="pageJsonLd.headline"></property>
             <property name="text" value="pageJsonLd.text"></property>
             <property name="description" value="pageJsonLd.description"></property>
             <property name="inLanguage" value="pageJsonLd.language"></property>
+            <property name="workTranslation" value="pageJsonLd.workTranslation"></property>
             <map as="isPartOf">
                 <type name="WebSite">
                     <property name="@id" value="pageJsonLd.websiteId"></property>

@@ -5,6 +5,7 @@
 
 <script env="server" type="module">
 	import { resolveStartNowUrl } from "./utils.admin-url-from-token";
+	import { jsonLdLabel } from "./utils.jsonld-i18n";
 
 	const startNowUrl = resolveStartNowUrl();
 
@@ -13,7 +14,7 @@
 		const text = value => k.utils.dom.getText(String(value == null ? "" : value)).replace(/\s+/g, " ").trim();
 		const plans = k.state.get("pricingPlans") || [];
 		const faqs = k.state.get("faqItems") || [];
-		const period = text(k.site.labels.getValue("/year") || "/year");
+		const period = jsonLdLabel("/year", "/year", "/年");
 		const planItems = plans.map((plan, index) => {
 			const price = text(plan.Price);
 			return {
@@ -36,10 +37,12 @@
 			acceptedAnswer: {
 				"@type": "Answer",
 				text: text(faq.Description),
+				inLanguage: pricePageJsonLd.language,
 			},
+			inLanguage: pricePageJsonLd.language,
 		})).filter(question => question.name && question.acceptedAnswer.text);
 
-		pricePageJsonLd.headline = text(k.site.labels.getValue("Pricing") || "Pricing");
+		pricePageJsonLd.headline = jsonLdLabel("Pricing", "Pricing", "定价");
 		pricePageJsonLd.mainEntity = {
 			"@type": "ItemList",
 			"@id": pricePageJsonLd.url + "#pricing-plans",
@@ -50,8 +53,9 @@
 		pricePageJsonLd.hasPart = questions.length ? [{
 			"@type": "FAQPage",
 			"@id": pricePageJsonLd.url + "#price-faq-title",
-			name: "FAQ",
+			name: jsonLdLabel("FAQ", "FAQ", "常见问题"),
 			mainEntity: questions,
+			inLanguage: pricePageJsonLd.language,
 		}] : [];
 		k.state.set("pageJsonLd", pricePageJsonLd);
 	}

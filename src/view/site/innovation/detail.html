@@ -1,4 +1,6 @@
-<script env="server">
+<script env="server" type="module">
+    import { jsonLdContent } from "./utils.jsonld-i18n";
+
     const articleSlug = String(k.request.get("slug") || "").trim();
     const article = articleSlug
         ? k.content.KoobooCore.all().find((item) => item.slug === articleSlug)
@@ -9,8 +11,16 @@
     }
     if (article) {
         k.state.set("coreDetail", article);
-        const articleTitle = article?.Title?.trim();
-        const articleDescription = article?.Description?.replace(/\s+/g, " ").trim();
+        const articleTitle = jsonLdContent(
+            article?.Title,
+            "Web Platform Features & Innovation",
+            "Web 平台功能与创新"
+        );
+        const articleDescription = jsonLdContent(
+            article?.Description,
+            "Explore Kooboo's web platform features, from AI and visual editing to e-commerce, email marketing, and analytics.",
+            "探索 Kooboo 的 Web 平台功能，从 AI、可视化编辑到电商、邮件营销和分析。"
+        );
         const articlePageJsonLd = k.state.get("pageJsonLd");
         articlePageJsonLd.headline = articleTitle || articlePageJsonLd.name;
         articlePageJsonLd.mainEntity = {
@@ -37,9 +47,14 @@
             articleAngles.push(/^&(?:lt|#0*60|#x0*3c);$/i.test(value) ? "<" : ">");
             return articleAngleMarker + (articleAngles.length - 1) + "__";
         });
-        const articleBodyText = k.utils.dom.getText(protectedArticleBody)
+        const articleBodySourceText = k.utils.dom.getText(protectedArticleBody)
             .replace(new RegExp(articleAngleMarker + "(\\d+)__", "g"), (_, index) => articleAngles[Number(index)])
             .replace(/\s+/g, " ").trim();
+        const articleBodyText = jsonLdContent(
+            articleBodySourceText,
+            articleBodySourceText,
+            articleDescription
+        );
         const articleJsonLd = {
             "@context": "https://schema.org",
             "@type": "Article",
@@ -49,6 +64,8 @@
             description: articleDescription || "",
             articleBody: articleBodyText,
             inLanguage: articlePageJsonLd.language,
+            alternateName: articlePageJsonLd.alternateName || articleTitle,
+            workTranslation: articlePageJsonLd.workTranslation,
             mainEntityOfPage: { "@type": "WebPage", "@id": articlePageJsonLd.url },
             publisher: { "@type": "Organization", "@id": k.site.info.makeAbsUrl("/") + "#organization" },
         };
