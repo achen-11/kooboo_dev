@@ -321,6 +321,27 @@ const PROMPT_GENERATOR_STRINGS = {
     },
 };
 
+const AI_PROVIDER_DISPLAY_NAMES = {
+    zh: {
+        openai: "OpenAI",
+        qwen: "千问",
+        anthropic: "Anthropic",
+        deepseek: "DeepSeek",
+        google: "Google",
+        minimax: "MiniMax",
+        zhipu: "智谱",
+    },
+    en: {
+        openai: "OpenAI",
+        qwen: "Qwen",
+        anthropic: "Anthropic",
+        deepseek: "DeepSeek",
+        google: "Google",
+        minimax: "MiniMax",
+        zhipu: "Zhipu",
+    },
+};
+
 function detectPromptGeneratorLang(element) {
     const rawLang = (
         element?.closest?.("[lang]")?.getAttribute("lang") ||
@@ -334,6 +355,16 @@ function promptGeneratorText(key, element) {
     const lang = detectPromptGeneratorLang(element);
     const strings = PROMPT_GENERATOR_STRINGS[lang] || PROMPT_GENERATOR_STRINGS.en;
     return strings[key] ?? PROMPT_GENERATOR_STRINGS.en[key];
+}
+
+function resolveProviderDisplayName(provider, element) {
+    const lang = detectPromptGeneratorLang(element);
+    const key = String(provider?.name || "").trim().toLowerCase();
+    const displayNames = AI_PROVIDER_DISPLAY_NAMES[lang] || AI_PROVIDER_DISPLAY_NAMES.en;
+    if (key && displayNames[key]) {
+        return displayNames[key];
+    }
+    return provider?.displayName || provider?.name || "";
 }
 
 function readPromptFromGenerator(root) {
@@ -422,7 +453,7 @@ function populateModelSelect(select, providers, preferred) {
 
     providers.forEach((provider) => {
         const group = document.createElement("optgroup");
-        group.label = provider.displayName;
+        group.label = resolveProviderDisplayName(provider, select);
 
         provider.models.forEach((model) => {
             const option = document.createElement("option");
