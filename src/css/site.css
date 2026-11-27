@@ -2747,6 +2747,10 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
         font-size: 30px;
     }
 
+    .home-production > .site-container {
+        width: min(100% - 32px, var(--container-width));
+    }
+
     .home-production__grid {
         grid-template-columns: 1fr;
         gap: 24px;
@@ -3065,8 +3069,8 @@ html.site-reveal-ready .site-scroll-reveal.is-visible {
     }
 
     .prompt-generator__btn {
-        width: 180px;
-        align-self: flex-end;
+        width: 100%;
+        align-self: stretch;
     }
 
     .home-publish-banner {
